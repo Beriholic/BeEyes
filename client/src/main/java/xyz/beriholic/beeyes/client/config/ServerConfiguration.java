@@ -18,7 +18,7 @@ import java.util.Scanner;
 @Slf4j
 @Configuration
 public class ServerConfiguration {
-    private final String CONFIG_FILE_PATH = "config/server.json";
+    private final String CONFIG_FILE_PATH = "client-config/server.json";
 
     @Resource
     private ClientApi api;
@@ -65,7 +65,7 @@ public class ServerConfiguration {
     }
 
     private void saveConfigToLocal(ConnectionConfig config) {
-        File dir = new File("config");
+        File dir = new File("client-config");
         if (!dir.exists() && dir.mkdir()) {
             log.info("创建配置文件目录成功");
         }

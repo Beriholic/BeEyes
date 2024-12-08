@@ -37,6 +37,6 @@ out/
 ### VS Code ###
 .vscode/
 
-config
+client-config/
 
-log
+log/
