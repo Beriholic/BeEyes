@@ -30,6 +30,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation("com.alibaba.fastjson2:fastjson2:2.0.53")
+    implementation("com.github.oshi:oshi-core:6.4.0")
 }
 
 tasks.withType<Test> {

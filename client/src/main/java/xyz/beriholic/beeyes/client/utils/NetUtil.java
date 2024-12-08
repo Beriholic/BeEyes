@@ -1,5 +1,6 @@
 package xyz.beriholic.beeyes.client.utils;
 
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -22,25 +23,11 @@ public class NetUtil {
     @Resource
     private ConnectionConfig config;
 
-    public boolean registerToServer(String address, String token) {
-        log.info("注册到服务端...");
-        log.debug("Address: {} Token: {}", address, token);
-
-        Response response = this.doGet("/register", address, token);
-        if (response.isOk()) {
-            log.info("客户端注册成功");
-        } else {
-            log.error("客户端注册失败: {}", response.msg());
-        }
-
-        return response.isOk();
-    }
-
-    private Response doGet(String url) {
+    public Response doGet(String url) {
         return this.doGet(url, config.getAddress(), config.getToken());
     }
 
-    private Response doGet(String url, String address, String token) {
+    public Response doGet(String url, String address, String token) {
         try {
             HttpRequest request = HttpRequest
                     .newBuilder()
@@ -52,6 +39,24 @@ public class NetUtil {
             return JSONObject.parseObject(response.body(), Response.class);
         } catch (Exception e) {
             log.error("请求服务端注册时出现错误", e);
+            return Response.onFail(e);
+        }
+    }
+
+    public Response doPost(String url, Object data) {
+        try {
+            String raw = JSON.toJSONString(data);
+            HttpRequest request = HttpRequest
+                    .newBuilder()
+                    .POST(HttpRequest.BodyPublishers.ofString(raw))
+                    .uri(new URI(config.getAddress() + "/client" + url))
+                    .header("Authorization", config.getToken())
+                    .header("Content-Type", "application/json")
+                    .build();
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            return JSONObject.parseObject(response.body(), Response.class);
+        } catch (Exception e) {
+            log.error("上报客户端数据出现错误", e);
             return Response.onFail(e);
         }
     }

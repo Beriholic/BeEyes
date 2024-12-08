@@ -1,12 +1,13 @@
 package xyz.beriholic.beeyes.controller;
 
 import jakarta.annotation.Resource;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
 import xyz.beriholic.beeyes.entity.RestBean;
+import xyz.beriholic.beeyes.entity.dto.Client;
+import xyz.beriholic.beeyes.entity.vo.request.ClientReportVO;
 import xyz.beriholic.beeyes.service.ClientService;
+import xyz.beriholic.beeyes.utils.Const;
 
 @RestController
 @RequestMapping("/client")
@@ -31,5 +32,12 @@ public class ClientController {
                 : RestBean.onFail(401, "客户端注册失败，Token无效");
     }
 
-
+    @PostMapping("/report")
+    public RestBean<Void> reportClientInfo(
+            @RequestAttribute(Const.ATTR_CLIENT) Client client,
+            @RequestBody @Valid ClientReportVO vo
+    ) {
+        service.reportClientDetail(client.getId(), vo);
+        return RestBean.onOk();
+    }
 }

@@ -45,7 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     response.getWriter().write(RestBean.onFail(401, "主机未注册").asJsonString());
                     return;
                 } else {
-                    request.setAttribute(Const.ATTR_CLIENT_ID, client);
+                    request.setAttribute(Const.ATTR_CLIENT, client);
                 }
             }
         } else {

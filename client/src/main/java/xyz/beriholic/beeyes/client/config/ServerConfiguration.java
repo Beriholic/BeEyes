@@ -5,8 +5,8 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import xyz.beriholic.beeyes.client.api.ClientApi;
 import xyz.beriholic.beeyes.client.entity.ConnectionConfig;
-import xyz.beriholic.beeyes.client.utils.NetUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,8 +21,7 @@ public class ServerConfiguration {
     private final String CONFIG_FILE_PATH = "config/server.json";
 
     @Resource
-    private NetUtil netUtil;
-
+    private ClientApi api;
 
     @Bean
     ConnectionConfig connectionConfig() {
@@ -32,6 +31,7 @@ public class ServerConfiguration {
         if (config == null) {
             config = registerToServer();
         }
+        log.info("连接到服务端: {}", config);
         return config;
     }
 
@@ -44,7 +44,7 @@ public class ServerConfiguration {
             address = sc.nextLine();
             log.info("服务端token: ");
             token = sc.nextLine();
-        } while (!netUtil.registerToServer(address, token));
+        } while (!api.registerToServer(address, token));
 
         ConnectionConfig config = new ConnectionConfig(address, token);
         this.saveConfigToLocal(config);

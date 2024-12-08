@@ -20,6 +20,6 @@ public final class Const {
     //用户角色
     public final static String ROLE_DEFAULT = "user";
     //客户端id
-    public final static String ATTR_CLIENT_ID = "clientId";
+    public final static String ATTR_CLIENT = "clientId";
 
 }
