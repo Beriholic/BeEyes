@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import xyz.beriholic.beeyes.client.entity.MachineInfo;
 import xyz.beriholic.beeyes.client.entity.Response;
+import xyz.beriholic.beeyes.client.entity.RuntimeInfo;
 import xyz.beriholic.beeyes.client.utils.NetUtil;
 
 @Slf4j
@@ -33,6 +34,15 @@ public class ClientApi {
             log.info("机器信息上报成功");
         } else {
             log.error("机器信息上报失败: {}", response.msg());
+        }
+    }
+
+    public void reportRuntimeInfo(RuntimeInfo runtimeInfo) {
+        Response response = net.doPost("/runtime", runtimeInfo);
+        if (response.isOk()) {
+            log.info("运行信息上报成功");
+        } else {
+            log.error("运行信息上报失败: {}", response.msg());
         }
     }
 }

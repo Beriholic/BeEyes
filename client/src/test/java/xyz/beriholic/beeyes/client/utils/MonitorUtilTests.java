@@ -2,6 +2,7 @@ package xyz.beriholic.beeyes.client.utils;
 
 import org.junit.jupiter.api.Test;
 import xyz.beriholic.beeyes.client.entity.MachineInfo;
+import xyz.beriholic.beeyes.client.entity.RuntimeInfo;
 
 
 public class MonitorUtilTests {
@@ -19,5 +20,12 @@ public class MonitorUtilTests {
         assert (machineInfo.getDiskSize() > 0);
 
         System.out.println(machineInfo);
+    }
+
+    @Test
+    public void testFetchRuntimeInfo() {
+        final MonitorUtil monitorUtil = new MonitorUtil();
+        RuntimeInfo runtimeInfo = monitorUtil.fetchRuntimeInfo();
+        System.out.println(runtimeInfo);
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import xyz.beriholic.beeyes.entity.dto.Client;
 import xyz.beriholic.beeyes.entity.dto.ClientDetail;
 import xyz.beriholic.beeyes.entity.vo.request.ClientReportVO;
+import xyz.beriholic.beeyes.entity.vo.request.RuntimeInfoVO;
 import xyz.beriholic.beeyes.mapper.ClientDetailMapper;
 import xyz.beriholic.beeyes.mapper.ClientMapper;
 import xyz.beriholic.beeyes.service.ClientService;
@@ -29,12 +30,12 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     ClientDetailMapper clientDetailMapper;
 
     private String token = this.generateRandomToken();
+    private Map<Integer, RuntimeInfoVO> runtimeData = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void initClientCache() {
         this.list().forEach(this::putCache);
     }
-
 
     @Override
     public Client getClientById(int id) {
@@ -55,7 +56,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     public boolean verifyAndRegister(String token) {
         if (this.getRegisterToken().equals(token)) {
             int id = this.generateRandomId();
-            Client client = new Client(id, "未命名主机", token, new Date());
+            Client client = new Client(id, "未命名主机", token, new Date(), "cn", "未命名节点");
 
             if (this.save(client)) {
                 this.token = this.generateRandomToken();
@@ -69,7 +70,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     }
 
     @Override
-    public void reportClientDetail(int clientId, ClientReportVO vo) {
+    public void reportClientInfo(int clientId, ClientReportVO vo) {
         ClientDetail clientDetail = ClientDetail.from(clientId, vo);
 
         if (Objects.nonNull(clientDetailMapper.selectById(clientId))) {
@@ -79,6 +80,10 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
         }
     }
 
+    @Override
+    public void reportRuntimeInfo(int clientId, RuntimeInfoVO vo) {
+        runtimeData.put(clientId, vo);
+    }
 
     private void putCache(Client client) {
         this.idCache.put(client.getId(), client);
