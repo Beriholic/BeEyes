@@ -8,17 +8,16 @@ import oshi.hardware.HWDiskStore;
 import oshi.hardware.HardwareAbstractionLayer;
 import oshi.hardware.NetworkIF;
 import oshi.software.os.OperatingSystem;
-import xyz.beriholic.beeyes.client.entity.InterfaceInfo;
 import xyz.beriholic.beeyes.client.entity.MachineInfo;
+import xyz.beriholic.beeyes.client.entity.NetworkInterfaceInfo;
 import xyz.beriholic.beeyes.client.entity.RuntimeInfo;
 
 import java.io.File;
-import java.net.InetAddress;
+import java.io.IOException;
+import java.net.NetworkInterface;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @Slf4j
 @Component
@@ -36,7 +35,14 @@ public class MonitorUtil {
 
         double diskCapacity = hardware.getDiskStores().stream().mapToDouble(disk -> disk.getSize() / 1024.0 / 1024 / 1024).sum();
 
-        List<InterfaceInfo> interfaceInfos = fetchInterfaceInfo(hardware);
+        NetworkIF networkIF = this.fetchNetworkInterface(hardware);
+
+        NetworkInterfaceInfo networkInterfaceInfo = new NetworkInterfaceInfo();
+        if (networkIF != null) {
+            networkInterfaceInfo.setName(networkIF.getName());
+            networkInterfaceInfo.setIpv4Addr(networkIF.getIPv4addr());
+            networkInterfaceInfo.setIpv6Addr(networkIF.getIPv6addr());
+        }
 
         return new MachineInfo()
                 .setOsArch(systemProperties.getProperty("os.arch"))
@@ -47,7 +53,7 @@ public class MonitorUtil {
                 .setCpuCoreCount(hardware.getProcessor().getLogicalProcessorCount())
                 .setMemorySize(memoryCapacity)
                 .setDiskSize(diskCapacity)
-                .setInterfacesInfo(interfaceInfos);
+                .setNetworkInterfaceInfo(networkInterfaceInfo);
     }
 
     public RuntimeInfo fetchRuntimeInfo() {
@@ -55,11 +61,17 @@ public class MonitorUtil {
 
         try {
             HardwareAbstractionLayer hardware = systemInfo.getHardware();
-            NetworkIF networkIF = this.fetchInterface(hardware).getFirst();
+            NetworkIF networkIF = this.fetchNetworkInterface(hardware);
             CentralProcessor processor = hardware.getProcessor();
 
-            double uploadSpeed = networkIF.getBytesSent();
-            double downloadSpeed = networkIF.getBytesRecv();
+            double uploadSpeed = 0;
+            if (networkIF != null) {
+                uploadSpeed = networkIF.getBytesSent();
+            }
+            double downloadSpeed = 0;
+            if (networkIF != null) {
+                downloadSpeed = networkIF.getBytesRecv();
+            }
 
             double diskReadSpeed = hardware.getDiskStores().stream().mapToLong(HWDiskStore::getReadBytes).sum();
             double diskWriteSpeed = hardware.getDiskStores().stream().mapToLong(HWDiskStore::getWriteBytes).sum();
@@ -68,10 +80,14 @@ public class MonitorUtil {
 
             Thread.sleep((long) (staticTime * 1000));
 
-            networkIF = this.fetchInterface(hardware).getFirst();
+            networkIF = this.fetchNetworkInterface(hardware);
 
-            uploadSpeed = (networkIF.getBytesSent() - uploadSpeed) / staticTime;
-            downloadSpeed = (networkIF.getBytesRecv() - downloadSpeed) / staticTime;
+            if (networkIF != null) {
+                uploadSpeed = (networkIF.getBytesSent() - uploadSpeed) / staticTime;
+            }
+            if (networkIF != null) {
+                downloadSpeed = (networkIF.getBytesRecv() - downloadSpeed) / staticTime;
+            }
             diskReadSpeed = (hardware.getDiskStores().stream().mapToLong(HWDiskStore::getReadBytes).sum() - diskReadSpeed) / staticTime;
             diskWriteSpeed = (hardware.getDiskStores().stream().mapToLong(HWDiskStore::getWriteBytes).sum() - diskWriteSpeed) / staticTime;
             double memory = (hardware.getMemory().getTotal() - hardware.getMemory().getAvailable()) / 1024.0 / 1024 / 1024;
@@ -93,61 +109,28 @@ public class MonitorUtil {
         return null;
     }
 
+    private NetworkIF fetchNetworkInterface(HardwareAbstractionLayer hardware) {
+        try {
 
-    private List<InterfaceInfo> fetchInterfaceInfo(HardwareAbstractionLayer hardware) {
-        List<InterfaceInfo> interfaceInfos = new CopyOnWriteArrayList<>();
+            for (NetworkIF networkIF : hardware.getNetworkIFs()) {
+                String[] ipv4Addr = networkIF.getIPv4addr();
+                String[] ipv6Addr = networkIF.getIPv6addr();
 
-        List<NetworkIF> networkIFS = this.fetchInterface(hardware);
+                NetworkInterface networkInterface = networkIF.queryNetworkInterface();
 
-        networkIFS.forEach(networkIF -> {
-            InterfaceInfo interfaceInfo = new InterfaceInfo(
-                    networkIF.getName(),
-                    networkIF.getIPv4addr(),
-                    networkIF.getIPv6addr()
-            );
-            interfaceInfos.add(interfaceInfo);
-        });
-
-        return interfaceInfos;
-    }
-
-    //TODO 待优化网络接口获取
-    private List<NetworkIF> fetchInterface(HardwareAbstractionLayer hardware) {
-        List<NetworkIF> interfaces = new CopyOnWriteArrayList<>();
-        List<NetworkIF> networkIFs = hardware.getNetworkIFs();
-
-        for (NetworkIF networkIF : networkIFs) {
-            String[] ipv4Addresses = networkIF.getIPv4addr();
-
-            for (String ipv4 : ipv4Addresses) {
-                if (isPrivateIP(ipv4)) {
-                    interfaces.add(networkIF);
-                    break;
+                if (!networkInterface.isLoopback() && !networkInterface.isVirtual()
+                        && !networkInterface.isPointToPoint() && networkInterface.isUp()
+                        && (networkInterface.getName().startsWith("eth") || networkInterface.getName().startsWith("en") || networkInterface.getName().startsWith("wl"))
+                        && (ipv4Addr.length > 0 || ipv6Addr.length > 0)) {
+                    return networkIF;
                 }
             }
+        } catch (IOException e) {
+            log.error("获取网络接口出错", e);
         }
-        return interfaces;
+        return null;
     }
 
-    private boolean isPublicIP(String ip) {
-        try {
-            InetAddress inetAddress = InetAddress.getByName(ip);
-            return !inetAddress.isLoopbackAddress() && !inetAddress.isLinkLocalAddress() && !inetAddress.isSiteLocalAddress();
-        } catch (Exception e) {
-            log.error("解析 IP 地址失败: {}", ip, e);
-            return false;
-        }
-    }
-
-    private boolean isPrivateIP(String ip) {
-        try {
-//            return ip.startsWith("10.") || ip.startsWith("192.168.") || ip.startsWith("172.") && (ip.split("\\.")[1].equals("16") || ip.split("\\.")[1].equals("31"));
-            return ip.startsWith("192.168.");
-        } catch (Exception e) {
-            log.error("解析 IP 地址失败: {}", ip, e);
-            return false;
-        }
-    }
 
     private double calculateCpuUsage(CentralProcessor processor, long[] prevTicks) {
         long[] ticks = processor.getSystemCpuLoadTicks();

@@ -73,6 +73,8 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     public void reportClientInfo(int clientId, ClientReportVO vo) {
         ClientDetail clientDetail = ClientDetail.from(clientId, vo);
 
+        log.info("Client {} report info: {}", clientId, vo);
+
         if (Objects.nonNull(clientDetailMapper.selectById(clientId))) {
             clientDetailMapper.updateById(clientDetail);
         } else {

@@ -38,7 +38,7 @@ public class NetUtil {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             return JSONObject.parseObject(response.body(), Response.class);
         } catch (Exception e) {
-            log.error("请求服务端注册时出现错误", e);
+            log.error("请求(GET)服务端时出现错误", e);
             return Response.onFail(e);
         }
     }
@@ -56,7 +56,7 @@ public class NetUtil {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             return JSONObject.parseObject(response.body(), Response.class);
         } catch (Exception e) {
-            log.error("上报客户端数据出现错误", e);
+            log.error("请求(POST)服务端时出现错误", e);
             return Response.onFail(e);
         }
     }

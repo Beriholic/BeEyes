@@ -30,6 +30,7 @@ public class ClientApi {
 
     public void reportMachineInfo(MachineInfo machineInfo) {
         Response response = net.doPost("/report", machineInfo);
+        log.info("机器信息: {}", machineInfo);
         if (response.isOk()) {
             log.info("机器信息上报成功");
         } else {
@@ -39,6 +40,7 @@ public class ClientApi {
 
     public void reportRuntimeInfo(RuntimeInfo runtimeInfo) {
         Response response = net.doPost("/runtime", runtimeInfo);
+        log.info("运行信息: {}", runtimeInfo);
         if (response.isOk()) {
             log.info("运行信息上报成功");
         } else {

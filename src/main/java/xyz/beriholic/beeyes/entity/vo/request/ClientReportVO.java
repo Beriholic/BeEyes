@@ -2,9 +2,7 @@ package xyz.beriholic.beeyes.entity.vo.request;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import xyz.beriholic.beeyes.entity.dto.InterfaceInfo;
-
-import java.util.List;
+import xyz.beriholic.beeyes.entity.dto.NetworkInterfaceInfo;
 
 @Data
 public class ClientReportVO {
@@ -21,6 +19,5 @@ public class ClientReportVO {
     int cpuCoreCount;
     double memorySize;
     double diskSize;
-    @NotNull
-    List<InterfaceInfo> interfacesInfo;
+    NetworkInterfaceInfo networkInterfaceInfo;
 }

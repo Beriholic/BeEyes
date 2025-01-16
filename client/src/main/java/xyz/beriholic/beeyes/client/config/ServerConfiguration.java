@@ -40,7 +40,7 @@ public class ServerConfiguration {
         String address, token;
 
         do {
-            log.info("服务端地址[host:port]: ");
+            log.info("服务端地址 http(s)://host:port");
             address = sc.nextLine();
             log.info("服务端token: ");
             token = sc.nextLine();

@@ -5,8 +5,10 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import xyz.beriholic.beeyes.entity.vo.request.ClientReportVO;
 
+@Slf4j
 @Data
 @AllArgsConstructor
 @TableName("tb_client_detail")
@@ -22,11 +24,9 @@ public class ClientDetail {
     int cpuCoreCount;
     double memorySize;
     double diskSize;
-
-    String interfacesInfo;
+    String NetworkInterfaceInfo;
 
     public static ClientDetail from(int clientId, ClientReportVO vo) {
-
         return new ClientDetail(
                 clientId,
                 vo.getOsArch(),
@@ -37,7 +37,7 @@ public class ClientDetail {
                 vo.getCpuCoreCount(),
                 vo.getMemorySize(),
                 vo.getDiskSize(),
-                JSON.toJSONString(vo.getInterfacesInfo())
+                JSON.toJSONString(vo.getNetworkInterfaceInfo())
         );
     }
 }
