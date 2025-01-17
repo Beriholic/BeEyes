@@ -40,6 +40,7 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
     implementation("com.influxdb:influxdb-client-java:7.2.0")
     implementation("org.springframework.boot:spring-boot-starter-websocket")
+    implementation("com.influxdb:influxdb-client-java:6.6.0")
     implementation("com.jcraft:jsch:0.1.55")
 }
 

@@ -7,6 +7,11 @@ spring:
     host: ""
     username: ""
     password: ""
+  influx-db:
+    url: http://localhost:8086
+    token: "-gID2ytNKhMVkXqKyVVftReTFNyqxJLPDJknlWd8kQUmi2u1diOzyAGuCAYC-Dz7qMEl-5zVtbfDZC03gQN4Pg=="
+    bucket: "be_eyes"
+    org: "docs"
   rabbitmq:
     addresses: localhost
     username: root

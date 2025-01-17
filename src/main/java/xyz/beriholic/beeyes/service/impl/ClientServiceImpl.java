@@ -12,6 +12,7 @@ import xyz.beriholic.beeyes.entity.vo.request.RuntimeInfoVO;
 import xyz.beriholic.beeyes.mapper.ClientDetailMapper;
 import xyz.beriholic.beeyes.mapper.ClientMapper;
 import xyz.beriholic.beeyes.service.ClientService;
+import xyz.beriholic.beeyes.utils.InfluxDBUtils;
 
 import java.security.SecureRandom;
 import java.util.Date;
@@ -25,12 +26,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> implements ClientService {
     private final Map<String, Client> tokenCache = new ConcurrentHashMap<>();
     private final Map<Integer, Client> idCache = new ConcurrentHashMap<>();
+    private final Map<Integer, RuntimeInfoVO> runtimeInfoCache = new ConcurrentHashMap<>();
 
     @Resource
     ClientDetailMapper clientDetailMapper;
+    @Resource
+    InfluxDBUtils influxDBUtils;
 
     private String token = this.generateRandomToken();
-    private Map<Integer, RuntimeInfoVO> runtimeData = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void initClientCache() {
@@ -84,7 +87,8 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
 
     @Override
     public void reportRuntimeInfo(int clientId, RuntimeInfoVO vo) {
-        runtimeData.put(clientId, vo);
+        runtimeInfoCache.put(clientId, vo);
+        influxDBUtils.writeRuntimeInfo(clientId, vo);
     }
 
     private void putCache(Client client) {
