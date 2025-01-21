@@ -43,3 +43,12 @@ spring:
       origin: '*'
       credentials: false
       methods: '*'
+
+sa-token:
+  token-name: beeyes-token
+  timeout: 2592000
+  active-timeout: -1
+  is-concurrent: true
+  is-share: true
+  token-style: tik
+  is-log: false

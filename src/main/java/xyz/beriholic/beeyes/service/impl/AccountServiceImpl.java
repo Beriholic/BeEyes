@@ -1,26 +1,31 @@
 package xyz.beriholic.beeyes.service.impl;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import xyz.beriholic.beeyes.entity.dto.Account;
+import xyz.beriholic.beeyes.entity.dto.UserSession;
 import xyz.beriholic.beeyes.entity.vo.request.ConfirmResetVO;
 import xyz.beriholic.beeyes.entity.vo.request.EmailResetVO;
+import xyz.beriholic.beeyes.entity.vo.response.AuthorizeVO;
+import xyz.beriholic.beeyes.exception.UserNameOrEmailNotFound;
+import xyz.beriholic.beeyes.exception.UserNameOrPasswordError;
 import xyz.beriholic.beeyes.mapper.AccountMapper;
 import xyz.beriholic.beeyes.service.AccountService;
 import xyz.beriholic.beeyes.utils.Const;
 import xyz.beriholic.beeyes.utils.FlowUtils;
+import xyz.beriholic.beeyes.utils.PasswordUtil;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+
+import static xyz.beriholic.beeyes.utils.Const.USER_SESSION;
 
 @Service
 public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> implements AccountService {
@@ -35,23 +40,17 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
     StringRedisTemplate stringRedisTemplate;
 
     @Resource
-    PasswordEncoder passwordEncoder;
+    PasswordUtil passwordUtil;
 
     @Resource
     FlowUtils flow;
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Account account = this.findAccountByNameOrEmail(username);
-
-        if (account == null) throw new UsernameNotFoundException("用户名或密码错误");
-
-        return User
-                .withUsername(username)
-                .password(account.getPassword())
-                .roles(account.getRole())
-                .build();
-    }
+    @Value("${spring.security.jwt.limit.base}")
+    private int limit_base;
+    @Value("${spring.security.jwt.limit.upgrade}")
+    private int limit_upgrade;
+    @Value("${spring.security.jwt.limit.frequency}")
+    private int limit_frequency;
 
     public String registerEmailVerifyCode(String type, String email, String address) {
         synchronized (address.intern()) {
@@ -72,7 +71,7 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
         String verify = resetConfirm(new ConfirmResetVO(info.getEmail(), info.getCode()));
         if (verify != null) return verify;
         String email = info.getEmail();
-        String password = passwordEncoder.encode(info.getPassword());
+        String password = passwordUtil.encrypt(info.getPassword());
         boolean update = this.update().eq("email", email).set("password", password).update();
         if (update) {
             this.deleteEmailVerifyCode(email);
@@ -87,6 +86,35 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
         if (code == null) return "请先获取验证码";
         if (!code.equals(info.getCode())) return "验证码错误，请重新输入";
         return null;
+    }
+
+    @Override
+    public AuthorizeVO authenticate(String username, String password) {
+        Account account = this.findAccountByNameOrEmail(username);
+
+        if (Objects.isNull(account)) {
+            throw new UserNameOrEmailNotFound();
+        }
+
+   /*     if (this.frequencyCheck(account.getId())) {
+            throw new LoginFrequencyException();
+        }
+
+*/
+        if (!passwordUtil.check(password, account.getPassword())) {
+            throw new UserNameOrPasswordError();
+        }
+
+        StpUtil.login(account.getId());
+        StpUtil.getSession().set(
+                USER_SESSION,
+                new UserSession()
+                        .setId(account.getId())
+                        .setUsername(account.getUsername())
+                        .setRole(account.getRole())
+        );
+
+        return new AuthorizeVO().setUsername(account.getUsername()).setRole(account.getRole());
     }
 
     private void deleteEmailVerifyCode(String email) {
@@ -110,4 +138,10 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
                 .eq("email", text)
                 .one();
     }
+
+    private boolean frequencyCheck(int userId) {
+        String key = Const.JWT_FREQUENCY + userId;
+        return flow.limitOnceUpgradeCheck(key, limit_frequency, limit_base, limit_upgrade);
+    }
 }
+

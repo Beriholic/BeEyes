@@ -1,4 +1,4 @@
-package xyz.beriholic.beeyes.controller.exception;
+package xyz.beriholic.beeyes.exception.controller;
 
 import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +13,6 @@ public class ValidationController {
     @ExceptionHandler(ValidationException.class)
     public RestBean<Void> validateError(ValidationException exception) {
         log.warn("Resolved [{}: {}]", exception.getClass().getName(), exception.getMessage());
-        return RestBean.onFail(400, "请求参数有误");
+        return RestBean.failed(400, "请求参数有误");
     }
 }

@@ -1,4 +1,4 @@
-package xyz.beriholic.beeyes.controller.exception;
+package xyz.beriholic.beeyes.exception.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.boot.autoconfigure.web.servlet.error.AbstractErrorController;
@@ -26,7 +26,7 @@ public class ErrorPageController extends AbstractErrorController {
         Map<String, Object> errorAttributes = this.getErrorAttributes(request, this.getAttributeOptions());
         String message = this.convertErrorMessage(status)
                 .orElse(errorAttributes.get("message").toString());
-        return RestBean.onFail(status.value(), message);
+        return RestBean.failed(status.value(), message);
     }
 
     private Optional<String> convertErrorMessage(HttpStatus status) {

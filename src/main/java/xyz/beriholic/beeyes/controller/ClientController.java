@@ -28,8 +28,8 @@ public class ClientController {
     ) {
         System.out.println(token);
         return service.verifyAndRegister(token)
-                ? RestBean.onOk()
-                : RestBean.onFail(401, "客户端注册失败，Token无效");
+                ? RestBean.success()
+                : RestBean.failed(401, "客户端注册失败，Token无效");
     }
 
     /**
@@ -45,7 +45,7 @@ public class ClientController {
             @RequestBody @Valid ClientReportVO vo
     ) {
         service.reportClientInfo(client.getId(), vo);
-        return RestBean.onOk();
+        return RestBean.success();
     }
 
     /**
@@ -61,6 +61,6 @@ public class ClientController {
             @RequestBody @Valid RuntimeInfoVO vo
     ) {
         service.reportRuntimeInfo(client.getId(), vo);
-        return RestBean.onOk();
+        return RestBean.success();
     }
 }

@@ -1,12 +1,12 @@
 package xyz.beriholic.beeyes.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import xyz.beriholic.beeyes.entity.dto.Account;
 import xyz.beriholic.beeyes.entity.vo.request.ConfirmResetVO;
 import xyz.beriholic.beeyes.entity.vo.request.EmailResetVO;
+import xyz.beriholic.beeyes.entity.vo.response.AuthorizeVO;
 
-public interface AccountService extends IService<Account>, UserDetailsService {
+public interface AccountService extends IService<Account> {
     Account findAccountByNameOrEmail(String text);
 
     String registerEmailVerifyCode(String type, String email, String address);
@@ -14,4 +14,6 @@ public interface AccountService extends IService<Account>, UserDetailsService {
     String resetEmailAccountPassword(EmailResetVO info);
 
     String resetConfirm(ConfirmResetVO info);
+
+    AuthorizeVO authenticate(String username, String password);
 }

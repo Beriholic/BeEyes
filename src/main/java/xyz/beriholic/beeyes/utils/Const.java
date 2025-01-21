@@ -22,4 +22,6 @@ public final class Const {
     //客户端id
     public final static String ATTR_CLIENT = "clientId";
 
+    public final static String USER_SESSION = "user_session";
+
 }
