@@ -19,14 +19,15 @@ import {
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { Logo } from "@/components/icons";
-import { getLocalUserInfo } from "@/store/model";
 import { api } from "@/api/instance";
 import { PopMsg } from "@/store/pops";
 import { useRouter } from "next/navigation";
+import { useUserInfoStore } from "@/store/user";
 
 export const Navbar = () => {
   const router = useRouter();
-  const userInfo = getLocalUserInfo();
+
+  const userInfo = useUserInfoStore((state) => state.userInfo);
 
   const logout = async () => {
     const res = await api.authService.logout();

@@ -7,8 +7,8 @@ import { useRouter } from "next/navigation";
 
 import { Logo } from "@/components/icons";
 import { api } from "@/api/instance";
-import { UserInfoKey } from "@/store/model";
 import { PopMsg } from "@/store/pops";
+import { useUserInfoStore } from "@/store/user";
 
 interface LoginForm {
   username: string;
@@ -17,6 +17,7 @@ interface LoginForm {
 
 export default function LoginPage() {
   const router = useRouter();
+  const saveUserInfo = useUserInfoStore((state) => state.save);
 
   const [form, setForm] = useState<LoginForm>({
     username: "",
@@ -44,13 +45,10 @@ export default function LoginPage() {
       description: "正在跳转至首页",
     });
 
-    localStorage.setItem(
-      UserInfoKey,
-      JSON.stringify({
-        username: res.data.username,
-        role: res.data.role,
-      })
-    );
+    saveUserInfo({
+      username: res.data.username,
+      role: res.data.role,
+    });
 
     setTimeout(() => {
       router.push("/");
