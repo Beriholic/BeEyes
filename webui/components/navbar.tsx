@@ -21,12 +21,32 @@ import { ThemeSwitch } from "@/components/theme-switch";
 import { Logo } from "@/components/icons";
 import { getLocalUserInfo } from "@/store/model";
 import { api } from "@/api/instance";
+import { PopMsg } from "@/store/pops";
+import { useRouter } from "next/navigation";
 
 export const Navbar = () => {
+  const router = useRouter();
   const userInfo = getLocalUserInfo();
 
   const logout = async () => {
     const res = await api.authService.logout();
+    if (res.code !== 200) {
+      PopMsg({
+        type: "danger",
+        title: "登出失败",
+        description: res.message,
+      });
+    }
+
+    PopMsg({
+      type: "success",
+      title: "登出成功",
+      description: "正在跳转至登录页",
+    });
+
+    setTimeout(() => {
+      router.push("/login");
+    }, 600);
   };
   return (
     <HeroUINavbar maxWidth="xl" position="sticky">
