@@ -5,11 +5,11 @@ import { Input } from "@heroui/input";
 import "@/components/LoginInput.module.css";
 import { Alert, Button } from "@heroui/react";
 import { AnimatePresence, motion } from "motion/react";
+import { useRouter } from "next/navigation";
 
 import { Logo } from "@/components/icons";
 import { api } from "@/api/instance";
-import { Token, TokenKey, UserInfoKey } from "@/store/model";
-import { useRouter } from "next/navigation";
+import { UserInfoKey } from "@/store/model";
 
 interface LoginForm {
   username: string;
@@ -60,20 +60,11 @@ export default function LoginPage() {
 
       return;
     }
-
     showPops({
       type: "success",
       title: "登陆成功",
       description: "正在跳转至首页",
     });
-
-    localStorage.setItem(
-      TokenKey,
-      JSON.stringify({
-        value: res.data.token,
-        expire: res.data.expire,
-      })
-    );
 
     localStorage.setItem(
       UserInfoKey,
@@ -83,7 +74,9 @@ export default function LoginPage() {
       })
     );
 
-    router.push("/");
+    setTimeout(() => {
+      router.push("/");
+    }, 1000);
   };
 
   return (

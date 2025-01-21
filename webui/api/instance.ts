@@ -1,6 +1,6 @@
 import { Api } from "./internal/api";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_API ?? "http://localhost:8080";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_API ?? "";
 
 export const api = new Api(async ({ uri, method, headers, body }) => {
   const tenant = (window as any).__tenant as string | undefined;
