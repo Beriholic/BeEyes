@@ -19,8 +19,15 @@ import {
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { Logo } from "@/components/icons";
+import { getLocalUserInfo } from "@/store/model";
+import { api } from "@/api/instance";
 
 export const Navbar = () => {
+  const userInfo = getLocalUserInfo();
+
+  const logout = async () => {
+    const res = await api.authService.logout();
+  };
   return (
     <HeroUINavbar maxWidth="xl" position="sticky">
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
@@ -67,17 +74,13 @@ export const Navbar = () => {
           </DropdownTrigger>
           <DropdownMenu aria-label="Profile Actions" variant="flat">
             <DropdownItem key="profile" className="h-14 gap-2">
-              <p className="font-semibold">Signed in as</p>
-              <p className="font-semibold">beriholic@petalmail.com</p>
+              <p className="font-semibold">登陆于</p>
+              <p className="font-semibold">{userInfo.username}</p>
             </DropdownItem>
-            <DropdownItem key="settings">My Settings</DropdownItem>
-            <DropdownItem key="team_settings">Team Settings</DropdownItem>
-            <DropdownItem key="analytics">Analytics</DropdownItem>
-            <DropdownItem key="system">System</DropdownItem>
-            <DropdownItem key="configurations">Configurations</DropdownItem>
-            <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
-            <DropdownItem key="logout" color="danger">
-              Log Out
+            <DropdownItem key="settings">设置</DropdownItem>
+            <DropdownItem key="analytics">分析</DropdownItem>
+            <DropdownItem key="logout" color="danger" onPress={logout}>
+              登出
             </DropdownItem>
           </DropdownMenu>
         </Dropdown>
