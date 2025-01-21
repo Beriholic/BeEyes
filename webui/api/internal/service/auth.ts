@@ -2,6 +2,7 @@ import { Executor } from "../executor";
 import { AuthServiceRequest } from "../model/request/auth";
 import { AuthServiceResponse } from "../model/response/auth";
 import { RestBean } from "../model/static/RestBean";
+import { Void } from "../model/static/void";
 
 export class AuthService {
   constructor(private executor: Executor) {}
@@ -15,5 +16,14 @@ export class AuthService {
       uri: _uri,
       method: "POST",
     })) as Promise<RestBean<AuthServiceResponse["AUTH_SERVICE/LOGIN"]>>;
+  }
+
+  async logout(): Promise<RestBean<Void>> {
+    const _uri = `/api/auth/logout`;
+
+    return (await this.executor({
+      uri: _uri,
+      method: "POST",
+    })) as Promise<RestBean<Void>>;
   }
 }

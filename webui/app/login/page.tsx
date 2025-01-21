@@ -2,32 +2,19 @@
 import { useState } from "react";
 import { ShaderGradientCanvas, ShaderGradient } from "@shadergradient/react";
 import { Input } from "@heroui/input";
-import "@/components/LoginInput.module.css";
-import { Alert, Button } from "@heroui/react";
-import { AnimatePresence, motion } from "motion/react";
+import { Button } from "@heroui/react";
 import { useRouter } from "next/navigation";
 
 import { Logo } from "@/components/icons";
 import { api } from "@/api/instance";
 import { UserInfoKey } from "@/store/model";
+import { PopMsg } from "@/store/pops";
 
 interface LoginForm {
   username: string;
   password: string;
 }
 
-interface AlertContent {
-  type:
-    | "success"
-    | "primary"
-    | "default"
-    | "secondary"
-    | "warning"
-    | "danger"
-    | undefined;
-  description?: string;
-  title: string;
-}
 export default function LoginPage() {
   const router = useRouter();
 
@@ -36,15 +23,6 @@ export default function LoginPage() {
     password: "",
   });
 
-  const [pops, setPops] = useState<AlertContent | null>(null);
-  const showPops = (content: AlertContent) => {
-    setPops(content);
-
-    setTimeout(() => {
-      setPops(null);
-    }, 3000);
-  };
-
   const login = async () => {
     const res = await api.authService.login({
       username: form.username,
@@ -52,7 +30,7 @@ export default function LoginPage() {
     });
 
     if (res.code !== 200) {
-      showPops({
+      PopMsg({
         type: "danger",
         title: "登陆失败",
         description: res.message,
@@ -60,7 +38,7 @@ export default function LoginPage() {
 
       return;
     }
-    showPops({
+    PopMsg({
       type: "success",
       title: "登陆成功",
       description: "正在跳转至首页",
@@ -76,7 +54,7 @@ export default function LoginPage() {
 
     setTimeout(() => {
       router.push("/");
-    }, 1000);
+    }, 600);
   };
 
   return (
@@ -134,22 +112,6 @@ export default function LoginPage() {
           <div className="text-2xl mt-2">BeEyes 运维监测平台</div>
         </div>
       </div>
-      <AnimatePresence>
-        {pops && (
-          <motion.div
-            animate={{ opacity: 1, y: 0 }}
-            className="fixed top-0 right-0 z-50 flex flex-col w-1/4 p-2"
-            exit={{ opacity: 0, y: -100 }}
-            initial={{ opacity: 0, y: -100 }}
-          >
-            <Alert
-              color={pops.type}
-              description={pops.description}
-              title={pops.title}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
     </section>
   );
 }
