@@ -107,9 +107,9 @@ export default function LoginPage() {
             </Button>
           </div>
         </div>
-        <div className="flex items-center justify-center w-1/2">
-          <Logo className="w-24 h-24" />
-          <div className="text-2xl mt-2">BeEyes 运维监测平台</div>
+        <div className="flex items-center justify-center  w-1/2 gap-2">
+          <Logo className="size-12" />
+          <div className="text-2xl">BeEyes 运维监测平台</div>
         </div>
       </div>
     </section>

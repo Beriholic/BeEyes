@@ -15,11 +15,19 @@ export const Logo: React.FC<IconSvgProps> = ({
     width={size || width}
     {...props}
   >
+    <circle
+      cx="16"
+      cy="16"
+      r="14.4"
+      stroke="currentColor"
+      stroke-width="2.56"
+    />
+    <circle cx="16" cy="16" r="6.4" fill="currentColor" />
     <path
-      clipRule="evenodd"
-      d="M17.6482 10.1305L15.8785 7.02583L7.02979 22.5499H10.5278L17.6482 10.1305ZM19.8798 14.0457L18.11 17.1983L19.394 19.4511H16.8453L15.1056 22.5499H24.7272L19.8798 14.0457Z"
-      fill="currentColor"
-      fillRule="evenodd"
+      d="M6.4 16 L25.6 16"
+      stroke="currentColor"
+      stroke-width="2.56"
+      stroke-linecap="round"
     />
   </svg>
 );
