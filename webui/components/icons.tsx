@@ -15,19 +15,13 @@ export const Logo: React.FC<IconSvgProps> = ({
     width={size || width}
     {...props}
   >
-    <circle
-      cx="16"
-      cy="16"
-      r="14.4"
-      stroke="currentColor"
-      stroke-width="2.56"
-    />
+    <circle cx="16" cy="16" r="14.4" stroke="currentColor" strokeWidth="2.56" />
     <circle cx="16" cy="16" r="6.4" fill="currentColor" />
     <path
       d="M6.4 16 L25.6 16"
       stroke="currentColor"
-      stroke-width="2.56"
-      stroke-linecap="round"
+      strokeWidth="2.56"
+      strokeLinecap="round"
     />
   </svg>
 );
