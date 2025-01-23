@@ -9,16 +9,14 @@ import xyz.beriholic.beeyes.entity.dto.Client;
 import xyz.beriholic.beeyes.entity.dto.ClientDetail;
 import xyz.beriholic.beeyes.entity.vo.request.ClientReportVO;
 import xyz.beriholic.beeyes.entity.vo.request.RuntimeInfoVO;
+import xyz.beriholic.beeyes.entity.vo.response.ClientMetricVO;
 import xyz.beriholic.beeyes.mapper.ClientDetailMapper;
 import xyz.beriholic.beeyes.mapper.ClientMapper;
 import xyz.beriholic.beeyes.service.ClientService;
 import xyz.beriholic.beeyes.utils.InfluxDBUtils;
 
 import java.security.SecureRandom;
-import java.util.Date;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
@@ -89,6 +87,27 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     public void reportRuntimeInfo(int clientId, RuntimeInfoVO vo) {
         runtimeInfoCache.put(clientId, vo);
         influxDBUtils.writeRuntimeInfo(clientId, vo);
+    }
+
+    @Override
+    public List<ClientMetricVO> getAllClientMetric() {
+        return idCache.values().stream().map(client -> {
+            ClientMetricVO metric = ClientMetricVO.from(client);
+
+            ClientDetail clientDetail = clientDetailMapper.selectById(client.getId());
+
+            metric.addDataFromClientDetail(clientDetail);
+
+            RuntimeInfoVO runtime = runtimeInfoCache.get(client.getId());
+
+            metric.setOnline(false);
+            if (Objects.nonNull(runtime) && System.currentTimeMillis() - runtime.getTimestamp() < 60 * 1000) {
+                metric.addDataFromRuntimeInfo(runtime);
+                metric.setOnline(true);
+            }
+
+            return metric;
+        }).toList();
     }
 
     private void putCache(Client client) {

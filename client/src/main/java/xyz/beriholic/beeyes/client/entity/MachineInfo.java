@@ -14,6 +14,7 @@ public class MachineInfo {
     int cpuCoreCount;
     double memorySize;
     double diskSize;
+    double diskTotalSize;
     NetworkInterfaceInfo networkInterfaceInfo;
 }
 

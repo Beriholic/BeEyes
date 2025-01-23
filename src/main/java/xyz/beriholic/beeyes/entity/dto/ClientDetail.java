@@ -24,6 +24,7 @@ public class ClientDetail {
     int cpuCoreCount;
     double memorySize;
     double diskSize;
+    double diskTotalSize;
     String NetworkInterfaceInfo;
 
     public static ClientDetail from(int clientId, ClientReportVO vo) {
@@ -37,6 +38,7 @@ public class ClientDetail {
                 vo.getCpuCoreCount(),
                 vo.getMemorySize(),
                 vo.getDiskSize(),
+                vo.getDiskTotalSize(),
                 JSON.toJSONString(vo.getNetworkInterfaceInfo())
         );
     }

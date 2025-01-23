@@ -18,22 +18,35 @@ import {
   FaMicrochip,
 } from "react-icons/fa6";
 import { ClipedLabel } from "./CilpedLabel";
+import { MetricData } from "@/api/internal/model/response/metric";
+import { useMemo } from "react";
 
-export interface ServerCardProps {
-  name: string;
-  osName: string;
-  osArch: string;
-  osVersion: string;
-  status: "online" | "offline";
-}
+export default function ServerCard({ data }: { data: MetricData }) {
+  const {
+    online,
+    name,
+    location,
+    osName,
+    osArch,
+    osVersion,
+    osBitSize,
+    cpuName,
+    ipList,
+    cpuCoreCount,
+    memorySize,
+    cpuUsage,
+    memoryUsage,
+    networkUploadSpeed,
+    networkDownloadSpeed,
+  } = data;
 
-export default function ServerCard({
-  name,
-  status,
-  osName,
-  osArch,
-  osVersion,
-}: ServerCardProps) {
+  const cpuUsagePercent: number = useMemo(() => {
+    return cpuUsage * 100;
+  }, [cpuUsage]);
+  const memoryUsagePercent = useMemo(() => {
+    return (memoryUsage / memorySize) * 100;
+  }, [memoryUsage]);
+
   return (
     <div className="border-2 border-foreground-500 rounded-2xl p-4 w-80 flex flex-col">
       <div className="flex justify-between items-center">
@@ -42,7 +55,7 @@ export default function ServerCard({
             style={{
               fontSize: "1rem",
             }}
-            countryCode="hk"
+            countryCode={location}
           />
           <div
             className="text-xl cursor-grab hover:underline"
@@ -54,7 +67,7 @@ export default function ServerCard({
           </div>
         </div>
         <div>
-          {status == "online" ? (
+          {online ? (
             <div className="text-success-500 flex items-center gap-2">
               <FaCirclePlay />
               <div>运行中</div>
@@ -71,23 +84,25 @@ export default function ServerCard({
         <div>
           {osName} {osVersion}
         </div>
-        <div>{osArch}</div>
+        <div>{osBitSize} 位</div>
       </div>
       <Divider className="my-2 bg-divider" />
       <div className="flex text-sm items-center">
         <FaLocationDot />
         <div className="flex gap-1 items-center">
           <div>IP:</div>
-          <ClipedLabel text="42.80.122.15" />
+          <ClipedLabel text={ipList[0]} />
           <Popover placement="right">
             <PopoverTrigger>
               <b className="cursor-grab text-primary">...</b>
             </PopoverTrigger>
             <PopoverContent>
               <div className="px-1 py-2 ">
-                <ClipedLabel text="42.80.122.15" />
-                <ClipedLabel text="41.72.107.37" />
-                <ClipedLabel text="4AA4:2733:412F:EC99:3EB0:98D1:D4DF:7F10" />
+                {ipList.map((ip, index) => (
+                  <div key={index}>
+                    <ClipedLabel text={ip} />
+                  </div>
+                ))}
               </div>
             </PopoverContent>
           </Popover>
@@ -96,38 +111,47 @@ export default function ServerCard({
       <div className="flex gap-4 text-sm">
         <div className="flex items-center gap-1">
           <FaMicrochip />
-          <div>2 CPU</div>
+          <Popover placement="right">
+            <PopoverTrigger>
+              <div className="cursor-grab">{cpuCoreCount} CPU</div>
+            </PopoverTrigger>
+            <PopoverContent>
+              <div className="px-1 py-2 ">
+                {cpuName} {osArch}
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
         <div className="flex items-center gap-1">
           <FaMemory />
-          <div>4 GB</div>
+          <div>{memorySize.toFixed(2)} GB</div>
         </div>
       </div>
       <div className="flex flex-col gap-y-2 text-xs mt-2">
         <div>
           <div className="flex gap-1">
             <div>CPU: </div>
-            <div>11%</div>
+            <div>{cpuUsagePercent.toFixed(2)}%</div>
           </div>
-          <Progress size="sm" value={11} />
+          <Progress size="sm" value={cpuUsagePercent} />
         </div>
         <div>
           <div className="flex gap-1">
             <div>内存: </div>
-            <div>33%</div>
+            <div>{memoryUsagePercent.toFixed(2)}%</div>
           </div>
-          <Progress size="sm" value={33} />
+          <Progress size="sm" value={memoryUsagePercent} />
         </div>
         <div className="flex justify-between">
           <span>网络</span>
           <div className="flex items-center gap-2">
             <div className="flex items-center">
               <FaArrowUp />
-              <span>12kb/s</span>
+              <div>{networkUploadSpeed.toFixed(2)} kb/s</div>
             </div>
             <div className="flex items-center">
               <FaArrowDown />
-              <span>11kb/s </span>
+              <div>{networkDownloadSpeed.toFixed(2)} kb/s</div>
             </div>
           </div>
         </div>

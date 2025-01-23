@@ -35,6 +35,8 @@ public class MonitorUtil {
 
         double diskCapacity = hardware.getDiskStores().stream().mapToDouble(disk -> disk.getSize() / 1024.0 / 1024 / 1024).sum();
 
+        double diskTotalCapacity = Arrays.stream(File.listRoots()).mapToDouble(file -> file.getTotalSpace() / 1024.0 / 1024 / 1024).sum();
+
         NetworkIF networkIF = this.fetchNetworkInterface(hardware);
 
         NetworkInterfaceInfo networkInterfaceInfo = new NetworkInterfaceInfo();
@@ -53,6 +55,7 @@ public class MonitorUtil {
                 .setCpuCoreCount(hardware.getProcessor().getLogicalProcessorCount())
                 .setMemorySize(memoryCapacity)
                 .setDiskSize(diskCapacity)
+                .setDiskTotalSize(diskTotalCapacity)
                 .setNetworkInterfaceInfo(networkInterfaceInfo);
     }
 
