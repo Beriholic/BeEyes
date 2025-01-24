@@ -1,11 +1,21 @@
 "use client";
 
 import {
+  Button,
+  Card,
   Divider,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
   Popover,
   PopoverContent,
   PopoverTrigger,
   Progress,
+  Tooltip,
+  useDisclosure,
 } from "@heroui/react";
 import ReactCountryFlag from "react-country-flag";
 import {
@@ -16,12 +26,19 @@ import {
   FaLocationDot,
   FaMemory,
   FaMicrochip,
+  FaPen,
 } from "react-icons/fa6";
 import { ClipedLabel } from "./CilpedLabel";
 import { MetricData } from "@/api/internal/model/response/metric";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
-export default function ServerCard({ data }: { data: MetricData }) {
+export default function ServerCard({
+  data,
+  rename,
+}: {
+  data: MetricData;
+  rename: (name: string) => void;
+}) {
   const {
     online,
     name,
@@ -47,26 +64,43 @@ export default function ServerCard({ data }: { data: MetricData }) {
     return (memoryUsage / memorySize) * 100;
   }, [memoryUsage]);
 
+  const {
+    isOpen: isOpenRename,
+    onOpen: onOpenRename,
+    onOpenChange: onOpenChangeRename,
+  } = useDisclosure();
+  const [newName, setNewName] = useState("");
+
+  const renameServer = () => {
+    rename(newName);
+    setNewName("");
+  };
+
   return (
-    <div className="border-2 border-foreground-500 rounded-2xl p-4 w-80 flex flex-col">
+    <Card className="rounded-2xl p-4 w-80 flex flex-col">
       <div className="flex justify-between items-center">
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 flex-1 min-w-0">
           <ReactCountryFlag
             style={{
               fontSize: "1rem",
             }}
             countryCode={location}
           />
-          <div
-            className="text-xl cursor-grab hover:underline"
-            onClick={() => {
-              //TODO navigate to machine info page
-            }}
-          >
-            {name}
-          </div>
+          <Tooltip content={name}>
+            <div
+              className="text-xl cursor-grab hover:underline truncate flex-1 min-w-0"
+              onClick={() => {
+                //TODO navigate to machine info page
+              }}
+            >
+              {name}
+            </div>
+          </Tooltip>
+          <button onClick={onOpenRename}>
+            <FaPen className="size-3 mx-1" />
+          </button>
         </div>
-        <div>
+        <div className="flex-shrink-0 pl-2">
           {online ? (
             <div className="text-success-500 flex items-center gap-2">
               <FaCirclePlay />
@@ -156,6 +190,38 @@ export default function ServerCard({ data }: { data: MetricData }) {
           </div>
         </div>
       </div>
-    </div>
+      <Modal isOpen={isOpenRename} onOpenChange={onOpenChangeRename}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                重命名主机名称
+              </ModalHeader>
+              <ModalBody>
+                <Input
+                  placeholder="新名称"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                />
+              </ModalBody>
+              <ModalFooter>
+                <Button color="default" variant="light" onPress={onClose}>
+                  取消
+                </Button>
+                <Button
+                  color="primary"
+                  onPress={() => {
+                    renameServer();
+                    onClose();
+                  }}
+                >
+                  确认
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+    </Card>
   );
 }

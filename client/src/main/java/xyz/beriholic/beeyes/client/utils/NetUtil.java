@@ -32,7 +32,7 @@ public class NetUtil {
             HttpRequest request = HttpRequest
                     .newBuilder()
                     .GET()
-                    .uri(new URI(address + "/client" + url))
+                    .uri(new URI(address + "/api/client" + url))
                     .header("Authorization", token)
                     .build();
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
@@ -49,7 +49,7 @@ public class NetUtil {
             HttpRequest request = HttpRequest
                     .newBuilder()
                     .POST(HttpRequest.BodyPublishers.ofString(raw))
-                    .uri(new URI(config.getAddress() + "/client" + url))
+                    .uri(new URI(config.getAddress() + "/api/client" + url))
                     .header("Authorization", config.getToken())
                     .header("Content-Type", "application/json")
                     .build();

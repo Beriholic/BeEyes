@@ -30,12 +30,12 @@ public class SaTokenConfiguration implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new SaInterceptor(_ -> {
-            SaRouter.match("/client/**", _ -> {
+            SaRouter.match("/api/client/**", _ -> {
                 String authorization = request.getHeader("Authorization");
 
                 String uri = request.getRequestURI();
-                if (uri.startsWith("/client")) {
-                    if (!uri.endsWith("/register")) {
+                if (uri.startsWith("/api/client")) {
+                    if (!uri.endsWith("/api/register")) {
                         Client client = clientService.getClientByToken(authorization);
                         if (client == null) {
                             try {
@@ -57,7 +57,7 @@ public class SaTokenConfiguration implements WebMvcConfigurer {
             SaRouter.match("/**")
                     .notMatch("/api/auth/**", "/error")
                     .notMatch("/swagger-ui/**", "/v3/api-docs/**")
-                    .notMatch("/client/**")
+                    .notMatch("/api/client/**")
                     .check(_ -> StpUtil.checkLogin());
 
 

@@ -5,6 +5,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import xyz.beriholic.beeyes.cache.ClientCache;
 import xyz.beriholic.beeyes.entity.dto.Client;
 import xyz.beriholic.beeyes.entity.dto.ClientDetail;
 import xyz.beriholic.beeyes.entity.vo.request.ClientReportVO;
@@ -23,9 +24,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> implements ClientService {
     private final Map<String, Client> tokenCache = new ConcurrentHashMap<>();
-    private final Map<Integer, Client> idCache = new ConcurrentHashMap<>();
     private final Map<Integer, RuntimeInfoVO> runtimeInfoCache = new ConcurrentHashMap<>();
-
+    @Resource
+    ClientCache clientCache;
     @Resource
     ClientDetailMapper clientDetailMapper;
     @Resource
@@ -40,7 +41,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
 
     @Override
     public Client getClientById(int id) {
-        return this.idCache.get(id);
+        return clientCache.getCache(id);
     }
 
     @Override
@@ -91,7 +92,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
 
     @Override
     public List<ClientMetricVO> getAllClientMetric() {
-        return idCache.values().stream().map(client -> {
+        return clientCache.getAllCache().stream().map(client -> {
             ClientMetricVO metric = ClientMetricVO.from(client);
 
             ClientDetail clientDetail = clientDetailMapper.selectById(client.getId());
@@ -111,7 +112,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     }
 
     private void putCache(Client client) {
-        this.idCache.put(client.getId(), client);
+        clientCache.putCache(client.getId(), client);
         this.tokenCache.put(client.getToken(), client);
     }
 

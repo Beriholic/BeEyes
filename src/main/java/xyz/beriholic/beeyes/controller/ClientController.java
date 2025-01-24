@@ -11,7 +11,7 @@ import xyz.beriholic.beeyes.service.ClientService;
 import xyz.beriholic.beeyes.utils.Const;
 
 @RestController
-@RequestMapping("/client")
+@RequestMapping("/api/client")
 public class ClientController {
     @Resource
     ClientService service;
