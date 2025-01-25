@@ -1,7 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"github.com/beriholic/beeyesc/cmd"
+)
 
 func main() {
-	fmt.Println("Trying TODO!")
+	cmd.Execute()
 }
