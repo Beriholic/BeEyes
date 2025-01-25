@@ -15,7 +15,7 @@ func (m *Monitor) FetchSystemInfo() (*model.SystemInfo, error) {
 	}
 
 	defer binary.Cleanup()
-	output, err := binary.Execute()
+	output, err := binary.Execute("system")
 	if err != nil {
 		return nil, fmt.Errorf("error calling Rust binary: %w", err)
 	}

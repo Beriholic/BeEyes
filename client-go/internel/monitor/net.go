@@ -18,7 +18,7 @@ func (m *Monitor) FetchNetwork() (*model.NetworkInfo, error) {
 	}
 
 	networkInfo := &model.NetworkInfo{
-		Interfaces: make([]model.InterfaceInfo, 0),
+		Interfaces: make([]*model.NetworkInterfaceInfo, 0),
 	}
 
 	interfaceIndexMap := make(map[string]int)
@@ -30,7 +30,7 @@ func (m *Monitor) FetchNetwork() (*model.NetworkInfo, error) {
 			continue
 		}
 
-		interfaceInfo := model.InterfaceInfo{
+		interfaceInfo := model.NetworkInterfaceInfo{
 			Name: iface.Name,
 			IPv4: make([]string, 0),
 			IPv6: make([]string, 0),
@@ -58,7 +58,7 @@ func (m *Monitor) FetchNetwork() (*model.NetworkInfo, error) {
 			}
 		}
 
-		networkInfo.Interfaces = append(networkInfo.Interfaces, interfaceInfo)
+		networkInfo.Interfaces = append(networkInfo.Interfaces, &interfaceInfo)
 		interfaceIndexMap[iface.Name] = len(networkInfo.Interfaces) - 1
 	}
 

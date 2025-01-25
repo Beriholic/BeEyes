@@ -1,14 +1,8 @@
 package model
 
 type MachineInfo struct {
-	OsArch               string               `json:"osArch"`
-	OsName               string               `json:"osName"`
-	OsVersion            string               `json:"osVersion"`
-	OsBitSize            int                  `json:"osBitSize"`
-	CpuName              string               `json:"cpuName"`
-	CpuCoreCount         int                  `json:"cpuCoreCount"`
-	MemorySize           float64              `json:"memorySize"`
-	DiskSize             float64              `json:"diskSize"`
-	DiskTotalSize        float64              `json:"diskTotalSize"`
-	NetworkInterfaceInfo NetworkInterfaceInfo `json:"networkInterfaceInfo"`
+	Systeminfo  *SystemInfo             `json:"system_info"`
+	CPUInfo     *CPUInfo                `json:"cpu_info"`
+	MemoryInfo  *MemoryInfo             `json:"memory_info"`
+	NetworkInfo []*NetworkInterfaceInfo `json:"network_interface_info"`
 }

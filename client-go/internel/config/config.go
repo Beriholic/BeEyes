@@ -110,3 +110,12 @@ func loadConfig() *BeEyesConfig {
 		Token: viper.GetString("token"),
 	}
 }
+
+func VertifyConfigFile() {
+	expandedPath := os.ExpandEnv(configFilePath)
+
+	if _, err := os.Stat(expandedPath); os.IsNotExist(err) {
+		fmt.Printf("配置文件 %s 不存在，请使用 be-eyes config 命令进行配置\n", expandedPath)
+		os.Exit(1)
+	}
+}

@@ -3,10 +3,10 @@ package server
 import (
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/beriholic/beeyesc/internel/model"
 	"github.com/beriholic/beeyesc/internel/monitor"
-	"github.com/bytedance/sonic"
 )
 
 type MonitorService struct {
@@ -14,42 +14,41 @@ type MonitorService struct {
 }
 
 var (
-	onceMonitorService sync.Once
-	monitorService     *MonitorService
+	initMonitorService     sync.Once
+	monitorServiceInstence *MonitorService
 )
 
 func NewMonitorService() *MonitorService {
-	onceMonitorService.Do(func() {
-		monitorService = &MonitorService{
+	initMonitorService.Do(func() {
+		monitorServiceInstence = &MonitorService{
 			monitor: monitor.NewMonitor(),
 		}
 	})
-	return monitorService
+	return monitorServiceInstence
 }
 
 func (s *MonitorService) FetchMachineInfo() (*model.MachineInfo, error) {
-	systemInfo, _ := s.monitor.FetchSystemInfo()
-	systemInfoJson, _ := sonic.Marshal(systemInfo)
-	fmt.Println(string(systemInfoJson))
+	sysinfo, err := s.monitor.FetchSystemInfo()
+	if err != nil {
+		return nil, fmt.Errorf("获取系统信息失败: %v", err)
+	}
+	cpuInfo, err := s.monitor.FetchCPUInfo(time.Second * 1)
+	if err != nil {
+		return nil, fmt.Errorf("获取CPU信息失败: %v", err)
+	}
+	memInfo, err := s.monitor.FetchMemoryInfo()
+	if err != nil {
+		return nil, fmt.Errorf("获取内存信息失败: %v", err)
+	}
+	netInfo, err := s.monitor.FetchNetwork()
+	if err != nil {
+		return nil, fmt.Errorf("获取网络信息失败: %v", err)
+	}
 
-	cpu, _ := s.monitor.FetchCPUInfo(0)
-
-	cpuJson, _ := sonic.Marshal(cpu)
-	fmt.Println(string(cpuJson))
-
-	mem, _ := s.monitor.FetchMemoryInfo()
-	memJson, _ := sonic.Marshal(mem)
-
-	fmt.Println(string(memJson))
-
-	disk, _ := s.monitor.FetchDiskInfo()
-	diskJson, _ := sonic.Marshal(disk)
-
-	fmt.Println(string(diskJson))
-
-	netInfo, _ := s.monitor.FetchNetwork()
-	netInfoJson, _ := sonic.Marshal(netInfo)
-	fmt.Println(string(netInfoJson))
-
-	return nil, nil
+	return &model.MachineInfo{
+		Systeminfo:  sysinfo,
+		CPUInfo:     cpuInfo,
+		MemoryInfo:  memInfo,
+		NetworkInfo: netInfo.Interfaces,
+	}, nil
 }

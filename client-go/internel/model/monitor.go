@@ -1,39 +1,39 @@
 package model
 
 type CPUInfo struct {
-	Name      string
-	CoreCount int
-	Usage     float64
+	Name      string  `json:"name"`
+	CoreCount int     `json:"core_count"`
+	Usage     float64 `json:"usage"`
 }
+
 type MemoryInfo struct {
-	MemoryTotal     float64
-	MemoryUsed      float64
-	MemoryAvailable float64
-	MemoryPercent   float64
-	SwapTotal       float64
-	SwapFree        float64
-	SwapCached      float64
-	SwapUsed        float64
-	SwapPercent     float64
+	TotalMemory   float64 `json:"total_memory"`
+	UsedMemory    float64 `json:"used_memory"`
+	FreeMemory    float64 `json:"free_memory"`
+	PercentMemory float64 `json:"percent_memory"`
+	TotalSwap     float64 `json:"total_swap"`
+	UsedSwap      float64 `json:"used_swap"`
+	FreeSwap      float64 `json:"free_swap"`
+	PercentSwap   float64 `json:"percent_swap"`
 }
 
 type DiskInfo struct {
-	Total   float64
-	Used    float64
-	Free    float64
-	Percent float64
+	Total   float64 `json:"total"`
+	Used    float64 `json:"used"`
+	Free    float64 `json:"free"`
+	Percent float64 `json:"percent"`
 }
 
 type NetworkInfo struct {
-	Interfaces []InterfaceInfo
+	Interfaces []*NetworkInterfaceInfo
 }
 
-type InterfaceInfo struct {
-	Name          string
-	IPv4          []string
-	IPv6          []string
-	UploadSpeed   uint64
-	DownloadSpeed uint64
+type NetworkInterfaceInfo struct {
+	Name          string   `json:"name"`
+	IPv4          []string `json:"ipv4"`
+	IPv6          []string `json:"ipv6"`
+	UploadSpeed   uint64   `json:"upload_speed"`
+	DownloadSpeed uint64   `json:"download_speed"`
 }
 
 type SystemInfo struct {

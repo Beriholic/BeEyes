@@ -1,30 +1,22 @@
-use serde::{Deserialize, Serialize};
-use sysinfo::System;
+use std::env;
 
-#[derive(Debug, Serialize, Deserialize)]
-struct SystemInfo {
-    name: String,
-    kernel_version: String,
-    os_version: String,
-    host_name: String,
-}
-impl SystemInfo {
-    fn new() -> SystemInfo {
-        let mut sys = System::new_all();
-        sys.refresh_all();
-        SystemInfo {
-            name: System::name().unwrap(),
-            kernel_version: System::kernel_version().unwrap(),
-            os_version: System::os_version().unwrap(),
-            host_name: System::host_name().unwrap(),
-        }
-    }
-    fn to_json(&self) -> String {
-        serde_json::to_string(self).unwrap()
-    }
-}
+use monitor::{memory_info::MemoryInfo, system_info::SystemInfo};
+
+mod monitor;
+mod utils;
 
 fn main() {
-    let sysinfo = SystemInfo::new();
-    println!("{}", sysinfo.to_json());
+    let args: Vec<String> = env::args().collect();
+
+    if let Some(arg) = args.get(1).map(|s| s.as_str()) {
+        match arg {
+            "system" => {
+                println!("{}", SystemInfo::new().to_json())
+            }
+            "memory" => {
+                println!("{}", MemoryInfo::new().to_json())
+            }
+            _ => {}
+        }
+    }
 }

@@ -1,38 +1,29 @@
 package monitor
 
 import (
+	"encoding/json"
 	"fmt"
 
+	"github.com/beriholic/beeyesc/internel/lib"
 	"github.com/beriholic/beeyesc/internel/model"
-	"github.com/shirou/gopsutil/v4/mem"
 )
 
 func (s *Monitor) FetchMemoryInfo() (*model.MemoryInfo, error) {
-	memInfo, err := mem.VirtualMemory()
+	binary, err := lib.NewEmbeddedBinary()
 	if err != nil {
-		return nil, fmt.Errorf("获取内存信息失败: %v\n", err)
+		return nil, err
 	}
 
-	memoryTotal := byteToGB(memInfo.Total)
-	memoryUsed := byteToGB(memInfo.Used)
-	memoryAvailable := byteToGB(memInfo.Available)
-	memoryPercent := twoDecimals(memInfo.UsedPercent)
+	defer binary.Cleanup()
+	output, err := binary.Execute("network")
+	if err != nil {
+		return nil, fmt.Errorf("error calling Rust binary: %w", err)
+	}
 
-	swapFree := byteToGB(memInfo.SwapFree)
-	swapCaced := byteToGB(memInfo.SwapCached)
-	swapTotal := byteToGB(memInfo.SwapTotal)
-	swapUsed := twoDecimals(swapTotal - swapFree - swapCaced)
-	swapPercent := twoDecimals(float64(swapUsed) / float64(swapTotal) * 100)
+	var memInfo model.MemoryInfo
+	if err := json.Unmarshal(output, &memInfo); err != nil {
+		return nil, fmt.Errorf("error parsing JSON: %w", err)
+	}
 
-	return &model.MemoryInfo{
-		MemoryTotal:     memoryTotal,
-		MemoryUsed:      memoryUsed,
-		MemoryAvailable: memoryAvailable,
-		MemoryPercent:   memoryPercent,
-		SwapFree:        swapFree,
-		SwapCached:      swapCaced,
-		SwapTotal:       swapTotal,
-		SwapUsed:        swapUsed,
-		SwapPercent:     swapPercent,
-	}, nil
+	return &memInfo, nil
 }

@@ -44,8 +44,8 @@ func NewEmbeddedBinary() (*EmbeddedBinary, error) {
 	}, nil
 }
 
-func (e *EmbeddedBinary) Execute() ([]byte, error) {
-	cmd := exec.Command(e.sysInfoTempFilePath)
+func (e *EmbeddedBinary) Execute(param string) ([]byte, error) {
+	cmd := exec.Command(e.sysInfoTempFilePath, param)
 	return cmd.Output()
 }
 

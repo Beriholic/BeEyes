@@ -31,7 +31,7 @@ func (m *Monitor) FetchCPUInfo(timespan time.Duration) (*model.CPUInfo, error) {
 	return &model.CPUInfo{
 		Name:      name,
 		CoreCount: coreCount,
-		Usage:     usage[0],
+		Usage:     twoDecimals(usage[0]),
 	}, nil
 
 }
