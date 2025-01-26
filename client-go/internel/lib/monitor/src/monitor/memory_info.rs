@@ -1,4 +1,3 @@
-
 use serde::{Deserialize, Serialize};
 use sysinfo::System;
 
@@ -32,7 +31,6 @@ impl MemoryInfo {
         let free_swap = byte_to_gb(sys.free_swap());
         let percent_swap = two_decimals(used_swap / total_swap);
 
-        // 直接返回 MemoryInfo 实例
         MemoryInfo {
             total_memory,
             used_memory,

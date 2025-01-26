@@ -7,7 +7,7 @@ import (
 	"os/exec"
 )
 
-//go:embed sysinfo/target/release/sysinfo
+//go:embed monitor/target/release/monitor
 var sysinfoBin embed.FS
 
 type EmbeddedBinary struct {
@@ -15,9 +15,9 @@ type EmbeddedBinary struct {
 }
 
 func NewEmbeddedBinary() (*EmbeddedBinary, error) {
-	binaryName := "sysinfo/target/release/sysinfo"
+	binaryName := "monitor/target/release/monitor"
 	if os.PathSeparator == '\\' { // Windows
-		binaryName = "sysinfo\\target\\release\\sysinfo.exe"
+		binaryName = "monitor\\target\\release\\monitor.exe"
 	}
 
 	binData, err := sysinfoBin.ReadFile(binaryName)
