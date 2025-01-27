@@ -17,7 +17,7 @@ type BeEyesConfig struct {
 	Url   string
 }
 
-func Vertify() error {
+func Verify() error {
 	cfg := NewBeEyesConfig()
 	if cfg.Url == "" {
 		return fmt.Errorf("服务端地址未设置，请使用 `beeyes config` 设置")

@@ -5,8 +5,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/beriholic/beeyesc/internel/model"
-	"github.com/beriholic/beeyesc/internel/monitor"
+	"github.com/beriholic/beeyesc/internal/model"
+	"github.com/beriholic/beeyesc/internal/monitor"
 )
 
 type MonitorService struct {

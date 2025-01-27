@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/beriholic/beeyesc/internel/lib"
-	"github.com/beriholic/beeyesc/internel/model"
+	"github.com/beriholic/beeyesc/internal/lib"
+	"github.com/beriholic/beeyesc/internal/model"
 )
 
 func (m *Monitor) FetchSystemInfo() (*model.SystemInfo, error) {

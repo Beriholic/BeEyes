@@ -1,11 +1,11 @@
-package internel
+package internal
 
 import (
 	"log/slog"
 	"time"
 
-	"github.com/beriholic/beeyesc/internel/api"
-	"github.com/beriholic/beeyesc/internel/server"
+	"github.com/beriholic/beeyesc/internal/api"
+	"github.com/beriholic/beeyesc/internal/server"
 )
 
 func RunMonitor() error {
@@ -40,7 +40,7 @@ func RunMonitor() error {
 		time.Sleep(time.Second * 5)
 	}
 }
-func RegisteToServer() error {
+func RegisterToServer() error {
 	err := api.NewApi().RegisterToServer()
 	if err != nil {
 		return err

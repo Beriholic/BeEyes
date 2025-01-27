@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/beriholic/beeyesc/internel/config"
+	"github.com/beriholic/beeyesc/internal/config"
 	"github.com/spf13/cobra"
 )
 

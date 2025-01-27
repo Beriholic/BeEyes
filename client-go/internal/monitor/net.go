@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/beriholic/beeyesc/internel/model"
+	"github.com/beriholic/beeyesc/internal/model"
 	gopsutilnet "github.com/shirou/gopsutil/v4/net"
 )
 

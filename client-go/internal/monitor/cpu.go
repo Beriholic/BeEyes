@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/beriholic/beeyesc/internel/model"
+	"github.com/beriholic/beeyesc/internal/model"
 	"github.com/shirou/gopsutil/v4/cpu"
 )
 

@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/beriholic/beeyesc/internel"
+	"github.com/beriholic/beeyesc/internal"
 	"github.com/spf13/cobra"
 )
 
@@ -15,7 +15,7 @@ var rootCmd = &cobra.Command{
 	Long:  `BeEyes Client`,
 	Run: func(cmd *cobra.Command, args []string) {
 		slog.Info("开始运行系统监测")
-		if err := internel.RunMonitor(); err != nil {
+		if err := internal.RunMonitor(); err != nil {
 			slog.Info("运行系统监测出错", "err", err)
 			os.Exit(1)
 		}

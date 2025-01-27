@@ -9,8 +9,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/beriholic/beeyesc/internel/config"
-	"github.com/beriholic/beeyesc/internel/model"
+	"github.com/beriholic/beeyesc/internal/config"
+	"github.com/beriholic/beeyesc/internal/model"
 	"github.com/bytedance/sonic"
 )
 
