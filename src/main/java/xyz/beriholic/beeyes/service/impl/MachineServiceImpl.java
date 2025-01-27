@@ -20,10 +20,10 @@ public class MachineServiceImpl extends ServiceImpl<ClientMapper, Client> implem
     public void rename(RenameClientVO vo) {
         this.update(Wrappers.<Client>update().eq("id", vo.getId()).set("name", vo.getName()));
 
-        Client client = clientCache.getCache(vo.getId());
+        Client client = clientCache.getIdCache(vo.getId());
         client.setName(vo.getName());
 
-        clientCache.putCache(vo.getId(), client);
+        clientCache.putIdCache(vo.getId(), client);
     }
 
 }

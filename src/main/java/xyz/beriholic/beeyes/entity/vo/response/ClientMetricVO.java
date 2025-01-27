@@ -6,7 +6,6 @@ import lombok.experimental.Accessors;
 import xyz.beriholic.beeyes.entity.dto.Client;
 import xyz.beriholic.beeyes.entity.dto.ClientDetail;
 import xyz.beriholic.beeyes.entity.dto.NetworkInterfaceInfo;
-import xyz.beriholic.beeyes.entity.vo.request.RuntimeInfoVO;
 
 import java.util.Collections;
 import java.util.List;
@@ -60,10 +59,10 @@ public class ClientMetricVO {
         this.ipList = ipList;
     }
 
-    public void addDataFromRuntimeInfo(RuntimeInfoVO runtime) {
-        this.cpuUsage = runtime.getCpuUsage();
-        this.memoryUsage = runtime.getMemoryUsage();
-        this.networkUploadSpeed = runtime.getNetworkUploadSpeed();
-        this.networkDownloadSpeed = runtime.getNetworkDownloadSpeed();
-    }
+//    public void addDataFromRuntimeInfo(RuntimeInfoVO runtime) {
+//        this.cpuUsage = runtime.getCpuUsage();
+//        this.memoryUsage = runtime.getMemoryUsage();
+//        this.networkUploadSpeed = runtime.getNetworkUploadSpeed();
+//        this.networkDownloadSpeed = runtime.getNetworkDownloadSpeed();
+//    }
 }

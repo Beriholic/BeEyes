@@ -40,3 +40,10 @@ func RunMonitor() error {
 		time.Sleep(time.Second * 5)
 	}
 }
+func RegisteToServer() error {
+	err := api.NewApi().RegisterToServer()
+	if err != nil {
+		return err
+	}
+	return nil
+}

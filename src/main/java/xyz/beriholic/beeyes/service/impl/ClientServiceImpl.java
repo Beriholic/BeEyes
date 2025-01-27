@@ -1,5 +1,6 @@
 package xyz.beriholic.beeyes.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
@@ -8,7 +9,6 @@ import org.springframework.stereotype.Service;
 import xyz.beriholic.beeyes.cache.ClientCache;
 import xyz.beriholic.beeyes.entity.dto.Client;
 import xyz.beriholic.beeyes.entity.dto.ClientDetail;
-import xyz.beriholic.beeyes.entity.vo.request.ClientReportVO;
 import xyz.beriholic.beeyes.entity.vo.request.RuntimeInfoVO;
 import xyz.beriholic.beeyes.entity.vo.response.ClientMetricVO;
 import xyz.beriholic.beeyes.mapper.ClientDetailMapper;
@@ -17,7 +17,9 @@ import xyz.beriholic.beeyes.service.ClientService;
 import xyz.beriholic.beeyes.utils.InfluxDBUtils;
 
 import java.security.SecureRandom;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
@@ -41,7 +43,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
 
     @Override
     public Client getClientById(int id) {
-        return clientCache.getCache(id);
+        return clientCache.getIdCache(id);
     }
 
     @Override
@@ -56,39 +58,39 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
 
     @Override
     public boolean verifyAndRegister(String token) {
-        if (this.getRegisterToken().equals(token)) {
-            int id = this.generateRandomId();
-            Client client = new Client(id, "未命名主机", token, new Date(), "cn", "未命名节点");
-
-            if (this.save(client)) {
-                this.token = this.generateRandomToken();
-                this.putCache(client);
-                log.info("Client注册成功: {}", client);
-                return true;
-            }
+        if (clientCache.getTokenCache(token)) {
+            log.info("Token无效 {}", token);
+            return true;
         }
-        log.info("注册失败, Token: {}", token);
-        return false;
-    }
 
-    @Override
-    public void reportClientInfo(int clientId, ClientReportVO vo) {
-        ClientDetail clientDetail = ClientDetail.from(clientId, vo);
-
-        log.info("Client {} report info: {}", clientId, vo);
-
-        if (Objects.nonNull(clientDetailMapper.selectById(clientId))) {
-            clientDetailMapper.updateById(clientDetail);
-        } else {
-            clientDetailMapper.insert(clientDetail);
+        long count = this.count(new QueryWrapper<Client>().eq("token", token));
+        if (count == 0) {
+            log.info("Token无效 {}", token);
+            return false;
         }
+
+        clientCache.putTokenCache(token, true);
+        return true;
     }
 
-    @Override
-    public void reportRuntimeInfo(int clientId, RuntimeInfoVO vo) {
-        runtimeInfoCache.put(clientId, vo);
-        influxDBUtils.writeRuntimeInfo(clientId, vo);
-    }
+//    @Override
+//    public void reportClientInfo(int clientId, ClientReportVO vo) {
+//        ClientDetail clientDetail = ClientDetail.from(clientId, vo);
+//
+//        log.info("Client {} report info: {}", clientId, vo);
+//
+//        if (Objects.nonNull(clientDetailMapper.selectById(clientId))) {
+//            clientDetailMapper.updateById(clientDetail);
+//        } else {
+//            clientDetailMapper.insert(clientDetail);
+//        }
+//    }
+//
+//    @Override
+//    public void reportRuntimeInfo(int clientId, RuntimeInfoVO vo) {
+//        runtimeInfoCache.put(clientId, vo);
+//        influxDBUtils.writeRuntimeInfo(clientId, vo);
+//    }
 
     @Override
     public List<ClientMetricVO> getAllClientMetric() {
@@ -102,17 +104,17 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
             RuntimeInfoVO runtime = runtimeInfoCache.get(client.getId());
 
             metric.setOnline(false);
-            if (Objects.nonNull(runtime) && System.currentTimeMillis() - runtime.getTimestamp() < 60 * 1000) {
-                metric.addDataFromRuntimeInfo(runtime);
-                metric.setOnline(true);
-            }
+//            if (Objects.nonNull(runtime) && System.currentTimeMillis() - runtime.getTimestamp() < 60 * 1000) {
+//                metric.addDataFromRuntimeInfo(runtime);
+//                metric.setOnline(true);
+//            }
 
             return metric;
         }).toList();
     }
 
     private void putCache(Client client) {
-        clientCache.putCache(client.getId(), client);
+        clientCache.putIdCache(client.getId(), client);
         this.tokenCache.put(client.getToken(), client);
     }
 
