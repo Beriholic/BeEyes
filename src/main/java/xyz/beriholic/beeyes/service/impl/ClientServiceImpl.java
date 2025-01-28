@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import xyz.beriholic.beeyes.cache.ClientCache;
 import xyz.beriholic.beeyes.entity.dto.Client;
 import xyz.beriholic.beeyes.entity.dto.ClientDetail;
+import xyz.beriholic.beeyes.entity.vo.request.MachineInfoVO;
 import xyz.beriholic.beeyes.entity.vo.request.RuntimeInfoVO;
 import xyz.beriholic.beeyes.entity.vo.response.ClientMetricVO;
 import xyz.beriholic.beeyes.mapper.ClientDetailMapper;
@@ -19,6 +20,7 @@ import xyz.beriholic.beeyes.utils.InfluxDBUtils;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -73,18 +75,16 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
         return true;
     }
 
-//    @Override
-//    public void reportClientInfo(int clientId, ClientReportVO vo) {
-//        ClientDetail clientDetail = ClientDetail.from(clientId, vo);
-//
-//        log.info("Client {} report info: {}", clientId, vo);
-//
-//        if (Objects.nonNull(clientDetailMapper.selectById(clientId))) {
-//            clientDetailMapper.updateById(clientDetail);
-//        } else {
-//            clientDetailMapper.insert(clientDetail);
-//        }
-//    }
+    @Override
+    public void reportClientInfo(int clientId, MachineInfoVO vo) {
+        ClientDetail clientDetail = ClientDetail.from(clientId, vo);
+        if (Objects.nonNull(clientDetailMapper.selectById(clientId))) {
+            clientDetailMapper.updateById(clientDetail);
+        } else {
+            clientDetailMapper.insert(clientDetail);
+        }
+    }
+
 //
 //    @Override
 //    public void reportRuntimeInfo(int clientId, RuntimeInfoVO vo) {

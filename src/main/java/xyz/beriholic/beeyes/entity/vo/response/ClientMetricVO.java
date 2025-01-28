@@ -1,15 +1,11 @@
 package xyz.beriholic.beeyes.entity.vo.response;
 
-import com.alibaba.fastjson2.JSON;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import xyz.beriholic.beeyes.entity.dto.Client;
 import xyz.beriholic.beeyes.entity.dto.ClientDetail;
-import xyz.beriholic.beeyes.entity.dto.NetworkInterfaceInfo;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @Data
 @Accessors(chain = true)
@@ -41,22 +37,7 @@ public class ClientMetricVO {
     }
 
     public void addDataFromClientDetail(ClientDetail detail) {
-        this.osArch = detail.getOsArch();
-        this.osName = detail.getOsName();
-        this.osVersion = detail.getOsVersion();
-        this.osBitSize = detail.getOsBitSize();
-        this.cpuName = detail.getCpuName();
-        this.memorySize = detail.getMemorySize();
-        this.cpuCoreCount = detail.getCpuCoreCount();
-        this.diskSize = detail.getDiskSize();
-        this.diskTotalSize = detail.getDiskTotalSize();
-
-        CopyOnWriteArrayList<String> ipList = new CopyOnWriteArrayList<>();
-        NetworkInterfaceInfo network = JSON.parseObject(detail.getNetworkInterfaceInfo(), NetworkInterfaceInfo.class);
-        Collections.addAll(ipList, network.getIpv4Addr());
-        Collections.addAll(ipList, network.getIpv6Addr());
-
-        this.ipList = ipList;
+        return;
     }
 
 //    public void addDataFromRuntimeInfo(RuntimeInfoVO runtime) {

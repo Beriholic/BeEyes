@@ -16,14 +16,17 @@ public class MachineInfoVO {
     private CpuInfo cpuInfo;
     private MemoryInfo memoryInfo;
     private List<NetworkInterfaceInfo> networkInterfaceInfo;
+    private DiskInfo diskInfo;
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class SystemInfo {
+        private String osName;
         private String kernelVersion;
         private String osVersion;
+        private String cpuArch;
     }
 
     @Data
@@ -52,6 +55,13 @@ public class MachineInfoVO {
         private String name;
         private List<String> ipv4 = new ArrayList<>();
         private List<String> ipv6 = new ArrayList<>();
-        private Long uploadSpeed;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public static class DiskInfo {
+        private double total;
     }
 }

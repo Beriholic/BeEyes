@@ -37,7 +37,7 @@ public class ClientController {
             @RequestBody @Valid MachineInfoVO vo
     ) {
         System.out.println(vo);
-//        service.reportClientInfo(client.getId(), vo);
+        service.reportClientInfo(client.getId(), vo);
         return RestBean.success();
     }
 
