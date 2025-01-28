@@ -58,6 +58,10 @@ func (m *Monitor) FetchNetwork() (*model.NetworkInfo, error) {
 			}
 		}
 
+		if len(interfaceInfo.IPv4) == 0 && len(interfaceInfo.IPv6) == 0 {
+			continue
+		}
+
 		networkInfo.Interfaces = append(networkInfo.Interfaces, &interfaceInfo)
 		interfaceIndexMap[iface.Name] = len(networkInfo.Interfaces) - 1
 	}

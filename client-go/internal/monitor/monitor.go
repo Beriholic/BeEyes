@@ -4,13 +4,13 @@ import "sync"
 
 var (
 	monitor     *Monitor
-	mointorOnce sync.Once
+	monitorOnce sync.Once
 )
 
 type Monitor struct{}
 
 func NewMonitor() *Monitor {
-	mointorOnce.Do(func() {
+	monitorOnce.Do(func() {
 		if monitor == nil {
 			monitor = &Monitor{}
 		}

@@ -44,11 +44,16 @@ func (s *MonitorService) FetchMachineInfo() (*model.MachineInfo, error) {
 	if err != nil {
 		return nil, fmt.Errorf("获取网络信息失败: %v", err)
 	}
+	diskInfo, err := s.monitor.FetchDiskInfo()
+	if err != nil {
+		return nil, fmt.Errorf("获取磁盘信息失败: %v", err)
+	}
 
 	return &model.MachineInfo{
 		Systeminfo:  sysinfo,
 		CPUInfo:     cpuInfo,
 		MemoryInfo:  memInfo,
+		DiskInfo:    diskInfo,
 		NetworkInfo: netInfo.Interfaces,
 	}, nil
 }

@@ -37,8 +37,8 @@ type NetworkInterfaceInfo struct {
 }
 
 type SystemInfo struct {
-	Name          string `json:"name,omitempty"`
+	OSName        string `json:"os_name,omitempty"`
 	KernelVersion string `json:"kernel_version,omitempty"`
 	OSVersion     string `json:"os_version,omitempty"`
-	HostName      string `json:"host_name,omitempty"`
+	CPUArch       string `json:"cpu_arch,omitempty"`
 }
