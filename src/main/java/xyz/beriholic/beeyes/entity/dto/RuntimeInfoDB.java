@@ -1,46 +1,46 @@
 package xyz.beriholic.beeyes.entity.dto;
 
+import com.influxdb.annotations.Column;
+import com.influxdb.annotations.Measurement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import xyz.beriholic.beeyes.entity.vo.request.RuntimeInfoVO;
 
+import java.time.Instant;
 import java.util.Date;
 
+@Measurement(name = "runtime_info")
 @AllArgsConstructor
 @Data
-public class RuntimeInfo {
+public class RuntimeInfoDB {
+    @Column(tag = true)
     Integer clientId;
-    Long timestamp;
+    @Column(timestamp = true)
+    Instant timestamp;
+
+    @Column
     Double cpuUsage;
+    @Column
     Double memoryUsage;
+    @Column
     Double swapUsage;
+    @Column
     Double diskUsage;
+    @Column
     Double networkUploadSpeed;
+    @Column
     Double networkDownloadSpeed;
 
-    public static RuntimeInfo from(int clientId, RuntimeInfoVO vo) {
-        return new RuntimeInfo(
+    public static RuntimeInfoDB from(int clientId, RuntimeInfoVO vo) {
+        return new RuntimeInfoDB(
                 clientId,
-                vo.getTimestamp(),
+                new Date(vo.getTimestamp()).toInstant(),
                 vo.getCpuInfo().getUsage(),
                 vo.getMemoryInfo().getPercentMemory(),
                 vo.getMemoryInfo().getPercentSwap(),
                 vo.getDiskInfo().getPercent(),
                 vo.getNetworkInfo().getInterfaces().getFirst().getUploadSpeed(),
                 vo.getNetworkInfo().getInterfaces().getFirst().getDownloadSpeed()
-        );
-    }
-
-    public RuntimeInfoDB toDB() {
-        return new RuntimeInfoDB(
-                this.clientId,
-                new Date(this.timestamp).toInstant(),
-                this.cpuUsage,
-                this.memoryUsage,
-                this.swapUsage,
-                this.diskUsage,
-                this.networkUploadSpeed,
-                this.networkDownloadSpeed
         );
     }
 }

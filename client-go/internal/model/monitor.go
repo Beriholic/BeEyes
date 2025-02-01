@@ -7,38 +7,38 @@ type CPUInfo struct {
 }
 
 type MemoryInfo struct {
-	TotalMemory   float64 `json:"total_memory,omitempty"`
-	UsedMemory    float64 `json:"used_memory,omitempty"`
-	FreeMemory    float64 `json:"free_memory,omitempty"`
-	PercentMemory float64 `json:"percent_memory,omitempty"`
-	TotalSwap     float64 `json:"total_swap,omitempty"`
-	UsedSwap      float64 `json:"used_swap,omitempty"`
-	FreeSwap      float64 `json:"free_swap,omitempty"`
-	PercentSwap   float64 `json:"percent_swap,omitempty"`
+	TotalMemory   float64 `json:"total_memory"`
+	UsedMemory    float64 `json:"used_memory"`
+	FreeMemory    float64 `json:"free_memory"`
+	PercentMemory float64 `json:"percent_memory"`
+	TotalSwap     float64 `json:"total_swap"`
+	UsedSwap      float64 `json:"used_swap"`
+	FreeSwap      float64 `json:"free_swap"`
+	PercentSwap   float64 `json:"percent_swap"`
 }
 
 type DiskInfo struct {
-	Total   float64 `json:"total,omitempty"`
-	Used    float64 `json:"used,omitempty"`
-	Free    float64 `json:"free,omitempty"`
-	Percent float64 `json:"percent,omitempty"`
+	Total   float64 `json:"total"`
+	Used    float64 `json:"used"`
+	Free    float64 `json:"free"`
+	Percent float64 `json:"percent"`
 }
 
 type NetworkInfo struct {
-	Interfaces []*NetworkInterfaceInfo `json:"interfaces,omitempty"`
+	Interfaces []*NetworkInterfaceInfo `json:"interfaces"`
 }
 
 type NetworkInterfaceInfo struct {
-	Name          string   `json:"name,omitempty"`
-	IPv4          []string `json:"ipv4,omitempty"`
-	IPv6          []string `json:"ipv6,omitempty"`
-	UploadSpeed   uint64   `json:"upload_speed,omitempty"`
-	DownloadSpeed uint64   `json:"download_speed,omitempty"`
+	Name          string   `json:"name"`
+	IPv4          []string `json:"ipv4"`
+	IPv6          []string `json:"ipv6"`
+	UploadSpeed   float64  `json:"upload_speed"`
+	DownloadSpeed float64  `json:"download_speed"`
 }
 
 type SystemInfo struct {
-	OSName        string `json:"os_name,omitempty"`
-	KernelVersion string `json:"kernel_version,omitempty"`
-	OSVersion     string `json:"os_version,omitempty"`
-	CPUArch       string `json:"cpu_arch,omitempty"`
+	OSName        string `json:"os_name"`
+	KernelVersion string `json:"kernel_version"`
+	OSVersion     string `json:"os_version"`
+	CPUArch       string `json:"cpu_arch"`
 }

@@ -31,6 +31,7 @@ import {
 import { ClipedLabel } from "./CilpedLabel";
 import { MetricData } from "@/api/internal/model/response/metric";
 import { useMemo, useState } from "react";
+import { totalmem } from "os";
 
 export default function ServerCard({
   data,
@@ -44,25 +45,21 @@ export default function ServerCard({
     name,
     location,
     osName,
-    osArch,
+    kernelVersion,
     osVersion,
-    osBitSize,
     cpuName,
-    ipList,
+    cpuArch,
     cpuCoreCount,
-    memorySize,
+    totalMemory,
+    totalSwap,
+    totalDisk,
     cpuUsage,
     memoryUsage,
+    swapUsage,
     networkUploadSpeed,
     networkDownloadSpeed,
+    ipList,
   } = data;
-
-  const cpuUsagePercent: number = useMemo(() => {
-    return cpuUsage * 100;
-  }, [cpuUsage]);
-  const memoryUsagePercent = useMemo(() => {
-    return (memoryUsage / memorySize) * 100;
-  }, [memoryUsage]);
 
   const {
     isOpen: isOpenRename,
@@ -115,10 +112,18 @@ export default function ServerCard({
         </div>
       </div>
       <div className="text-xs flex items-center justify-between">
-        <div>
-          {osName} {osVersion}
-        </div>
-        <div>{osBitSize} 位</div>
+        <Popover placement="right">
+          <PopoverTrigger>
+            <div className="cursor-grab">
+              {osName} {osVersion}
+            </div>
+          </PopoverTrigger>
+          <PopoverContent>
+            <div className="px-1 py-2 ">{kernelVersion}</div>
+          </PopoverContent>
+        </Popover>
+
+        <div>{cpuArch}</div>
       </div>
       <Divider className="my-2 bg-divider" />
       <div className="flex text-sm items-center">
@@ -147,45 +152,52 @@ export default function ServerCard({
           <FaMicrochip />
           <Popover placement="right">
             <PopoverTrigger>
-              <div className="cursor-grab">{cpuCoreCount} CPU</div>
+              <div className="cursor-grab">{cpuCoreCount} Core</div>
             </PopoverTrigger>
             <PopoverContent>
               <div className="px-1 py-2 ">
-                {cpuName} {osArch}
+                {cpuName} {cpuArch}
               </div>
             </PopoverContent>
           </Popover>
         </div>
         <div className="flex items-center gap-1">
           <FaMemory />
-          <div>{memorySize.toFixed(2)} GB</div>
+          <div>{totalMemory} GB</div>
         </div>
       </div>
       <div className="flex flex-col gap-y-2 text-xs mt-2">
         <div>
           <div className="flex gap-1">
             <div>CPU: </div>
-            <div>{cpuUsagePercent.toFixed(2)}%</div>
+            <div>{cpuUsage}%</div>
           </div>
-          <Progress size="sm" value={cpuUsagePercent} />
+          <Progress size="sm" value={cpuUsage} />
         </div>
         <div>
           <div className="flex gap-1">
             <div>内存: </div>
-            <div>{memoryUsagePercent.toFixed(2)}%</div>
+            <div>{memoryUsage * 100}%</div>
           </div>
-          <Progress size="sm" value={memoryUsagePercent} />
+          <Progress size="sm" value={memoryUsage * 100} />
+        </div>
+        <div>
+          <div className="flex gap-1">
+            <div>Swap: </div>
+            <div>{swapUsage * 100}%</div>
+          </div>
+          <Progress size="sm" value={memoryUsage * 100} />
         </div>
         <div className="flex justify-between">
           <span>网络</span>
           <div className="flex items-center gap-2">
             <div className="flex items-center">
               <FaArrowUp />
-              <div>{networkUploadSpeed.toFixed(2)} kb/s</div>
+              <div>{networkUploadSpeed} kb/s</div>
             </div>
             <div className="flex items-center">
               <FaArrowDown />
-              <div>{networkDownloadSpeed.toFixed(2)} kb/s</div>
+              <div>{networkDownloadSpeed} kb/s</div>
             </div>
           </div>
         </div>

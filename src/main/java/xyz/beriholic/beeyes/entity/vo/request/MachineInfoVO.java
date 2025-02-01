@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -53,8 +52,8 @@ public class MachineInfoVO {
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class NetworkInterfaceInfo {
         private String name;
-        private List<String> ipv4 = new ArrayList<>();
-        private List<String> ipv6 = new ArrayList<>();
+        private List<String> ipv4;
+        private List<String> ipv6;
     }
 
     @Data
@@ -62,6 +61,6 @@ public class MachineInfoVO {
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class DiskInfo {
-        private double total;
+        private Double total;
     }
 }

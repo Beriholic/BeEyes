@@ -27,17 +27,20 @@ func RunMonitor() error {
 	slog.Info("上报机器信息成功")
 
 	for {
-		runtimeInfo, err := server.FetchRuntimeInfo()
+		runtimeInfoDB, err := server.FetchRuntimeInfo()
 		if err != nil {
 			slog.Error("获取运行时信息失败", "err", err)
 			return nil
 		}
-		err = api.ReportRuntimeInfo(runtimeInfo)
+		err = api.ReportRuntimeInfo(runtimeInfoDB)
+
 		if err != nil {
 			slog.Error("上报运行时信息失败", "err", err)
-			return nil
+			slog.Warn("10s 后重试")
+			time.Sleep(time.Second * 10)
+			continue
 		}
-		time.Sleep(time.Second * 5)
+		time.Sleep(time.Second * 3)
 	}
 }
 func RegisterToServer() error {

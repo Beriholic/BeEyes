@@ -9,8 +9,8 @@ spring:
     password: ""
   influx-db:
     url: http://localhost:8086
-    token: "-gID2ytNKhMVkXqKyVVftReTFNyqxJLPDJknlWd8kQUmi2u1diOzyAGuCAYC-Dz7qMEl-5zVtbfDZC03gQN4Pg=="
-    bucket: "be_eyes"
+    token: "vCtq0Ih1b-n6RPR75bCP-_nTPXjKvxEcod_GPVMAkjOeN54JABbBqHfUKQy-WOcrBxOo7BLj7FxVPtl6Ua6g7w=="
+    bucket: "BeEyes"
     org: "docs"
   rabbitmq:
     addresses: localhost

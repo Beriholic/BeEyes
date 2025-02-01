@@ -15,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class RuntimeInfoVO {
+    private Long timestamp;
     private CpuInfo cpuInfo;
     private MemoryInfo memoryInfo;
     private DiskInfo diskInfo;
@@ -69,10 +70,10 @@ public class RuntimeInfoVO {
         @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
         public static class NetworkInterface {
             private String name;
-            private List<String> ipv4 = new ArrayList<>();
-            private List<String> ipv6 = new ArrayList<>();
-            private Long uploadSpeed;
-            private Long downloadSpeed; // 新增下载速度字段
+            private List<String> ipv4;
+            private List<String> ipv6;
+            private Double uploadSpeed;
+            private Double downloadSpeed;
         }
     }
 }

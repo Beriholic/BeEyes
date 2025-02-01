@@ -57,6 +57,7 @@ func (a *Api) doRequest(method, url, body string) (*model.Response, error) {
 	if err != nil {
 		return nil, fmt.Errorf("读取响应体失败: %v", err)
 	}
+	slog.Info("respBody", "value", string(respBody))
 
 	var response model.Response
 	if err := sonic.Unmarshal(respBody, &response); err != nil {

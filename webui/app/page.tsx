@@ -4,14 +4,13 @@ import { MetricData } from "@/api/internal/model/response/metric";
 import ServerCard from "@/components/ServerCard";
 import { HomeLayout } from "@/layout/HomeLayout";
 import { PopMsg } from "@/store/pops";
-import { divider, Divider, Spinner } from "@heroui/react";
+import { Divider, Spinner } from "@heroui/react";
 import { useEffect, useState } from "react";
 import { FaServer } from "react-icons/fa6";
 import { AnimatePresence, motion } from "framer-motion";
-import { rename } from "fs";
 
 export default function Home() {
-  const updateDelay = 2000;
+  const updateDelay = 3000;
   const [serverList, setServerList] = useState<Array<MetricData>>([]);
 
   useEffect(() => {

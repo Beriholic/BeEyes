@@ -77,6 +77,7 @@ func (s *MonitorService) FetchRuntimeInfo() (*model.RuntimeInfo, error) {
 	}
 
 	return &model.RuntimeInfo{
+		Timestamp:   time.Now().UnixMilli(),
 		CPUInfo:     cpuInfo,
 		MemoryInfo:  memInfo,
 		DiskInfo:    diskInfo,

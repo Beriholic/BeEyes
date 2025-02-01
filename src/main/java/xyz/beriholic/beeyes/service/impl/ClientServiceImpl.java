@@ -9,38 +9,35 @@ import org.springframework.stereotype.Service;
 import xyz.beriholic.beeyes.cache.ClientCache;
 import xyz.beriholic.beeyes.entity.dto.Client;
 import xyz.beriholic.beeyes.entity.dto.ClientDetail;
+import xyz.beriholic.beeyes.entity.dto.RuntimeInfo;
 import xyz.beriholic.beeyes.entity.vo.request.MachineInfoVO;
 import xyz.beriholic.beeyes.entity.vo.request.RuntimeInfoVO;
 import xyz.beriholic.beeyes.entity.vo.response.ClientMetricVO;
 import xyz.beriholic.beeyes.mapper.ClientDetailMapper;
 import xyz.beriholic.beeyes.mapper.ClientMapper;
+import xyz.beriholic.beeyes.repo.ClientDetailRepo;
 import xyz.beriholic.beeyes.service.ClientService;
 import xyz.beriholic.beeyes.utils.InfluxDBUtils;
 
 import java.security.SecureRandom;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Service
 public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> implements ClientService {
-    private final Map<String, Client> tokenCache = new ConcurrentHashMap<>();
-    private final Map<Integer, RuntimeInfoVO> runtimeInfoCache = new ConcurrentHashMap<>();
     @Resource
     ClientCache clientCache;
     @Resource
     ClientDetailMapper clientDetailMapper;
     @Resource
+    ClientDetailRepo clientDetailRepo;
+    @Resource
     InfluxDBUtils influxDBUtils;
-
-    private String token = this.generateRandomToken();
 
     @PostConstruct
     public void initClientCache() {
-        this.list().forEach(this::putCache);
+        this.list().forEach(client -> clientCache.putIdCache(client.getId(), client));
     }
 
     @Override
@@ -50,28 +47,24 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
 
     @Override
     public Client getClientByToken(String token) {
-        return this.tokenCache.get(token);
-    }
-
-    @Override
-    public String getRegisterToken() {
-        return this.token;
+        return clientCache.getTokenCache(token);
     }
 
     @Override
     public boolean verifyAndRegister(String token) {
-        if (clientCache.getTokenCache(token)) {
-            log.info("Token无效 {}", token);
+        if (clientCache.hasTokenCache(token)) {
             return true;
         }
 
-        long count = this.count(new QueryWrapper<Client>().eq("token", token));
-        if (count == 0) {
+
+        Client client = this.getOne(new QueryWrapper<Client>().eq("token", token));
+
+        if (Objects.isNull(client)) {
             log.info("Token无效 {}", token);
             return false;
         }
 
-        clientCache.putTokenCache(token, true);
+        clientCache.putTokenCache(token, client);
         return true;
     }
 
@@ -85,41 +78,32 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
         }
     }
 
-//
-//    @Override
-//    public void reportRuntimeInfo(int clientId, RuntimeInfoVO vo) {
-//        runtimeInfoCache.put(clientId, vo);
-//        influxDBUtils.writeRuntimeInfo(clientId, vo);
-//    }
+    @Override
+    public void reportRuntimeInfo(int clientId, RuntimeInfoVO vo) {
+        RuntimeInfo runtimeInfo = RuntimeInfo.from(clientId, vo);
+        clientCache.putRuntimeInfoCache(clientId, runtimeInfo);
+        influxDBUtils.writeRuntimeInfo(runtimeInfo.toDB());
+    }
 
     @Override
     public List<ClientMetricVO> getAllClientMetric() {
-        return clientCache.getAllCache().stream().map(client -> {
+        return clientCache.getAllIdCache().stream().map(client -> {
             ClientMetricVO metric = ClientMetricVO.from(client);
 
-            ClientDetail clientDetail = clientDetailMapper.selectById(client.getId());
+            ClientDetail clientDetail = clientDetailRepo.getClientDetailById(client.getId());
 
             metric.addDataFromClientDetail(clientDetail);
 
-            RuntimeInfoVO runtime = runtimeInfoCache.get(client.getId());
+            RuntimeInfo runtimeInfo = clientCache.getRuntimeInfoCache(client.getId());
 
             metric.setOnline(false);
-//            if (Objects.nonNull(runtime) && System.currentTimeMillis() - runtime.getTimestamp() < 60 * 1000) {
-//                metric.addDataFromRuntimeInfo(runtime);
-//                metric.setOnline(true);
-//            }
+            if (Objects.nonNull(runtimeInfo) && System.currentTimeMillis() - runtimeInfo.getTimestamp() < 30 * 1000) {
+                metric.addDataFromRuntimeInfo(runtimeInfo);
+                metric.setOnline(true);
+            }
 
             return metric;
         }).toList();
-    }
-
-    private void putCache(Client client) {
-        clientCache.putIdCache(client.getId(), client);
-        this.tokenCache.put(client.getToken(), client);
-    }
-
-    private int generateRandomId() {
-        return new Random().nextInt(90000000) + 10000000;
     }
 
     private String generateRandomToken() {

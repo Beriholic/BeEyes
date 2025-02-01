@@ -96,8 +96,8 @@ func (m *Monitor) FetchNetwork() (*model.NetworkInfo, error) {
 			continue
 		}
 
-		networkInfo.Interfaces[index].UploadSpeed = uploadSpeed
-		networkInfo.Interfaces[index].DownloadSpeed = downloadSpeed
+		networkInfo.Interfaces[index].UploadSpeed = byteToKB(uploadSpeed)
+		networkInfo.Interfaces[index].DownloadSpeed = byteToKB(downloadSpeed)
 	}
 
 	return networkInfo, nil

@@ -8,15 +8,19 @@ export interface MetricData {
   readonly name: string;
   readonly location: string;
   readonly osName: string;
-  readonly osArch: string;
+  readonly kernelVersion: string;
   readonly osVersion: string;
-  readonly osBitSize: number;
   readonly cpuName: string;
-  readonly ipList: Array<string>;
+  readonly cpuArch: string;
   readonly cpuCoreCount: number;
-  readonly memorySize: number;
+  readonly totalMemory: number;
+  readonly totalSwap: number;
+  readonly totalDisk: number;
+
   readonly cpuUsage: number;
   readonly memoryUsage: number;
+  readonly swapUsage: number;
   readonly networkUploadSpeed: number;
   readonly networkDownloadSpeed: number;
+  readonly ipList: Array<string>;
 }

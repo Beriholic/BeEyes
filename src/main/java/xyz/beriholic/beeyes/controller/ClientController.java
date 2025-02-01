@@ -47,7 +47,7 @@ public class ClientController {
             @RequestBody @Valid RuntimeInfoVO vo
     ) {
         System.out.println(vo);
-//        service.reportRuntimeInfo(client.getId(), vo);
+        service.reportRuntimeInfo(client.getId(), vo);
         return RestBean.success();
     }
 }

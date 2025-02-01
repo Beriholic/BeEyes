@@ -35,7 +35,7 @@ public class SaTokenConfiguration implements WebMvcConfigurer {
 
                 String uri = request.getRequestURI();
                 if (uri.startsWith("/api/client")) {
-                    if (!uri.endsWith("/api/register")) {
+                    if (!uri.endsWith("/api/client/register")) {
                         Client client = clientService.getClientByToken(authorization);
                         if (client == null) {
                             try {
@@ -45,7 +45,6 @@ public class SaTokenConfiguration implements WebMvcConfigurer {
                                 log.error("响应客户端失败", e);
                                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                             }
-                            return;
                         } else {
                             request.setAttribute(Const.ATTR_CLIENT, client);
                         }
