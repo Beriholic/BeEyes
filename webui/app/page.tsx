@@ -2,14 +2,16 @@
 import { api } from "@/api/instance";
 import { MetricData } from "@/api/internal/model/response/metric";
 import ServerCard from "@/components/ServerCard";
-import { HomeLayout } from "@/layout/HomeLayout";
 import { PopMsg } from "@/store/pops";
-import { Divider, Spinner } from "@heroui/react";
+import { Divider, Navbar, Spinner } from "@heroui/react";
 import { useEffect, useState } from "react";
 import { FaServer } from "react-icons/fa6";
 import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { HomeLayout } from "@/layout/HomeLayout";
 
 export default function Home() {
+  const router = useRouter();
   const updateDelay = 3000;
   const [serverList, setServerList] = useState<Array<MetricData>>([]);
 
@@ -73,6 +75,9 @@ export default function Home() {
                   data={server}
                   rename={(name) => {
                     renameServer(server.id, name);
+                  }}
+                  onClick={() => {
+                    router.push(`/machine/${server.id}`);
                   }}
                 />
               );

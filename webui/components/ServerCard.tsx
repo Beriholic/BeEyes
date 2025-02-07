@@ -36,9 +36,11 @@ import { totalmem } from "os";
 export default function ServerCard({
   data,
   rename,
+  onClick,
 }: {
   data: MetricData;
   rename: (name: string) => void;
+  onClick: () => void;
 }) {
   const {
     online,
@@ -51,8 +53,8 @@ export default function ServerCard({
     cpuArch,
     cpuCoreCount,
     totalMemory,
-    totalSwap,
-    totalDisk,
+    // totalSwap,
+    // totalDisk,
     cpuUsage,
     memoryUsage,
     swapUsage,
@@ -86,9 +88,7 @@ export default function ServerCard({
           <Tooltip content={name}>
             <div
               className="text-xl cursor-grab hover:underline truncate flex-1 min-w-0"
-              onClick={() => {
-                //TODO navigate to machine info page
-              }}
+              onClick={onClick}
             >
               {name}
             </div>
@@ -184,7 +184,7 @@ export default function ServerCard({
         <div>
           <div className="flex gap-1">
             <div>Swap: </div>
-            <div>{swapUsage * 100}%</div>
+            <div>{(swapUsage * 100).toFixed(0)}%</div>
           </div>
           <Progress size="sm" value={memoryUsage * 100} />
         </div>
