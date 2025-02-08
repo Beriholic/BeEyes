@@ -55,34 +55,35 @@ export default function Home() {
   return (
     <HomeLayout>
       <section className="flex flex-col">
-        <div className="flex gap-2 px-8 py-2 items-center">
-          <FaServer size={24} />
-          <b className="text-xl">主机列表</b>
-        </div>
-        <Divider className="bg-divider" />
-
         {serverList.length > 0 ? (
-          <motion.div
-            className="p-4 grid grid-cols-4 gap-x-4 gap-y-8"
-            initial={{ opacity: 0.4, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20, scale: 0.5 }}
-          >
-            {serverList.map((server) => {
-              return (
-                <ServerCard
-                  key={server.id}
-                  data={server}
-                  rename={(name) => {
-                    renameServer(server.id, name);
-                  }}
-                  onClick={() => {
-                    router.push(`/machine/${server.id}`);
-                  }}
-                />
-              );
-            })}
-          </motion.div>
+          <>
+            <div className="flex gap-2 px-8 py-2 items-center">
+              <FaServer size={24} />
+              <b className="text-xl">主机列表</b>
+            </div>
+            <Divider className="bg-divider" />
+            <motion.div
+              className="p-4 grid grid-cols-4 gap-x-4 gap-y-8"
+              initial={{ opacity: 0.4, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20, scale: 0.5 }}
+            >
+              {serverList.map((server) => {
+                return (
+                  <ServerCard
+                    key={server.id}
+                    data={server}
+                    rename={(name) => {
+                      renameServer(server.id, name);
+                    }}
+                    onClick={() => {
+                      router.push(`/machine/${server.id}`);
+                    }}
+                  />
+                );
+              })}
+            </motion.div>
+          </>
         ) : (
           <AnimatePresence>
             <motion.div

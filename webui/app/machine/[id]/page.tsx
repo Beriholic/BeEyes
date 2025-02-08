@@ -3,6 +3,7 @@ import MachineLayout from "@/layout/MachineLayout";
 import { useEffect, useState } from "react";
 import MachineDashboardPage from "./_module/dashbord";
 import MachineTerminalPage from "./_module/terminal";
+import MachineSettingPage from "./_module/setting";
 
 export default function MachinePage({
   params,
@@ -11,7 +12,6 @@ export default function MachinePage({
 }) {
   const [id, setId] = useState<number | null>(null);
 
-  const machineName = "测试机器";
   const [moduleIndex, setModuleIndex] = useState(0);
 
   useEffect(() => {
@@ -24,7 +24,6 @@ export default function MachinePage({
 
   return (
     <MachineLayout
-      machineName={machineName}
       moduleIndex={moduleIndex}
       setModuleIndex={(index) => {
         setModuleIndex(index);
@@ -34,6 +33,8 @@ export default function MachinePage({
         <MachineDashboardPage />
       ) : moduleIndex === 1 ? (
         <MachineTerminalPage />
+      ) : moduleIndex === 2 ? (
+        <MachineSettingPage />
       ) : (
         <></>
       )}
