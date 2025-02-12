@@ -90,6 +90,7 @@ export default function LoginPage() {
             <Input
               color="primary"
               placeholder="密码"
+              type="password"
               value={form.password}
               onChange={(e) => {
                 setForm({

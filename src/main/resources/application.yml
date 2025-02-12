@@ -31,8 +31,9 @@ spring:
       timeout: 2000
       lettuce:
         pool:
-          max-active: 8
-          max-idle: 8
+          max-active: 200
+          max-wait: -1ms
+          max-idle: 10
           min-idle: 0
   security:
     jwt:

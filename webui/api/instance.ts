@@ -23,5 +23,9 @@ export const api = new Api(async ({ uri, method, headers, body }) => {
     return null;
   }
 
-  return JSON.parse(text);
+  const resp = JSON.parse(text);
+  if (resp.code === 401) {
+    document.location.replace("/login");
+  }
+  return resp;
 });

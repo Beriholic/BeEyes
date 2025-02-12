@@ -26,7 +26,8 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    implementation("cn.dev33:sa-token-spring-boot3-starter:1.39.0")
+    implementation("cn.dev33:sa-token-spring-boot3-starter:1.40.0")
+    implementation("cn.dev33:sa-token-redis-jackson:1.40.0")
     implementation("cn.hutool:hutool-all:5.8.35")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
@@ -41,6 +42,7 @@ dependencies {
     implementation("com.influxdb:influxdb-client-java:7.2.0")
     implementation("org.springframework.boot:spring-boot-starter-websocket")
     implementation("com.influxdb:influxdb-client-java:6.6.0")
+    implementation("org.apache.commons:commons-pool2")
     implementation("com.jcraft:jsch:0.1.55")
 }
 
