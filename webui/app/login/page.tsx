@@ -49,6 +49,7 @@ export default function LoginPage() {
       username: res.data.username,
       role: res.data.role,
     });
+    localStorage.setItem("token", res.data.token);
 
     setTimeout(() => {
       router.push("/");

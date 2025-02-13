@@ -1,16 +1,15 @@
 import { Api } from "./internal/api";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_API ?? "";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_API ?? "http://localhost:8080";
 
 export const api = new Api(async ({ uri, method, headers, body }) => {
-  const tenant = (window as any).__tenant as string | undefined;
   const response = await fetch(`${BASE_URL}${uri}`, {
     method,
     body: body !== undefined ? JSON.stringify(body) : undefined,
     headers: {
       "content-type": "application/json;charset=UTF-8",
+      jinyum: localStorage.getItem("token") ?? "",
       ...headers,
-      ...(tenant !== undefined && tenant !== "" ? { tenant } : {}),
     },
   });
 

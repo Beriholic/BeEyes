@@ -58,7 +58,7 @@ spring:
       methods: '*'
 
 sa-token:
-  token-name: beeyes-token
+  token-name: jinyum
   timeout: 2592000
   active-timeout: -1
   is-concurrent: true

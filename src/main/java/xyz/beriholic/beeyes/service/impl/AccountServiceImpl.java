@@ -96,11 +96,6 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
             throw new UserNameOrEmailNotFound();
         }
 
-   /*     if (this.frequencyCheck(account.getId())) {
-            throw new LoginFrequencyException();
-        }
-
-*/
         if (!passwordUtil.check(password, account.getPassword())) {
             throw new UserNameOrPasswordError();
         }
@@ -113,8 +108,9 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
                         .setUsername(account.getUsername())
                         .setRole(account.getRole())
         );
+        String token = StpUtil.getTokenValue();
 
-        return new AuthorizeVO().setUsername(account.getUsername()).setRole(account.getRole());
+        return new AuthorizeVO().setUsername(account.getUsername()).setRole(account.getRole()).setToken(token);
     }
 
     private void deleteEmailVerifyCode(String email) {
