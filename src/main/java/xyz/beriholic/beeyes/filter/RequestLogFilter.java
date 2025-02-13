@@ -23,7 +23,7 @@ import java.util.Set;
 @Component
 public class RequestLogFilter extends OncePerRequestFilter {
 
-    private final Set<String> ignores = Set.of("/swagger-ui", "/v3/api-docs", "/runtime");
+    private final Set<String> ignores = Set.of("/swagger-ui", "/v3/api-docs", "/api/metric/test", "/api/metric/list");
 
     @Resource
     SnowflakeIdGenerator generator;

@@ -1,6 +1,9 @@
 "use client";
 import { api } from "@/api/instance";
-import { MetricData } from "@/api/internal/model/response/metric";
+import {
+  MetricData,
+  MetricServiceResponse,
+} from "@/api/internal/model/response/metric";
 import ServerCard from "@/components/ServerCard";
 import { PopMsg } from "@/store/pops";
 import { Divider, Navbar, Spinner } from "@heroui/react";
@@ -9,27 +12,40 @@ import { FaServer } from "react-icons/fa6";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { HomeLayout } from "@/layout/HomeLayout";
+import { fetchEventSource } from "@microsoft/fetch-event-source";
 
 export default function Home() {
   const router = useRouter();
-  const updateDelay = 3000;
   const [serverList, setServerList] = useState<Array<MetricData>>([]);
 
   useEffect(() => {
-    const interval = setInterval(async () => {
-      const res = await api.metricService.getAll();
-      if (res.code !== 200) {
-        PopMsg({
-          type: "danger",
-          title: "获取主机列表失败",
-          description: res.message,
-        });
-        setServerList([]);
-        return;
-      }
-      setServerList(res.data);
-    }, updateDelay);
-    return () => clearInterval(interval);
+    const ctrl = new AbortController();
+    api.metricService.getClientMetricList({
+      onmessage: (data) => {
+        setServerList(data);
+      },
+      onerror: (err) => {
+        console.log(err);
+      },
+      signal: ctrl.signal,
+    });
+    // fetchEventSource("http://localhost:8080/api/metric/list", {
+    //   method: "GET",
+    //   headers: {
+    //     jinyum: localStorage.getItem("token") ?? "",
+    //   },
+    //   onmessage: (event) => {
+    //     const data: MetricServiceResponse["METRIC_SERVICE/GET_CLIENT_METRICS"] =
+    //       JSON.parse(event.data);
+
+    //     setServerList(data);
+    //   },
+    //   signal: ctrl.signal,
+    // });
+
+    return () => {
+      ctrl.abort();
+    };
   }, []);
 
   const renameServer = async (id: number, name: string) => {

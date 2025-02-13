@@ -1,20 +1,41 @@
+import { BASE_URL } from "@/api/instance";
 import { Executor } from "../executor";
 import { MetricServiceResponse } from "../model/response/metric";
 import { RestBean } from "../model/static/RestBean";
+import {
+  fetchEventSource,
+  EventSourceMessage,
+} from "@microsoft/fetch-event-source";
 
 export class MetricService {
   constructor(private executor: Executor) {}
 
-  async getAll(): Promise<
-    RestBean<MetricServiceResponse["METRIC_SERVICE/GET_CLIENT_METRICS"]>
-  > {
-    const _uri = "/api/metric/list";
+  getClientMetricList({
+    onmessage,
+    onerror,
+    signal,
+  }: {
+    onmessage: (
+      data: MetricServiceResponse["METRIC_SERVICE/GET_CLIENT_METRICS"]
+    ) => void;
+    onerror: (err: any) => void;
+    signal: AbortSignal;
+  }) {
+    const _uri = `${BASE_URL}/api/metric/list`;
 
-    return (await this.executor({
-      uri: _uri,
+    fetchEventSource(_uri, {
       method: "GET",
-    })) as Promise<
-      RestBean<MetricServiceResponse["METRIC_SERVICE/GET_CLIENT_METRICS"]>
-    >;
+      headers: {
+        jinyum: localStorage.getItem("token") ?? "",
+      },
+      onmessage: (event) => {
+        const data = JSON.parse(
+          event.data
+        ) as MetricServiceResponse["METRIC_SERVICE/GET_CLIENT_METRICS"];
+        onmessage(data);
+      },
+      signal: signal,
+      onerror: onerror,
+    });
   }
 }

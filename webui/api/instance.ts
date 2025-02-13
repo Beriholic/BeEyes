@@ -1,6 +1,7 @@
 import { Api } from "./internal/api";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_API ?? "http://localhost:8080";
+export const BASE_URL =
+  process.env.NEXT_PUBLIC_BASE_API ?? "http://localhost:8080";
 
 export const api = new Api(async ({ uri, method, headers, body }) => {
   const response = await fetch(`${BASE_URL}${uri}`, {
