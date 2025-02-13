@@ -22,6 +22,7 @@
     "@heroui/switch": "2.2.8",
     "@heroui/system": "2.4.6",
     "@heroui/theme": "2.4.5",
+    "@microsoft/fetch-event-source": "^2.0.1",
     "@react-aria/ssr": "3.9.7",
     "@react-aria/visually-hidden": "3.8.18",
     "@react-spring/three": "^9.7.5",

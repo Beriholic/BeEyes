@@ -12,7 +12,6 @@ import { FaServer } from "react-icons/fa6";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { HomeLayout } from "@/layout/HomeLayout";
-import { fetchEventSource } from "@microsoft/fetch-event-source";
 
 export default function Home() {
   const router = useRouter();
@@ -29,19 +28,6 @@ export default function Home() {
       },
       signal: ctrl.signal,
     });
-    // fetchEventSource("http://localhost:8080/api/metric/list", {
-    //   method: "GET",
-    //   headers: {
-    //     jinyum: localStorage.getItem("token") ?? "",
-    //   },
-    //   onmessage: (event) => {
-    //     const data: MetricServiceResponse["METRIC_SERVICE/GET_CLIENT_METRICS"] =
-    //       JSON.parse(event.data);
-
-    //     setServerList(data);
-    //   },
-    //   signal: ctrl.signal,
-    // });
 
     return () => {
       ctrl.abort();

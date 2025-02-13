@@ -177,7 +177,7 @@ export default function ServerCard({
         <div>
           <div className="flex gap-1">
             <div>内存: </div>
-            <div>{memoryUsage * 100}%</div>
+            <div>{(memoryUsage * 100).toFixed(0)}%</div>
           </div>
           <Progress size="sm" value={memoryUsage * 100} />
         </div>
@@ -186,7 +186,7 @@ export default function ServerCard({
             <div>Swap: </div>
             <div>{(swapUsage * 100).toFixed(0)}%</div>
           </div>
-          <Progress size="sm" value={memoryUsage * 100} />
+          <Progress size="sm" value={swapUsage * 100} />
         </div>
         <div className="flex justify-between">
           <span>网络</span>
