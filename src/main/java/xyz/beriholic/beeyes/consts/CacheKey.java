@@ -1,5 +1,5 @@
 package xyz.beriholic.beeyes.consts;
 
 public class CacheKey {
-    public final static String CLIENT_DETAIL = "client_detail";
+    public static final String CLIENT_TOKEN_CACHE = "client_token_cache";
 }

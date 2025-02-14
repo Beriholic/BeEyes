@@ -8,7 +8,7 @@ export function Pops() {
   const msgList = usePopsStore((state) => state.msgList);
 
   return (
-    <div className="fixed top-0 right-0 z-50 flex flex-col w-1/4 p-2 gap-2 overflow-hidden">
+    <div className="fixed top-0 right-0 z-[100] flex flex-col w-1/4 p-2 gap-2 overflow-hidden">
       <AnimatePresence>
         {msgList.map((msg) => (
           <motion.div

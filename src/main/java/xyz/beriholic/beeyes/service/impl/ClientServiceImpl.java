@@ -19,7 +19,6 @@ import xyz.beriholic.beeyes.repo.ClientDetailRepo;
 import xyz.beriholic.beeyes.service.ClientService;
 import xyz.beriholic.beeyes.utils.InfluxDBUtils;
 
-import java.security.SecureRandom;
 import java.util.List;
 import java.util.Objects;
 
@@ -47,7 +46,14 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
 
     @Override
     public Client getClientByToken(String token) {
-        return clientCache.getTokenCache(token);
+        if (clientCache.hasTokenCache(token)) {
+            return clientCache.getTokenCache(token);
+        }
+        Client client = this.getOne(new QueryWrapper<Client>().eq("token", token));
+        if (Objects.nonNull(client)) {
+            clientCache.putTokenCache(token, client);
+        }
+        return client;
     }
 
     @Override
@@ -55,7 +61,6 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
         if (clientCache.hasTokenCache(token)) {
             return true;
         }
-
 
         Client client = this.getOne(new QueryWrapper<Client>().eq("token", token));
 
@@ -105,18 +110,4 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
             return metric;
         }).toList();
     }
-
-    private String generateRandomToken() {
-        String token = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        SecureRandom random = new SecureRandom();
-        StringBuilder builder = new StringBuilder(24);
-
-        for (int i = 0; i < 24; i++) {
-            builder.append(token.charAt(random.nextInt(token.length())));
-        }
-
-        log.info("Current Token: {}", builder);
-        return builder.toString();
-    }
-
 }

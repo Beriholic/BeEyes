@@ -12,9 +12,10 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static xyz.beriholic.beeyes.consts.CacheKey.CLIENT_TOKEN_CACHE;
+
 @Component
 public class ClientCache {
-    private final String CLIENT_TOKEN_CACHE = "client_token_cache";
     private final Map<Integer, Client> clientIdCache = new ConcurrentHashMap<>();
     private final Map<Integer, RuntimeInfo> runtimeInfoCache = new ConcurrentHashMap<>();
 
