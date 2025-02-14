@@ -56,6 +56,13 @@ func Create() {
 	url := ""
 	token := ""
 
+	cfg := loadConfig()
+
+	if cfg != nil {
+		url = cfg.Url
+		token = cfg.Token
+	}
+
 	form := huh.NewForm(
 		huh.NewGroup(
 			huh.NewInput().
