@@ -1,5 +1,3 @@
-import { Labrada } from "next/font/google";
-
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {

@@ -10,6 +10,7 @@ import { api } from "@/api/instance";
 import { PopMsg } from "@/store/pops";
 import { useUserInfoStore } from "@/store/user";
 import SplitText from "@/components/SplitText";
+import FadeContent from "@/components/FadeContent";
 
 interface LoginForm {
   username: string;
@@ -54,7 +55,7 @@ export default function LoginPage() {
 
     setTimeout(() => {
       router.push("/");
-    }, 600);
+    }, 300);
   };
 
   return (
@@ -71,7 +72,14 @@ export default function LoginPage() {
           zoomOut={false}
         />
       </ShaderGradientCanvas>
-      <div className="relative z-10 p-10 size-3/5 rounded-2xl bg-primary-300 flex flex-row justify-between">
+
+      <FadeContent
+        blur={true}
+        duration={1000}
+        easing="ease-out"
+        initialOpacity={0}
+        className="relative z-10 p-10 size-3/5 rounded-2xl bg-primary-300 flex flex-row justify-between"
+      >
         <div className="flex flex-col w-1/2">
           <div>
             <div className="text-4xl font-bold ">登陆</div>
@@ -120,7 +128,7 @@ export default function LoginPage() {
             rootMargin="-50px"
           />
         </div>
-      </div>
+      </FadeContent>
     </section>
   );
 }

@@ -118,6 +118,7 @@ export default function ApiKeysPage() {
         description: res.message,
       });
     }
+
     setMachineList(res.data);
   };
 

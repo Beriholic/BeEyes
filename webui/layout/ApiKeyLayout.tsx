@@ -1,3 +1,4 @@
+import FadeContent from "@/components/FadeContent";
 import { Navbar } from "@/components/navbar";
 
 export default function ApiKeyLayout({
@@ -8,12 +9,19 @@ export default function ApiKeyLayout({
   return (
     <div className="relative flex flex-col h-screen">
       <Navbar />
-      <main
-        className="container max-w-7xl pt-16 px-6 flex-grow"
-        suppressHydrationWarning
+      <FadeContent
+        blur={true}
+        duration={500}
+        easing="ease-out"
+        initialOpacity={0}
       >
-        {children}
-      </main>
+        <main
+          className="container max-w-7xl pt-16 px-6 flex-grow"
+          suppressHydrationWarning
+        >
+          {children}
+        </main>
+      </FadeContent>
     </div>
   );
 }

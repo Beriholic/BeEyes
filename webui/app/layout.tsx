@@ -7,6 +7,8 @@ import { Providers } from "./providers";
 import { siteConfig } from "@/config/site";
 import { fontSans } from "@/config/fonts";
 import { Pops } from "@/components/Pops";
+import Dock from "@/components/Dock";
+import dockConfig from "@/config/dock";
 
 export const metadata: Metadata = {
   title: {

@@ -53,7 +53,6 @@ export default function Home() {
       description: "等待数据刷新",
     });
   };
-
   return (
     <HomeLayout>
       {serverList === null ? (
@@ -75,7 +74,7 @@ export default function Home() {
           </div>
           <Divider className="bg-divider" />
           <motion.div
-            className="p-4 grid grid-cols-4 gap-x-4 gap-y-8"
+            className="p-4 grid grid-cols-4 gap-x-4 gap-y-8 over"
             initial={{ opacity: 0.4, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20, scale: 0.5 }}
