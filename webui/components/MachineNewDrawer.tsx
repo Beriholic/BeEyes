@@ -7,6 +7,8 @@ import {
   DrawerHeader,
   DrawerBody,
   DrawerFooter,
+  Select,
+  SelectItem,
 } from "@heroui/react";
 import { motion } from "framer-motion";
 import { FaServer, FaEarthAsia, FaCircleNodes, FaPlug } from "react-icons/fa6";
@@ -14,6 +16,7 @@ import CopyedText from "./CopyedText";
 import { api } from "@/api/instance";
 import { PopMsg } from "@/store/pops";
 import { useState } from "react";
+import LocationSelect from "./LocationSelect";
 
 interface NewMachineDrawerProps {
   isOpen: boolean;
@@ -71,6 +74,25 @@ export default function NMachineNewDrawer({
     setCurApiKey(null);
   };
 
+  const setName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewMachineInfo({
+      ...newMachineInfo,
+      name: e.target.value,
+    });
+  };
+  const setNodeName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewMachineInfo({
+      ...newMachineInfo,
+      nodeName: e.target.value,
+    });
+  };
+  const setLocation = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setNewMachineInfo({
+      ...newMachineInfo,
+      location: e.target.value,
+    });
+  };
+
   return (
     <Drawer isOpen={isOpen} onOpenChange={closeNewMachineDrawer}>
       <DrawerContent>
@@ -85,25 +107,14 @@ export default function NMachineNewDrawer({
                 <Input
                   label="主机名称"
                   value={newMachineInfo.name}
-                  onChange={(e) => {
-                    setNewMachineInfo({
-                      ...newMachineInfo,
-                      name: e.target.value,
-                    });
-                  }}
+                  onChange={setName}
                 />
               </div>
               <div className="flex items-center gap-2">
                 <FaEarthAsia size={24} />
-                <Input
-                  label="地区"
-                  value={newMachineInfo.location}
-                  onChange={(e) => {
-                    setNewMachineInfo({
-                      ...newMachineInfo,
-                      location: e.target.value,
-                    });
-                  }}
+                <LocationSelect
+                  onChange={setLocation}
+                  name={newMachineInfo.location}
                 />
               </div>
               <div className="flex items-center gap-2">
@@ -111,12 +122,7 @@ export default function NMachineNewDrawer({
                 <Input
                   label="节点名称"
                   value={newMachineInfo.nodeName}
-                  onChange={(e) => {
-                    setNewMachineInfo({
-                      ...newMachineInfo,
-                      nodeName: e.target.value,
-                    });
-                  }}
+                  onChange={setNodeName}
                 />
               </div>
               {curApiKey && (

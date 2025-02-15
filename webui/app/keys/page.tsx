@@ -36,7 +36,8 @@ import { MachineType } from "@/api/internal/model/response/machine";
 import { api } from "@/api/instance";
 import { PopMsg } from "@/store/pops";
 import { CopyToClipBoard } from "@/components/CopyedText";
-import MachineEditorDrawer from "@/components/MachineEditor";
+import MachineEditorDrawer from "@/components/MachineEditorDrawer";
+import ReactCountryFlag from "react-country-flag";
 
 export default function ApiKeysPage() {
   const router = useRouter();
@@ -158,6 +159,9 @@ export default function ApiKeysPage() {
             {machine.token}
           </button>
         );
+
+      case "location":
+        return <ReactCountryFlag countryCode={machine.location} />;
       case "active":
         return (
           <Chip

@@ -6,6 +6,7 @@ import {
   DrawerFooter,
   DrawerHeader,
   Input,
+  Select,
 } from "@heroui/react";
 import { FaServer, FaEarthAsia, FaCircleNodes } from "react-icons/fa6";
 import { MachineType } from "@/api/internal/model/response/machine";
@@ -13,6 +14,7 @@ import { useState } from "react";
 import { MachineServiceRequest } from "@/api/internal/model/request/machine";
 import { api } from "@/api/instance";
 import { PopMsg } from "@/store/pops";
+import LocationSelect from "./LocationSelect";
 
 interface MachineEditorProps {
   machine: MachineType;
@@ -40,7 +42,7 @@ export default function MachineEditorDrawer({
       name: e.target.value,
     });
   };
-  const setLocation = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const setLocation = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setNewMachine({
       ...newMachine,
       location: e.target.value,
@@ -99,9 +101,8 @@ export default function MachineEditorDrawer({
               </div>
               <div className="flex items-center gap-2">
                 <FaEarthAsia size={24} />
-                <Input
-                  label="地区"
-                  value={newMachine.location}
+                <LocationSelect
+                  name={newMachine.location}
                   onChange={setLocation}
                 />
               </div>
