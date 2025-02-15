@@ -5,6 +5,8 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import xyz.beriholic.beeyes.entity.RestBean;
 import xyz.beriholic.beeyes.entity.dto.Client;
+import xyz.beriholic.beeyes.entity.vo.request.MachineDeleteVO;
+import xyz.beriholic.beeyes.entity.vo.request.MachineUpdateVO;
 import xyz.beriholic.beeyes.entity.vo.request.NewMachineVO;
 import xyz.beriholic.beeyes.entity.vo.request.RenameClientVO;
 import xyz.beriholic.beeyes.service.MachineService;
@@ -37,6 +39,22 @@ public class MachineController {
             @RequestBody @Valid RenameClientVO vo
     ) {
         service.renameMachine(vo);
+        return RestBean.success();
+    }
+
+    @PostMapping("/delete")
+    public RestBean<Void> deleteMachine(
+            @RequestBody @Valid MachineDeleteVO vo
+    ) {
+        service.deleteMachine(vo.getId());
+        return RestBean.success();
+    }
+
+    @PostMapping("/update")
+    public RestBean<Void> updateMachine(
+            @RequestBody @Valid MachineUpdateVO vo
+    ) {
+        service.updateMachine(vo);
         return RestBean.success();
     }
 }

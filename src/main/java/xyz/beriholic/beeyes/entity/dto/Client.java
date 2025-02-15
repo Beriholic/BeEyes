@@ -2,6 +2,7 @@ package xyz.beriholic.beeyes.entity.dto;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,8 @@ public class Client {
     Long id;
     String name;
     String token;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     Date registerTime;
     String location;
     String nodeName;

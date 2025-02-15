@@ -9,7 +9,7 @@ import { FaServer } from "react-icons/fa6";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { HomeLayout } from "@/layout/HomeLayout";
-import NewMachineDrawer from "@/components/NewMachineDrawer";
+import NMachineNewDrawer from "@/components/MachineNewDrawer";
 import Loading from "@/components/Loading";
 
 export default function Home() {
@@ -95,7 +95,7 @@ export default function Home() {
               );
             })}
           </motion.div>
-          <NewMachineDrawer
+          <NMachineNewDrawer
             isOpen={isOpenNewMachineDrawre}
             openChange={(value) => setIsOpenNewMachine(value)}
           />

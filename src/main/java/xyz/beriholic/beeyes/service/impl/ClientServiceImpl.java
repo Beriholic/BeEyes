@@ -7,6 +7,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import xyz.beriholic.beeyes.cache.ClientCache;
 import xyz.beriholic.beeyes.entity.dto.Client;
 import xyz.beriholic.beeyes.entity.dto.ClientDetail;
@@ -16,7 +17,6 @@ import xyz.beriholic.beeyes.entity.vo.request.RuntimeInfoVO;
 import xyz.beriholic.beeyes.entity.vo.response.ClientMetricVO;
 import xyz.beriholic.beeyes.mapper.ClientDetailMapper;
 import xyz.beriholic.beeyes.mapper.ClientMapper;
-import xyz.beriholic.beeyes.repo.ClientDetailRepo;
 import xyz.beriholic.beeyes.service.ClientService;
 import xyz.beriholic.beeyes.utils.InfluxDBUtils;
 
@@ -31,8 +31,6 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     @Resource
     ClientDetailMapper clientDetailMapper;
     @Resource
-    ClientDetailRepo clientDetailRepo;
-    @Resource
     InfluxDBUtils influxDBUtils;
 
     @PostConstruct
@@ -46,6 +44,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     }
 
     @Override
+    @Transactional
     public Client getClientByToken(String token) {
         if (clientCache.hasTokenCache(token)) {
             return clientCache.getTokenCache(token);
@@ -58,6 +57,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     }
 
     @Override
+    @Transactional
     public boolean verifyAndRegister(String token) {
         if (clientCache.hasTokenCache(token)) {
             return true;
@@ -75,6 +75,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     }
 
     @Override
+    @Transactional
     public void reportClientInfo(long clientId, MachineInfoVO vo) {
         ClientDetail clientDetail = ClientDetail.from(clientId, vo);
         if (Objects.nonNull(clientDetailMapper.selectById(clientId))) {
@@ -91,6 +92,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     }
 
     @Override
+    @Transactional
     public void reportRuntimeInfo(long clientId, RuntimeInfoVO vo) {
         RuntimeInfo runtimeInfo = RuntimeInfo.from(clientId, vo);
         clientCache.putRuntimeInfoCache(clientId, runtimeInfo);
@@ -98,11 +100,12 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     }
 
     @Override
+    @Transactional
     public List<ClientMetricVO> getAllClientMetric() {
         return clientCache.getAllIdCache().stream().map(client -> {
             ClientMetricVO metric = ClientMetricVO.from(client);
 
-            ClientDetail clientDetail = clientDetailRepo.getClientDetailById(client.getId());
+            ClientDetail clientDetail = clientDetailMapper.selectById(client.getId());
 
             metric.addDataFromClientDetail(clientDetail);
 

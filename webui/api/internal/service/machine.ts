@@ -36,4 +36,24 @@ export class MachineService {
       method: "GET",
     });
   }
+  async delete(
+    req: MachineServiceRequest["MACHINE_SERVICE/DELETE"]
+  ): Promise<RestBean<Void>> {
+    const _uri = "/api/machine/delete";
+    return await this.executor({
+      uri: _uri,
+      method: "POST",
+      body: req,
+    });
+  }
+  async update(
+    req: MachineServiceRequest["MACHINE_SERVICE/UPDATE"]
+  ): Promise<RestBean<Void>> {
+    const _uri = "/api/machine/update";
+    return await this.executor({
+      uri: _uri,
+      method: "POST",
+      body: req,
+    });
+  }
 }

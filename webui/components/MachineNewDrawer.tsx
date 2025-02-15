@@ -27,7 +27,7 @@ interface NewMachineInfoProps {
   nodeName: string;
 }
 
-export default function NewMachineDrawer({
+export default function NMachineNewDrawer({
   isOpen,
   openChange,
   callBack,
@@ -58,9 +58,7 @@ export default function NewMachineDrawer({
       title: "新建成功",
       description: "请妥善保管API Key",
     });
-    if (callBack) {
-      callBack();
-    }
+    callBack?.();
   };
 
   const closeNewMachineDrawer = () => {

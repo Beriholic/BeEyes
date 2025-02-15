@@ -18,6 +18,11 @@ import {
   TableRow,
   Pagination,
   Input,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
 } from "@heroui/react";
 import {
   ChevronDownIcon,
@@ -26,10 +31,12 @@ import {
   VerticalDotsIcon,
 } from "@/components/icons";
 import { useRouter } from "next/navigation";
-import NewMachineDrawer from "@/components/NewMachineDrawer";
+import NMachineNewDrawer from "@/components/MachineNewDrawer";
 import { MachineType } from "@/api/internal/model/response/machine";
 import { api } from "@/api/instance";
 import { PopMsg } from "@/store/pops";
+import { CopyToClipBoard } from "@/components/CopyedText";
+import MachineEditorDrawer from "@/components/MachineEditor";
 
 export default function ApiKeysPage() {
   const router = useRouter();
@@ -47,7 +54,14 @@ export default function ApiKeysPage() {
   const [visibleColumns, setVisibleColumns] = useState<Selection>(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
+  const [curDeleteMachine, setCurDeleteMachine] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
+  const [curEditorMachine, setCurEditorMachine] = useState<MachineType | null>(
+    null
+  );
   const onRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setRowPerPage(Number(e.target.value));
     setCurPage(1);
@@ -106,6 +120,30 @@ export default function ApiKeysPage() {
     setMachineList(res.data);
   };
 
+  const deleteMachine = async () => {
+    if (!curDeleteMachine) return;
+
+    const res = await api.machineService.delete({
+      id: curDeleteMachine.id,
+    });
+
+    if (res.code != 200) {
+      PopMsg({
+        type: "danger",
+        title: `删除${curDeleteMachine.name}失败`,
+        description: res.message,
+      });
+    }
+
+    setCurDeleteMachine(null);
+    fetchMachineList();
+
+    PopMsg({
+      type: "success",
+      title: `删除${curDeleteMachine.name}成功`,
+    });
+  };
+
   useEffect(() => {
     fetchMachineList();
   }, []);
@@ -114,6 +152,12 @@ export default function ApiKeysPage() {
     const cellValue = machine[columnKey as keyof MachineType];
 
     switch (columnKey) {
+      case "token":
+        return (
+          <button onClick={() => CopyToClipBoard(machine.token)}>
+            {machine.token}
+          </button>
+        );
       case "active":
         return (
           <Chip
@@ -144,8 +188,25 @@ export default function ApiKeysPage() {
                 >
                   查看
                 </DropdownItem>
-                <DropdownItem key="edit">编辑</DropdownItem>
-                <DropdownItem key="delete">删除</DropdownItem>
+                <DropdownItem
+                  key="edit"
+                  onPress={() => {
+                    setCurEditorMachine(machine);
+                  }}
+                >
+                  编辑
+                </DropdownItem>
+                <DropdownItem
+                  key="delete"
+                  onPress={() => {
+                    setCurDeleteMachine({
+                      id: machine.id,
+                      name: machine.name,
+                    });
+                  }}
+                >
+                  删除
+                </DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </div>
@@ -290,6 +351,7 @@ export default function ApiKeysPage() {
     <ApiKeyLayout>
       <div className="flex flex-col">
         <Table
+          aria-label="Machine Table"
           classNames={{
             wrapper: "max-h-[100%]",
           }}
@@ -320,13 +382,51 @@ export default function ApiKeysPage() {
             )}
           </TableBody>
         </Table>
-        <NewMachineDrawer
+        <NMachineNewDrawer
           isOpen={isOpenNewMachineDrawer}
           openChange={(value) => setIsOpenNewMachineDrawer(value)}
           callBack={() => {
             fetchMachineList();
           }}
         />
+        <Modal
+          isOpen={curDeleteMachine != null}
+          onClose={() => {
+            setCurDeleteMachine(null);
+          }}
+        >
+          <ModalContent>
+            {(onClose) => (
+              <>
+                <ModalHeader className="">
+                  <span>确定删除</span>
+                  <Chip className="mx-1">{curDeleteMachine?.name}</Chip>
+                  <span>吗？</span>
+                </ModalHeader>
+                <ModalBody>
+                  <p>
+                    你应该清楚自己在删除此主机，否则可能会造成不可预知的后果。
+                  </p>
+                </ModalBody>
+                <ModalFooter>
+                  <Button color="danger" variant="light" onPress={onClose}>
+                    取消
+                  </Button>
+                  <Button color="primary" onPress={() => deleteMachine()}>
+                    删除
+                  </Button>
+                </ModalFooter>
+              </>
+            )}
+          </ModalContent>
+        </Modal>
+        {curEditorMachine != null && (
+          <MachineEditorDrawer
+            machine={curEditorMachine}
+            closeOpen={() => setCurEditorMachine(null)}
+            callBack={fetchMachineList}
+          />
+        )}
       </div>
     </ApiKeyLayout>
   );

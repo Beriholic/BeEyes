@@ -55,4 +55,12 @@ public class ClientCache {
     public RuntimeInfo getRuntimeInfoCache(long clientId) {
         return runtimeInfoCache.get(clientId);
     }
+
+    public void deleteIdCache(Long id) {
+        this.clientIdCache.remove(id);
+    }
+
+    public void deleteTokenCache(String token) {
+        clientTokenCache.delete(CLIENT_TOKEN_CACHE + token);
+    }
 }
