@@ -3,8 +3,8 @@ package xyz.beriholic.beeyes.entity.vo.response;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import xyz.beriholic.beeyes.entity.dto.Client;
 import xyz.beriholic.beeyes.entity.dto.ClientDetail;
+import xyz.beriholic.beeyes.entity.dto.Machine;
 import xyz.beriholic.beeyes.entity.dto.RuntimeInfo;
 import xyz.beriholic.beeyes.entity.vo.request.MachineInfoVO;
 
@@ -41,11 +41,11 @@ public class ClientMetricVO {
     Double networkDownloadSpeed;
     List<String> ipList;
 
-    public static ClientMetricVO from(Client client) {
+    public static ClientMetricVO from(Machine machine) {
         return new ClientMetricVO()
-                .setId(client.getId())
-                .setName(client.getName())
-                .setLocation(client.getLocation());
+                .setId(machine.getId())
+                .setName(machine.getName())
+                .setLocation(machine.getLocation());
     }
 
     public void addDataFromClientDetail(ClientDetail detail) {

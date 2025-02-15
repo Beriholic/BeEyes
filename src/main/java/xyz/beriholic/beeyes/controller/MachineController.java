@@ -4,7 +4,7 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import xyz.beriholic.beeyes.entity.RestBean;
-import xyz.beriholic.beeyes.entity.dto.Client;
+import xyz.beriholic.beeyes.entity.dto.Machine;
 import xyz.beriholic.beeyes.entity.vo.request.MachineDeleteVO;
 import xyz.beriholic.beeyes.entity.vo.request.MachineUpdateVO;
 import xyz.beriholic.beeyes.entity.vo.request.NewMachineVO;
@@ -20,8 +20,8 @@ public class MachineController {
     MachineService service;
 
     @GetMapping("/list")
-    public RestBean<List<Client>> listMachine() {
-        List<Client> list = service.list();
+    public RestBean<List<Machine>> listMachine() {
+        List<Machine> list = service.list();
         return RestBean.success(list);
     }
 

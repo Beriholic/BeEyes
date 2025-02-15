@@ -8,9 +8,9 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import xyz.beriholic.beeyes.cache.ClientCache;
-import xyz.beriholic.beeyes.entity.dto.Client;
+import xyz.beriholic.beeyes.cache.MachineCache;
 import xyz.beriholic.beeyes.entity.dto.ClientDetail;
+import xyz.beriholic.beeyes.entity.dto.Machine;
 import xyz.beriholic.beeyes.entity.dto.RuntimeInfo;
 import xyz.beriholic.beeyes.entity.vo.request.MachineInfoVO;
 import xyz.beriholic.beeyes.entity.vo.request.RuntimeInfoVO;
@@ -25,9 +25,9 @@ import java.util.Objects;
 
 @Slf4j
 @Service
-public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> implements ClientService {
+public class ClientServiceImpl extends ServiceImpl<ClientMapper, Machine> implements ClientService {
     @Resource
-    ClientCache clientCache;
+    MachineCache machineCache;
     @Resource
     ClientDetailMapper clientDetailMapper;
     @Resource
@@ -35,42 +35,42 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
 
     @PostConstruct
     public void initClientCache() {
-        this.list().forEach(client -> clientCache.putIdCache(client.getId(), client));
+        this.list().forEach(client -> machineCache.putIdCache(client.getId(), client));
     }
 
     @Override
-    public Client getClientById(long id) {
-        return clientCache.getIdCache(id);
+    public Machine getClientById(long id) {
+        return machineCache.getIdCache(id);
     }
 
     @Override
     @Transactional
-    public Client getClientByToken(String token) {
-        if (clientCache.hasTokenCache(token)) {
-            return clientCache.getTokenCache(token);
+    public Machine getClientByToken(String token) {
+        if (machineCache.hasTokenCache(token)) {
+            return machineCache.getTokenCache(token);
         }
-        Client client = this.getOne(new QueryWrapper<Client>().eq("token", token));
-        if (Objects.nonNull(client)) {
-            clientCache.putTokenCache(token, client);
+        Machine machine = this.getOne(new QueryWrapper<Machine>().eq("token", token));
+        if (Objects.nonNull(machine)) {
+            machineCache.putTokenCache(token, machine);
         }
-        return client;
+        return machine;
     }
 
     @Override
     @Transactional
     public boolean verifyAndRegister(String token) {
-        if (clientCache.hasTokenCache(token)) {
+        if (machineCache.hasTokenCache(token)) {
             return true;
         }
 
-        Client client = this.getOne(new QueryWrapper<Client>().eq("token", token));
+        Machine machine = this.getOne(new QueryWrapper<Machine>().eq("token", token));
 
-        if (Objects.isNull(client)) {
+        if (Objects.isNull(machine)) {
             log.info("Token无效 {}", token);
             return false;
         }
 
-        clientCache.putTokenCache(token, client);
+        machineCache.putTokenCache(token, machine);
         return true;
     }
 
@@ -84,32 +84,32 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
             clientDetailMapper.insert(clientDetail);
         }
 
-        UpdateWrapper<Client> wrapper = new UpdateWrapper<>();
+        UpdateWrapper<Machine> wrapper = new UpdateWrapper<>();
         wrapper.eq("id", clientId).set("active", "yes");
         this.update(wrapper);
 
-        clientCache.putIdCache(clientId, clientCache.getIdCache(clientId).setActive("yes"));
+        machineCache.putIdCache(clientId, machineCache.getIdCache(clientId).setActive("yes"));
     }
 
     @Override
     @Transactional
     public void reportRuntimeInfo(long clientId, RuntimeInfoVO vo) {
         RuntimeInfo runtimeInfo = RuntimeInfo.from(clientId, vo);
-        clientCache.putRuntimeInfoCache(clientId, runtimeInfo);
+        machineCache.putRuntimeInfoCache(clientId, runtimeInfo);
         influxDBUtils.writeRuntimeInfo(runtimeInfo.toDB());
     }
 
     @Override
     @Transactional
     public List<ClientMetricVO> getAllClientMetric() {
-        return clientCache.getAllIdCache().stream().map(client -> {
+        return machineCache.getAllIdCache().stream().map(client -> {
             ClientMetricVO metric = ClientMetricVO.from(client);
 
             ClientDetail clientDetail = clientDetailMapper.selectById(client.getId());
 
             metric.addDataFromClientDetail(clientDetail);
 
-            RuntimeInfo runtimeInfo = clientCache.getRuntimeInfoCache(client.getId());
+            RuntimeInfo runtimeInfo = machineCache.getRuntimeInfoCache(client.getId());
 
             metric.setOnline(false);
             if (Objects.nonNull(runtimeInfo) && System.currentTimeMillis() - runtimeInfo.getTimestamp() < 30 * 1000) {

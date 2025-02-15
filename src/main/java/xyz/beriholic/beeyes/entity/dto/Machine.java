@@ -12,11 +12,11 @@ import java.util.Date;
 
 
 @Data
-@TableName("tb_client")
+@TableName("tb_machine")
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class Client {
+public class Machine {
     @TableId
     Long id;
     String name;

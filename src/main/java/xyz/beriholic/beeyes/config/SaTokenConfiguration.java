@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import xyz.beriholic.beeyes.entity.RestBean;
-import xyz.beriholic.beeyes.entity.dto.Client;
+import xyz.beriholic.beeyes.entity.dto.Machine;
 import xyz.beriholic.beeyes.service.ClientService;
 import xyz.beriholic.beeyes.utils.Const;
 
@@ -36,8 +36,8 @@ public class SaTokenConfiguration implements WebMvcConfigurer {
                 String uri = request.getRequestURI();
                 if (uri.startsWith("/api/client")) {
                     if (!uri.endsWith("/api/client/register")) {
-                        Client client = clientService.getClientByToken(authorization);
-                        if (client == null) {
+                        Machine machine = clientService.getClientByToken(authorization);
+                        if (machine == null) {
                             try {
                                 response.setStatus(401);
                                 response.getWriter().write(RestBean.failed(401, "主机未注册").asJsonString());
@@ -46,7 +46,7 @@ public class SaTokenConfiguration implements WebMvcConfigurer {
                                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                             }
                         } else {
-                            request.setAttribute(Const.ATTR_CLIENT, client);
+                            request.setAttribute(Const.ATTR_CLIENT, machine);
                         }
                     }
                 }

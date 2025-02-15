@@ -5,17 +5,15 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import xyz.beriholic.beeyes.cache.ClientCache;
-import xyz.beriholic.beeyes.entity.dto.Client;
+import xyz.beriholic.beeyes.cache.MachineCache;
+import xyz.beriholic.beeyes.entity.dto.Machine;
 import xyz.beriholic.beeyes.entity.vo.request.MachineUpdateVO;
 import xyz.beriholic.beeyes.entity.vo.request.NewMachineVO;
 import xyz.beriholic.beeyes.entity.vo.request.RenameClientVO;
 import xyz.beriholic.beeyes.mapper.ClientDetailMapper;
 import xyz.beriholic.beeyes.mapper.ClientMapper;
-import xyz.beriholic.beeyes.service.ClientService;
 import xyz.beriholic.beeyes.service.MachineService;
 
 import java.security.SecureRandom;
@@ -23,24 +21,22 @@ import java.util.Date;
 
 @Slf4j
 @Service
-public class MachineServiceImpl extends ServiceImpl<ClientMapper, Client> implements MachineService {
+public class MachineServiceImpl extends ServiceImpl<ClientMapper, Machine> implements MachineService {
     @Resource
-    ClientCache clientCache;
+    MachineCache machineCache;
     @Resource
     ClientDetailMapper clientDetailMapper;
-    @Autowired
-    private ClientService clientService;
 
 
     @Override
     @Transactional
     public void renameMachine(RenameClientVO vo) {
-        this.update(Wrappers.<Client>update().eq("id", vo.getId()).set("name", vo.getName()));
+        this.update(Wrappers.<Machine>update().eq("id", vo.getId()).set("name", vo.getName()));
 
-        Client client = clientCache.getIdCache(vo.getId());
-        client.setName(vo.getName());
+        Machine machine = machineCache.getIdCache(vo.getId());
+        machine.setName(vo.getName());
 
-        clientCache.putIdCache(vo.getId(), client);
+        machineCache.putIdCache(vo.getId(), machine);
     }
 
     @Override
@@ -49,11 +45,11 @@ public class MachineServiceImpl extends ServiceImpl<ClientMapper, Client> implem
         String token;
         do {
             token = generateRandomToken();
-        } while (clientCache.hasTokenCache(token));
+        } while (machineCache.hasTokenCache(token));
 
 
         long id = IdUtil.getSnowflakeNextId();
-        Client client = new Client()
+        Machine machine = new Machine()
                 .setId(id)
                 .setName(vo.getName())
                 .setToken(token)
@@ -61,8 +57,8 @@ public class MachineServiceImpl extends ServiceImpl<ClientMapper, Client> implem
                 .setNodeName(vo.getNodeName())
                 .setRegisterTime(new Date());
 
-        this.save(client);
-        clientCache.putIdCache(id, client);
+        this.save(machine);
+        machineCache.putIdCache(id, machine);
 
         return token;
     }
@@ -70,10 +66,10 @@ public class MachineServiceImpl extends ServiceImpl<ClientMapper, Client> implem
     @Override
     @Transactional
     public void deleteMachine(Long id) {
-        Client client = clientCache.getIdCache(id);
+        Machine machine = machineCache.getIdCache(id);
 
-        clientCache.deleteIdCache(id);
-        clientCache.deleteTokenCache(client.getToken());
+        machineCache.deleteIdCache(id);
+        machineCache.deleteTokenCache(machine.getToken());
         this.removeById(id);
         clientDetailMapper.deleteById(id);
     }
@@ -81,15 +77,15 @@ public class MachineServiceImpl extends ServiceImpl<ClientMapper, Client> implem
     @Override
     @Transactional
     public void updateMachine(MachineUpdateVO vo) {
-        Client client = clientCache.getIdCache(vo.getId());
+        Machine machine = machineCache.getIdCache(vo.getId());
 
-        client.setName(vo.getName())
+        machine.setName(vo.getName())
                 .setNodeName(vo.getNodeName())
                 .setLocation(vo.getLocation());
 
-        clientCache.putIdCache(vo.getId(), client);
-        clientCache.putTokenCache(client.getToken(), client);
-        this.updateById(client);
+        machineCache.putIdCache(vo.getId(), machine);
+        machineCache.putTokenCache(machine.getToken(), machine);
+        this.updateById(machine);
     }
 
 
