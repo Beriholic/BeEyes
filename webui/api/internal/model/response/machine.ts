@@ -3,7 +3,7 @@ export type MachineServiceResponse = {
 };
 
 export interface MachineType {
-  id: number;
+  id: string;
   name: string;
   location: string;
   nodeName: string;

@@ -15,7 +15,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Data
 @Accessors(chain = true)
 public class ClientMetricVO {
-    Integer id;
+    Long id;
     Boolean online;
     String name;
     String location;

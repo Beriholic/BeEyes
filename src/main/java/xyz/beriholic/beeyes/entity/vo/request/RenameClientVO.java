@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class RenameClientVO {
-    int id;
+    Long id;
     String name;
 }

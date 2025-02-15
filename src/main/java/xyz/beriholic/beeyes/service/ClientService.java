@@ -10,15 +10,15 @@ import xyz.beriholic.beeyes.entity.vo.response.ClientMetricVO;
 import java.util.List;
 
 public interface ClientService extends IService<Client> {
-    Client getClientById(int id);
+    Client getClientById(long id);
 
     Client getClientByToken(String token);
 
     boolean verifyAndRegister(String token);
 
-    void reportClientInfo(int clientId, MachineInfoVO vo);
+    void reportClientInfo(long clientId, MachineInfoVO vo);
 
-    void reportRuntimeInfo(int clientId, @Valid RuntimeInfoVO vo);
+    void reportRuntimeInfo(long clientId, @Valid RuntimeInfoVO vo);
 
     List<ClientMetricVO> getAllClientMetric();
 }

@@ -14,7 +14,7 @@ import java.util.Date;
 @Data
 public class RuntimeInfoDB {
     @Column(tag = true)
-    Integer clientId;
+    Long clientId;
     @Column(timestamp = true)
     Instant timestamp;
 
@@ -31,7 +31,7 @@ public class RuntimeInfoDB {
     @Column
     Double networkDownloadSpeed;
 
-    public static RuntimeInfoDB from(int clientId, RuntimeInfoVO vo) {
+    public static RuntimeInfoDB from(long clientId, RuntimeInfoVO vo) {
         return new RuntimeInfoDB(
                 clientId,
                 new Date(vo.getTimestamp()).toInstant(),

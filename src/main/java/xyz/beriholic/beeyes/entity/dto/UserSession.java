@@ -9,7 +9,7 @@ import static xyz.beriholic.beeyes.utils.Const.USER_SESSION;
 @Data
 @Accessors(chain = true)
 public class UserSession {
-    private int id;
+    private Long id;
     private String username;
     private String role;
 

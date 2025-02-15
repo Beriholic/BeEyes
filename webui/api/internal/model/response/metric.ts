@@ -3,7 +3,7 @@ export type MetricServiceResponse = {
 };
 
 export interface MetricData {
-  readonly id: number;
+  readonly id: string;
   readonly online: boolean;
   readonly name: string;
   readonly location: string;

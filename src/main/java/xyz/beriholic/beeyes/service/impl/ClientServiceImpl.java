@@ -41,7 +41,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     }
 
     @Override
-    public Client getClientById(int id) {
+    public Client getClientById(long id) {
         return clientCache.getIdCache(id);
     }
 
@@ -75,7 +75,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     }
 
     @Override
-    public void reportClientInfo(int clientId, MachineInfoVO vo) {
+    public void reportClientInfo(long clientId, MachineInfoVO vo) {
         ClientDetail clientDetail = ClientDetail.from(clientId, vo);
         if (Objects.nonNull(clientDetailMapper.selectById(clientId))) {
             clientDetailMapper.updateById(clientDetail);
@@ -86,10 +86,12 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
         UpdateWrapper<Client> wrapper = new UpdateWrapper<>();
         wrapper.eq("id", clientId).set("active", "yes");
         this.update(wrapper);
+
+        clientCache.putIdCache(clientId, clientCache.getIdCache(clientId).setActive("yes"));
     }
 
     @Override
-    public void reportRuntimeInfo(int clientId, RuntimeInfoVO vo) {
+    public void reportRuntimeInfo(long clientId, RuntimeInfoVO vo) {
         RuntimeInfo runtimeInfo = RuntimeInfo.from(clientId, vo);
         clientCache.putRuntimeInfoCache(clientId, runtimeInfo);
         influxDBUtils.writeRuntimeInfo(runtimeInfo.toDB());

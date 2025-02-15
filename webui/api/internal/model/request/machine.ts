@@ -5,7 +5,7 @@ export type MachineServiceRequest = {
     readonly nodeName: string;
   };
   "MACHINE_SERVICE/RENAME": {
-    readonly id: number;
+    readonly id: string;
     readonly name: string;
   };
 };

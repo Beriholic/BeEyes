@@ -1,8 +1,8 @@
 package xyz.beriholic.beeyes.filter;
 
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson2.JSONObject;
-import jakarta.annotation.Resource;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,7 +14,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 import xyz.beriholic.beeyes.entity.dto.UserSession;
 import xyz.beriholic.beeyes.utils.Const;
-import xyz.beriholic.beeyes.utils.SnowflakeIdGenerator;
 
 import java.io.IOException;
 import java.util.Set;
@@ -24,9 +23,6 @@ import java.util.Set;
 public class RequestLogFilter extends OncePerRequestFilter {
 
     private final Set<String> ignores = Set.of("/swagger-ui", "/v3/api-docs", "/api/metric/test", "/api/metric/list");
-
-    @Resource
-    SnowflakeIdGenerator generator;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -58,7 +54,7 @@ public class RequestLogFilter extends OncePerRequestFilter {
     }
 
     public void logRequestStart(HttpServletRequest request) {
-        long reqId = generator.nextId();
+        long reqId = IdUtil.getSnowflakeNextId();
         MDC.put("reqId", String.valueOf(reqId));
         JSONObject object = new JSONObject();
         request.getParameterMap().forEach((k, v) -> object.put(k, v.length > 0 ? v[0] : null));

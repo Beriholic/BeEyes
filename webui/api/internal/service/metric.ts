@@ -13,12 +13,14 @@ export class MetricService {
   getClientMetricList({
     onmessage,
     onerror,
+    onopen,
     signal,
   }: {
     onmessage: (
       data: MetricServiceResponse["METRIC_SERVICE/GET_CLIENT_METRICS"]
     ) => void;
     onerror: (err: any) => void;
+    onopen?: (resp: Response) => Promise<void>;
     signal: AbortSignal;
   }) {
     const _uri = `${BASE_URL}/api/metric/list`;
@@ -28,6 +30,7 @@ export class MetricService {
       headers: {
         jinyum: localStorage.getItem("token") ?? "",
       },
+      onopen: onopen,
       onmessage: (event) => {
         const data = JSON.parse(
           event.data

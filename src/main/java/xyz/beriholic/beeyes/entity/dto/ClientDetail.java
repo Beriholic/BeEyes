@@ -19,7 +19,7 @@ import xyz.beriholic.beeyes.entity.vo.request.MachineInfoVO;
 @Accessors(chain = true)
 public class ClientDetail {
     @TableId
-    Integer id;
+    Long id;
     String osName;
     String kernelVersion;
     String osVersion;
@@ -33,7 +33,7 @@ public class ClientDetail {
     @TableField("network_interface_info")
     String networkInterfaceInfoJSON;
 
-    public static ClientDetail from(int clientId, MachineInfoVO vo) {
+    public static ClientDetail from(long clientId, MachineInfoVO vo) {
         return new ClientDetail()
                 .setId(clientId)
                 .setOsName(vo.getSystemInfo().getOsName())

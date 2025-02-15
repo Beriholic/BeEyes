@@ -86,8 +86,8 @@ export default function ApiKeysPage() {
 
   const machineListItemSorted = useMemo<Array<MachineType>>(() => {
     return [...machineListItem].sort((a, b) => {
-      const first = a[sortDescriptor.column as keyof MachineType] as number;
-      const second = b[sortDescriptor.column as keyof MachineType] as number;
+      const first = a[sortDescriptor.column as keyof MachineType] as string;
+      const second = b[sortDescriptor.column as keyof MachineType] as string;
       const cmp = first < second ? -1 : first > second ? 1 : 0;
 
       return sortDescriptor.direction === "descending" ? -cmp : cmp;

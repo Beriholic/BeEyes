@@ -10,7 +10,7 @@ public class ClientDetailRepo {
     @Resource
     ClientDetailMapper clientDetailMapper;
 
-    public ClientDetail getClientDetailById(int id) {
+    public ClientDetail getClientDetailById(long id) {
         return clientDetailMapper.selectById(id);
     }
 }

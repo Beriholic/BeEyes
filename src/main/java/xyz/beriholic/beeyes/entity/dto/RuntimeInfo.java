@@ -9,7 +9,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Data
 public class RuntimeInfo {
-    Integer clientId;
+    Long clientId;
     Long timestamp;
     Double cpuUsage;
     Double memoryUsage;
@@ -18,7 +18,7 @@ public class RuntimeInfo {
     Double networkUploadSpeed;
     Double networkDownloadSpeed;
 
-    public static RuntimeInfo from(int clientId, RuntimeInfoVO vo) {
+    public static RuntimeInfo from(long clientId, RuntimeInfoVO vo) {
         return new RuntimeInfo(
                 clientId,
                 vo.getTimestamp(),

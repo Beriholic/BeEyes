@@ -1,5 +1,6 @@
 package xyz.beriholic.beeyes.service.impl;
 
+import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
@@ -40,7 +41,9 @@ public class MachineServiceImpl extends ServiceImpl<ClientMapper, Client> implem
         } while (clientCache.hasTokenCache(token));
 
 
+        long id = IdUtil.getSnowflakeNextId();
         Client client = new Client()
+                .setId(id)
                 .setName(vo.getName())
                 .setToken(token)
                 .setLocation(vo.getLocation())
@@ -48,6 +51,7 @@ public class MachineServiceImpl extends ServiceImpl<ClientMapper, Client> implem
                 .setRegisterTime(new Date());
 
         this.save(client);
+        clientCache.putIdCache(id, client);
 
         return token;
     }

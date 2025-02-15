@@ -16,17 +16,17 @@ import static xyz.beriholic.beeyes.consts.CacheKey.CLIENT_TOKEN_CACHE;
 
 @Component
 public class ClientCache {
-    private final Map<Integer, Client> clientIdCache = new ConcurrentHashMap<>();
-    private final Map<Integer, RuntimeInfo> runtimeInfoCache = new ConcurrentHashMap<>();
+    private final Map<Long, Client> clientIdCache = new ConcurrentHashMap<>();
+    private final Map<Long, RuntimeInfo> runtimeInfoCache = new ConcurrentHashMap<>();
 
     @Resource
     StringRedisTemplate clientTokenCache;
 
-    public void putIdCache(int id, Client client) {
+    public void putIdCache(long id, Client client) {
         clientIdCache.put(id, client);
     }
 
-    public Client getIdCache(int id) {
+    public Client getIdCache(long id) {
         return clientIdCache.get(id);
     }
 
@@ -48,11 +48,11 @@ public class ClientCache {
         return JSONObject.parseObject(json, Client.class);
     }
 
-    public void putRuntimeInfoCache(int clientId, RuntimeInfo info) {
+    public void putRuntimeInfoCache(long clientId, RuntimeInfo info) {
         runtimeInfoCache.put(clientId, info);
     }
 
-    public RuntimeInfo getRuntimeInfoCache(int clientId) {
+    public RuntimeInfo getRuntimeInfoCache(long clientId) {
         return runtimeInfoCache.get(clientId);
     }
 }

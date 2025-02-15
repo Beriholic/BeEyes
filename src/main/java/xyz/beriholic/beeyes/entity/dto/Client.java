@@ -17,7 +17,7 @@ import java.util.Date;
 @Accessors(chain = true)
 public class Client {
     @TableId
-    Integer id;
+    Long id;
     String name;
     String token;
     Date registerTime;
