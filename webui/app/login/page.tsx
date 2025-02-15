@@ -9,6 +9,7 @@ import { Logo } from "@/components/icons";
 import { api } from "@/api/instance";
 import { PopMsg } from "@/store/pops";
 import { useUserInfoStore } from "@/store/user";
+import SplitText from "@/components/SplitText";
 
 interface LoginForm {
   username: string;
@@ -109,7 +110,15 @@ export default function LoginPage() {
         </div>
         <div className="flex items-center justify-center  w-1/2 gap-2">
           <Logo className="size-12" />
-          <div className="text-2xl">BeEyes 运维监测平台</div>
+          <SplitText
+            text="BeEyes 运维监测平台"
+            className="text-2xl font-semibold text-center"
+            delay={100}
+            animationFrom={{ opacity: 0, transform: "translate3d(0,50px,0)" }}
+            animationTo={{ opacity: 1, transform: "translate3d(0,0,0)" }}
+            threshold={0.2}
+            rootMargin="-50px"
+          />
         </div>
       </div>
     </section>
