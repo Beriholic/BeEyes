@@ -1,3 +1,5 @@
+import { Labrada } from "next/font/google";
+
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
@@ -7,6 +9,10 @@ export const siteConfig = {
     {
       label: "仪表盘",
       href: "/",
+    },
+    {
+      label: "APi Keys",
+      href: "/keys",
     },
     {
       label: "终端",

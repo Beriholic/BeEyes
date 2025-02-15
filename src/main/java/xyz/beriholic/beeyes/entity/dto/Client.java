@@ -23,4 +23,5 @@ public class Client {
     Date registerTime;
     String location;
     String nodeName;
+    String active;
 }

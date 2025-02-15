@@ -20,17 +20,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { HomeLayout } from "@/layout/HomeLayout";
 import CopyedText from "@/components/CopyedText";
+import NewMachineDrawer from "@/components/NewMachineDrawer";
 
 export default function Home() {
   const router = useRouter();
   const [serverList, setServerList] = useState<Array<MetricData>>([]);
   const [isOpenNewMachineDrawre, setIsOpenNewMachine] = useState(false);
-  const [newMachineInfo, setNewMachineInfo] = useState<NewMachineInfoProps>({
-    name: "",
-    location: "",
-    nodeName: "",
-  });
-  const [curApiKey, setCurApiKey] = useState<string | null>(null);
 
   useEffect(() => {
     const ctrl = new AbortController();
@@ -48,38 +43,6 @@ export default function Home() {
       ctrl.abort();
     };
   }, []);
-
-  const newMachine = async () => {
-    const res = await api.machineService.newMachine({
-      name: newMachineInfo.name,
-      location: newMachineInfo.location,
-      nodeName: newMachineInfo.nodeName,
-    });
-    if (res.code !== 200) {
-      PopMsg({
-        type: "danger",
-        title: "新建失败",
-        description: res.message,
-      });
-      return;
-    }
-    setCurApiKey(res.data);
-    PopMsg({
-      type: "success",
-      title: "新建成功",
-      description: "请妥善保管API Key",
-    });
-  };
-
-  const closeNewMachineDrawer = () => {
-    setIsOpenNewMachine(false);
-    setNewMachineInfo({
-      name: "",
-      location: "",
-      nodeName: "",
-    });
-    setCurApiKey(null);
-  };
 
   const renameServer = async (id: number, name: string) => {
     const res = await api.machineService.rename({
@@ -116,7 +79,7 @@ export default function Home() {
                 color="primary"
                 onPress={() => setIsOpenNewMachine(true)}
               >
-                新建
+                新建主机
               </Button>
             </div>
             <Divider className="bg-divider" />
@@ -155,83 +118,10 @@ export default function Home() {
             </motion.div>
           </AnimatePresence>
         )}
-
-        <Drawer
+        <NewMachineDrawer
           isOpen={isOpenNewMachineDrawre}
-          onOpenChange={closeNewMachineDrawer}
-        >
-          <DrawerContent>
-            {(onClose) => (
-              <>
-                <DrawerHeader className="flex flex-col gap-1">
-                  新建主机
-                </DrawerHeader>
-                <DrawerBody>
-                  <div className="flex items-center gap-2">
-                    <FaServer size={24} />
-                    <Input
-                      label="主机名称"
-                      value={newMachineInfo.name}
-                      onChange={(e) => {
-                        setNewMachineInfo({
-                          ...newMachineInfo,
-                          name: e.target.value,
-                        });
-                      }}
-                    />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <FaEarthAsia size={24} />
-                    <Input
-                      label="地区"
-                      value={newMachineInfo.location}
-                      onChange={(e) => {
-                        setNewMachineInfo({
-                          ...newMachineInfo,
-                          location: e.target.value,
-                        });
-                      }}
-                    />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <FaCircleNodes size={24} />
-                    <Input
-                      label="节点名称"
-                      value={newMachineInfo.nodeName}
-                      onChange={(e) => {
-                        setNewMachineInfo({
-                          ...newMachineInfo,
-                          nodeName: e.target.value,
-                        });
-                      }}
-                    />
-                  </div>
-                  {curApiKey && (
-                    <motion.div
-                      className="flex flex-col gap-4"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                    >
-                      <div className="flex items-center gap-2">
-                        <FaPlug size={24} />
-                        <h1>API Key</h1>
-                      </div>
-                      <CopyedText value={curApiKey} />
-                    </motion.div>
-                  )}
-                </DrawerBody>
-                <DrawerFooter>
-                  <Button color="danger" variant="light" onPress={onClose}>
-                    关闭
-                  </Button>
-                  <Button color="primary" onPress={newMachine}>
-                    新建
-                  </Button>
-                </DrawerFooter>
-              </>
-            )}
-          </DrawerContent>
-        </Drawer>
+          openChange={(value) => setIsOpenNewMachine(value)}
+        />
       </section>
     </HomeLayout>
   );

@@ -1,6 +1,7 @@
 package xyz.beriholic.beeyes.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
@@ -81,6 +82,10 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
         } else {
             clientDetailMapper.insert(clientDetail);
         }
+
+        UpdateWrapper<Client> wrapper = new UpdateWrapper<>();
+        wrapper.eq("id", clientId).set("active", "yes");
+        this.update(wrapper);
     }
 
     @Override
