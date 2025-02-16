@@ -315,6 +315,7 @@ export default function ApiKeysPage() {
           <label className="flex items-center text-default-400 text-small gap-1">
             每页行数:
             <select
+              value={rowPerPage}
               className="bg-transparent outline-none text-default-400 text-small"
               onChange={onRowsPerPageChange}
             >
