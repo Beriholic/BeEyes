@@ -35,6 +35,15 @@ export default function Home() {
   }, []);
 
   const renameServer = async (id: string, name: string) => {
+    if (name.length === 0) {
+      PopMsg({
+        type: "danger",
+        title: "重命名失败",
+        description: "主机名称不能为空",
+      });
+      return;
+    }
+
     const res = await api.machineService.rename({
       id: id,
       name: name,

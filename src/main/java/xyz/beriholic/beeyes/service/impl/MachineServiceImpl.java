@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import xyz.beriholic.beeyes.cache.MachineCache;
 import xyz.beriholic.beeyes.entity.dto.Machine;
+import xyz.beriholic.beeyes.entity.vo.request.MachineNewVO;
 import xyz.beriholic.beeyes.entity.vo.request.MachineUpdateVO;
-import xyz.beriholic.beeyes.entity.vo.request.NewMachineVO;
 import xyz.beriholic.beeyes.entity.vo.request.RenameClientVO;
 import xyz.beriholic.beeyes.mapper.ClientDetailMapper;
 import xyz.beriholic.beeyes.mapper.ClientMapper;
@@ -41,7 +41,7 @@ public class MachineServiceImpl extends ServiceImpl<ClientMapper, Machine> imple
 
     @Override
     @Transactional
-    public String newMachine(NewMachineVO vo) {
+    public String newMachine(MachineNewVO vo) {
         String token;
         do {
             token = generateRandomToken();

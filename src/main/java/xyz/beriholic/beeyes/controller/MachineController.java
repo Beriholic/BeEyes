@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import xyz.beriholic.beeyes.entity.RestBean;
 import xyz.beriholic.beeyes.entity.dto.Machine;
 import xyz.beriholic.beeyes.entity.vo.request.MachineDeleteVO;
+import xyz.beriholic.beeyes.entity.vo.request.MachineNewVO;
 import xyz.beriholic.beeyes.entity.vo.request.MachineUpdateVO;
-import xyz.beriholic.beeyes.entity.vo.request.NewMachineVO;
 import xyz.beriholic.beeyes.entity.vo.request.RenameClientVO;
 import xyz.beriholic.beeyes.service.MachineService;
 
@@ -27,7 +27,7 @@ public class MachineController {
 
     @PostMapping("/new")
     public RestBean<String> newMachine(
-            @RequestBody @Valid NewMachineVO vo
+            @RequestBody @Valid MachineNewVO vo
     ) {
         String token = service.newMachine(vo);
         return RestBean.success(token);

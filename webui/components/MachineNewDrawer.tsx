@@ -42,6 +42,23 @@ export default function NMachineNewDrawer({
   });
   const [curApiKey, setCurApiKey] = useState<string | null>(null);
   const newMachine = async () => {
+    if (newMachineInfo.name.length === 0) {
+      PopMsg({
+        type: "danger",
+        title: "新建失败",
+        description: "主机名称不能为空",
+      });
+      return;
+    }
+    if (newMachineInfo.location.length === 0) {
+      PopMsg({
+        type: "danger",
+        title: "新建失败",
+        description: "主机位置不能为空",
+      });
+      return;
+    }
+
     const res = await api.machineService.newMachine({
       name: newMachineInfo.name,
       location: newMachineInfo.location,

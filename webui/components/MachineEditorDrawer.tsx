@@ -60,6 +60,23 @@ export default function MachineEditorDrawer({
   };
 
   const save = async () => {
+    if (newMachine.name.length === 0) {
+      PopMsg({
+        type: "danger",
+        title: "保存失败",
+        description: "主机名称不能为空",
+      });
+      return;
+    }
+    if (newMachine.location.length === 0) {
+      PopMsg({
+        type: "danger",
+        title: "保存失败",
+        description: "主机位置不能为空",
+      });
+      return;
+    }
+
     const res = await api.machineService.update({
       id: newMachine.id,
       name: newMachine.name,
