@@ -10,7 +10,7 @@ import java.util.List;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class MachineInfoVO {
+public class MachineInfoReportVO {
     private SystemInfo systemInfo;
     private CpuInfo cpuInfo;
     private MemoryInfo memoryInfo;

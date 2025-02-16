@@ -12,9 +12,11 @@ import xyz.beriholic.beeyes.cache.MachineCache;
 import xyz.beriholic.beeyes.entity.dto.ClientDetail;
 import xyz.beriholic.beeyes.entity.dto.Machine;
 import xyz.beriholic.beeyes.entity.dto.RuntimeInfo;
-import xyz.beriholic.beeyes.entity.vo.request.MachineInfoVO;
+import xyz.beriholic.beeyes.entity.vo.request.MachineInfoReportVO;
 import xyz.beriholic.beeyes.entity.vo.request.RuntimeInfoVO;
 import xyz.beriholic.beeyes.entity.vo.response.ClientMetricVO;
+import xyz.beriholic.beeyes.entity.vo.response.RuntimeInfoCurrentVO;
+import xyz.beriholic.beeyes.entity.vo.response.RuntimeInfoHistoryVO;
 import xyz.beriholic.beeyes.mapper.ClientDetailMapper;
 import xyz.beriholic.beeyes.mapper.ClientMapper;
 import xyz.beriholic.beeyes.service.ClientService;
@@ -26,6 +28,7 @@ import java.util.Objects;
 @Slf4j
 @Service
 public class ClientServiceImpl extends ServiceImpl<ClientMapper, Machine> implements ClientService {
+    private final int TIMEOUT_THRESHOLD = 30_000;
     @Resource
     MachineCache machineCache;
     @Resource
@@ -76,7 +79,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Machine> implem
 
     @Override
     @Transactional
-    public void reportClientInfo(long clientId, MachineInfoVO vo) {
+    public void reportClientInfo(long clientId, MachineInfoReportVO vo) {
         ClientDetail clientDetail = ClientDetail.from(clientId, vo);
         if (Objects.nonNull(clientDetailMapper.selectById(clientId))) {
             clientDetailMapper.updateById(clientDetail);
@@ -111,13 +114,37 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Machine> implem
 
             RuntimeInfo runtimeInfo = machineCache.getRuntimeInfoCache(client.getId());
 
-            metric.setOnline(false);
-            if (Objects.nonNull(runtimeInfo) && System.currentTimeMillis() - runtimeInfo.getTimestamp() < 30 * 1000) {
+            metric.setOnline(
+                    Objects.nonNull(runtimeInfo) && isMachineOnline(runtimeInfo.getTimestamp())
+            );
+
+            if (metric.getOnline()) {
                 metric.addDataFromRuntimeInfo(runtimeInfo);
-                metric.setOnline(true);
             }
 
             return metric;
         }).toList();
     }
+
+    @Override
+    public RuntimeInfoHistoryVO runtimeInfoHistory(long clientId) {
+        return influxDBUtils.readRuntimeInfo(clientId);
+    }
+
+    @Override
+    public RuntimeInfoCurrentVO runtimeInfoCurrent(long clientId) {
+        RuntimeInfo info = machineCache.getRuntimeInfoCache(clientId);
+        if (Objects.isNull(info)) return null;
+        RuntimeInfoCurrentVO vo = new RuntimeInfoCurrentVO();
+        vo.from(info);
+
+        vo.setOnline(isMachineOnline(info.getTimestamp()));
+        return vo;
+    }
+
+    private boolean isMachineOnline(long timestamp) {
+        return System.currentTimeMillis() - timestamp < TIMEOUT_THRESHOLD;
+    }
 }
+
+

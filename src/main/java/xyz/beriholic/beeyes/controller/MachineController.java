@@ -9,6 +9,7 @@ import xyz.beriholic.beeyes.entity.vo.request.MachineDeleteVO;
 import xyz.beriholic.beeyes.entity.vo.request.MachineNewVO;
 import xyz.beriholic.beeyes.entity.vo.request.MachineUpdateVO;
 import xyz.beriholic.beeyes.entity.vo.request.RenameClientVO;
+import xyz.beriholic.beeyes.entity.vo.response.MachineInfoVO;
 import xyz.beriholic.beeyes.service.MachineService;
 
 import java.util.List;
@@ -56,5 +57,13 @@ public class MachineController {
     ) {
         service.updateMachine(vo);
         return RestBean.success();
+    }
+
+    @GetMapping("/info")
+    public RestBean<MachineInfoVO> machineInfo(
+            @RequestParam long id
+    ) {
+        MachineInfoVO vo = service.machineInfo(id);
+        return RestBean.success(vo);
     }
 }

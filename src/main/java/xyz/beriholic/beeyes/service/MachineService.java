@@ -6,6 +6,7 @@ import xyz.beriholic.beeyes.entity.dto.Machine;
 import xyz.beriholic.beeyes.entity.vo.request.MachineNewVO;
 import xyz.beriholic.beeyes.entity.vo.request.MachineUpdateVO;
 import xyz.beriholic.beeyes.entity.vo.request.RenameClientVO;
+import xyz.beriholic.beeyes.entity.vo.response.MachineInfoVO;
 
 public interface MachineService extends IService<Machine> {
     void renameMachine(@Valid RenameClientVO vo);
@@ -15,4 +16,6 @@ public interface MachineService extends IService<Machine> {
     void deleteMachine(Long id);
 
     void updateMachine(@Valid MachineUpdateVO vo);
+
+    MachineInfoVO machineInfo(long id);
 }

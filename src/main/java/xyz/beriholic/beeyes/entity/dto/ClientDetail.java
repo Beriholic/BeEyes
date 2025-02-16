@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
-import xyz.beriholic.beeyes.entity.vo.request.MachineInfoVO;
+import xyz.beriholic.beeyes.entity.vo.request.MachineInfoReportVO;
 
 @Slf4j
 @Data
@@ -33,7 +33,7 @@ public class ClientDetail {
     @TableField("network_interface_info")
     String networkInterfaceInfoJSON;
 
-    public static ClientDetail from(long clientId, MachineInfoVO vo) {
+    public static ClientDetail from(long clientId, MachineInfoReportVO vo) {
         return new ClientDetail()
                 .setId(clientId)
                 .setOsName(vo.getSystemInfo().getOsName())

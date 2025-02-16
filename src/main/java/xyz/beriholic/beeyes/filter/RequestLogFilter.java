@@ -22,7 +22,7 @@ import java.util.Set;
 @Component
 public class RequestLogFilter extends OncePerRequestFilter {
 
-    private final Set<String> ignores = Set.of("/swagger-ui", "/v3/api-docs", "/api/metric/test", "/api/metric/list");
+    private final Set<String> ignores = Set.of("/swagger-ui", "/v3/api-docs", "/api/metric/list", "/api/metric/current");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {

@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import xyz.beriholic.beeyes.entity.RestBean;
 import xyz.beriholic.beeyes.entity.dto.Machine;
-import xyz.beriholic.beeyes.entity.vo.request.MachineInfoVO;
+import xyz.beriholic.beeyes.entity.vo.request.MachineInfoReportVO;
 import xyz.beriholic.beeyes.entity.vo.request.RuntimeInfoVO;
 import xyz.beriholic.beeyes.service.ClientService;
 import xyz.beriholic.beeyes.utils.Const;
@@ -34,7 +34,7 @@ public class ClientController {
     @PostMapping("/report/machine")
     public RestBean<Void> reportClientInfo(
             @RequestAttribute(Const.ATTR_CLIENT) Machine machine,
-            @RequestBody @Valid MachineInfoVO vo
+            @RequestBody @Valid MachineInfoReportVO vo
     ) {
         service.reportClientInfo(machine.getId(), vo);
         return RestBean.success();

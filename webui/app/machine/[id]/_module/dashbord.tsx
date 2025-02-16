@@ -3,7 +3,7 @@ import { Line } from "@ant-design/charts";
 import { Card } from "@heroui/react";
 import clsx from "clsx";
 import { useTheme } from "next-themes";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ReactCountryFlag from "react-country-flag";
 import { motion } from "framer-motion";
 import { GaugeComponent } from "react-gauge-component";
@@ -12,21 +12,372 @@ import {
   FaCodepen,
   FaEye,
   FaEyeSlash,
+  FaFloppyDisk,
   FaMemory,
   FaMicrochip,
   FaServer,
 } from "react-icons/fa6";
+import { MachineInfoType } from "@/api/internal/model/response/machine";
+import { api } from "@/api/instance";
+import { PopMsg } from "@/store/pops";
+import { CurrentRuntimeInfoType } from "@/api/internal/model/response/metric";
+import MachineStatus, { MachineStatusType } from "@/components/MachineStatus";
+import { FadeContentDefault } from "@/components/FadeContent";
 
-const data = {
-  machineName: "测试机器",
-};
-
-export default function MachineDashboardPage() {
+export default function MachineDashboardPage({ id }: { id: string }) {
+  const theme = useTheme();
   const [showMachineInfo, setShowMachineInfo] = useState(true);
+  const [machineStatus, setMachineStatus] =
+    useState<MachineStatusType>("loading");
   const toggleShowMachineInfo = () => {
     setShowMachineInfo((value) => !value);
   };
 
+  const [machineInfo, setMachineInfo] = useState<MachineInfoType | null>(null);
+  const [curRuntimeInfo, setCurRuntimeInfo] =
+    useState<CurrentRuntimeInfoType | null>(null);
+
+  const [cpuHistory, setCPUHistory] = useState<Array<HistoryData> | null>(null);
+  const [memoryHistory, setMemoryHistory] = useState<Array<HistoryData> | null>(
+    null
+  );
+  const [swapHistory, setSwapHistory] = useState<Array<HistoryData> | null>(
+    null
+  );
+  const [networkHistory, setNetworkHistory] =
+    useState<Array<HistoryData> | null>(null);
+  const [diskHistory, setDiskHistory] = useState<Array<HistoryData> | null>(
+    null
+  );
+
+  useEffect(() => {
+    const ctrl = new AbortController();
+    api.metricService.getCurrentRuntimeInfo({
+      id: id,
+      onmessage: (data) => {
+        data.online ? setMachineStatus("online") : setMachineStatus("offline");
+        setCurRuntimeInfo(data);
+      },
+      onerror: (err) => {
+        console.log(err);
+      },
+      signal: ctrl.signal,
+    });
+
+    return () => {
+      ctrl.abort();
+    };
+  }, []);
+
+  useEffect(() => {
+    const fetchMachineInfo = async () => {
+      const res = await api.machineService.info(id);
+      if (res.code !== 200) {
+        PopMsg({
+          title: "获取机器信息失败",
+          type: "danger",
+          description: res.message,
+        });
+        return;
+      }
+      setMachineInfo(res.data);
+    };
+    fetchMachineInfo();
+  }, []);
+
+  useEffect(() => {
+    const fetchHistoryInfo = async () => {
+      const res = await api.metricService.getHistoryInfo({
+        id: id,
+      });
+      if (res.code !== 200) {
+        PopMsg({
+          title: "获取历史信息失败",
+          type: "danger",
+          description: res.message,
+        });
+      }
+      let cpu: Array<HistoryData> = [];
+      let memory: Array<HistoryData> = [];
+      let disk: Array<HistoryData> = [];
+      let swap: Array<HistoryData> = [];
+      let network: Array<HistoryData> = [];
+
+      res.data.list.forEach((history) => {
+        const time = extractTime(history.timestamp);
+
+        cpu.push({ time: time, value: history.cpuUsage });
+        memory.push({ time: time, value: history.memoryUsage * 100.0 });
+        disk.push({ time: time, value: history.diskUsage });
+        swap.push({ time: time, value: history.swapUsage * 100.0 });
+        network.push({
+          time: time,
+          value: history.networkDownloadSpeed,
+          type: "download",
+        });
+        network.push({
+          time: time,
+          value: history.networkUploadSpeed,
+          type: "upload",
+        });
+      });
+
+      setCPUHistory(cpu);
+      setMemoryHistory(memory);
+      setSwapHistory(swap);
+      setNetworkHistory(network);
+      setDiskHistory(disk);
+    };
+    fetchHistoryInfo();
+  }, []);
+
+  const renderUsageInfo = useCallback(() => {
+    if (!curRuntimeInfo || !curRuntimeInfo?.online) return;
+    return (
+      <FadeContentDefault>
+        <div className="flex flex-col gap-2">
+          <div className="text-xl">使用率</div>
+          <div className="flex gap-4 items-center flex-wrap">
+            <UsageGuage
+              className="size-72"
+              value={curRuntimeInfo.cpuUsage}
+              label="CPU 使用率"
+            />
+            <UsageGuage
+              className="size-72"
+              value={curRuntimeInfo.memoryUsage * 100.0}
+              label="内存 使用率"
+            />
+            <UsageGuage
+              className="size-72"
+              value={curRuntimeInfo.swapUsage * 100.0}
+              label="Swap 使用率"
+            />
+            <UsageGuage
+              className="size-72"
+              value={curRuntimeInfo.diskUsage}
+              label="磁盘使用率"
+            />
+          </div>
+        </div>
+      </FadeContentDefault>
+    );
+  }, [curRuntimeInfo]);
+
+  const renderCPUHistory = useCallback(
+    ({ className, height }: GraphProps) => {
+      if (!cpuHistory) return;
+
+      return (
+        <Card className={className}>
+          <Line
+            theme={theme.theme}
+            title="CPU 用量历史"
+            height={height}
+            data={cpuHistory}
+            encode={{
+              x: "time",
+              y: "value",
+            }}
+            axis={{
+              y: {
+                title: "CPU 用量 (%)",
+                min: 0,
+                max: 100,
+                grid: true,
+                label: {
+                  formatter: (v: number) => `${v}%`,
+                },
+              },
+            }}
+            scale={{
+              y: {
+                nice: true,
+              },
+            }}
+            style={{
+              smooth: true,
+            }}
+            tooltip={{
+              items: [
+                {
+                  channel: "y",
+                  valueFormatter: (v) => `${v}%`,
+                },
+              ],
+            }}
+          />
+        </Card>
+      );
+    },
+    [cpuHistory, theme.theme]
+  );
+
+  const renderMemoryHistory = useCallback(
+    ({ className, height }: GraphProps) => {
+      if (!memoryHistory) return;
+      return (
+        <Card className={className}>
+          <Line
+            theme={theme.theme}
+            title="内存用量历史"
+            data={memoryHistory}
+            height={height}
+            encode={{
+              x: "time",
+              y: "value",
+            }}
+            axis={{
+              y: {
+                title: "内存用量 (%)",
+                min: 0,
+                max: 16,
+                label: {
+                  formatter: (v: string) => `${v}%`,
+                },
+              },
+            }}
+            smooth={true}
+            tooltip={{
+              items: [
+                {
+                  channel: "y",
+                  valueFormatter: (v: number) => `${v}%`,
+                },
+              ],
+            }}
+          />
+        </Card>
+      );
+    },
+    [memoryHistory, theme.theme]
+  );
+  const renderSwapHistory = useCallback(
+    ({ className, height }: GraphProps) => {
+      if (!swapHistory) return;
+      return (
+        <Card className={className}>
+          <Line
+            theme={theme.theme}
+            title="交换空间用量历史"
+            data={swapHistory}
+            height={height}
+            encode={{
+              x: "time",
+              y: "value",
+            }}
+            axis={{
+              y: {
+                title: "交换空间用量 (%)",
+                min: 0,
+                max: 4,
+                label: {
+                  formatter: (v: string) => `${v}%`,
+                },
+              },
+            }}
+            smooth={true}
+            tooltip={{
+              items: [
+                {
+                  channel: "y",
+                  valueFormatter: (v: number) => `${v}%`,
+                },
+              ],
+            }}
+          />
+        </Card>
+      );
+    },
+    [swapHistory, theme.theme]
+  );
+
+  const renderNetworkHistory = useCallback(
+    ({ className, height }: GraphProps) => {
+      if (!networkHistory) return;
+      return (
+        <Card className={className}>
+          <Line
+            theme={theme.theme}
+            title="网络用量历史"
+            data={networkHistory}
+            height={height}
+            encode={{
+              x: "time",
+              y: "value",
+              color: "type",
+            }}
+            axis={{
+              y: {
+                title: "网络速度 (KB/s)",
+                min: 0,
+                max: 8,
+                label: {
+                  formatter: (v: string) => `${v}KB/s`,
+                },
+              },
+            }}
+            color={(type: string) => {
+              return type === "下载" ? "#2196F3" : "#4CAF50";
+            }}
+            smooth={true}
+            tooltip={{
+              items: [
+                {
+                  channel: "y",
+                  valueFormatter: (v: number) => `${v}KB/s`,
+                },
+              ],
+            }}
+            legend={{
+              position: "top",
+            }}
+          />
+        </Card>
+      );
+    },
+    [networkHistory, theme.theme]
+  );
+
+  const renderDiskHistory = useCallback(
+    ({ className, height }: GraphProps) => {
+      if (!swapHistory) return;
+      return (
+        <Card className={className}>
+          <Line
+            theme={theme.theme}
+            title="硬盘用量历史"
+            data={diskHistory}
+            height={height}
+            encode={{
+              x: "time",
+              y: "value",
+            }}
+            axis={{
+              y: {
+                title: "硬盘用量 (%)",
+                min: 0,
+                max: 4,
+                label: {
+                  formatter: (v: string) => `${v}%`,
+                },
+              },
+            }}
+            smooth={true}
+            tooltip={{
+              items: [
+                {
+                  channel: "y",
+                  valueFormatter: (v: number) => `${v}%`,
+                },
+              ],
+            }}
+          />
+        </Card>
+      );
+    },
+    [diskHistory, theme.theme]
+  );
   return (
     <motion.div
       initial={{ opacity: 0, x: -50 }}
@@ -41,8 +392,9 @@ export default function MachineDashboardPage() {
       className="flex flex-col h-screen gap-4"
     >
       <div className="flex items-center gap-2 text-xl">
-        <ReactCountryFlag countryCode="cn" />
-        <span className="text-2xl">{data.machineName}</span>
+        <ReactCountryFlag countryCode={machineInfo?.location ?? ""} />
+        <span className="text-2xl">{machineInfo?.name}</span>
+        <MachineStatus status={machineStatus} />
       </div>
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
@@ -51,57 +403,55 @@ export default function MachineDashboardPage() {
             {showMachineInfo ? <FaEye /> : <FaEyeSlash />}
           </button>
         </div>
-        {showMachineInfo && (
+        {showMachineInfo && machineInfo && (
           <Card className="flex flex-col gap-2 p-4 text-lg">
             <div className="flex gap-2 items-center">
               <FaServer />
               <div>System: </div>
-              <div>Arch Linux rolling</div>
+              <div>
+                {machineInfo.osName} {machineInfo.osVersion}
+              </div>
             </div>
             <div className="flex gap-2 items-center">
               <FaMicrochip />
               <div>CPU: </div>
-              <div>AMD Ryzen 7 5800H with Radeon Graphics x86_64</div>
+              <div>{machineInfo.cpuName}</div>
             </div>
             <div className="flex gap-2 items-center">
               <FaCodepen />
               <div>Kernel: </div>
-              <div>6.11.5-zen1-1-zen</div>
+              <div>{machineInfo.kernelVersion}</div>
             </div>
             <div className="flex gap-2 items-center">
               <FaMemory />
               <div>Memory: </div>
-              <div>16G</div>
+              <div>{Math.ceil(machineInfo.totalMemory)}G</div>
             </div>
             <div className="flex gap-2 items-center">
               <FaArrowRightArrowLeft />
               <div>Swap: </div>
-              <div>16G</div>
+              <div>{machineInfo.totalSwap}G</div>
+            </div>
+            <div className="flex gap-2 items-center">
+              <FaFloppyDisk />
+              <div>硬盘: </div>
+              <div>{machineInfo.totalDiskSize}G</div>
             </div>
           </Card>
         )}
       </div>
 
-      <div className="flex flex-col gap-2">
-        <div className="text-xl">使用率</div>
-        <div className="flex gap-4 items-center flex-wrap">
-          <UsageGuage className="size-72" value={7} label="CPU 使用率" />
-          <UsageGuage className="size-72" value={65} label="内存 使用率" />
-          <UsageGuage className="size-72" value={32} label="Swap 使用率" />
-          <UsageGuage className="size-72" value={53} label="磁盘 使用率" />
-        </div>
-      </div>
+      {renderUsageInfo()}
 
       <div className="flex flex-col gap-4">
-        <CPUUsageHistory height={300} />
+        {renderCPUHistory({ height: 300 })}
         <div className="flex items-center justify-between gap-4">
-          <MemoryUsageHistory className="w-1/2" height={300} />
-          <SwapUsageHistory className="w-1/2" height={300} />
+          {renderMemoryHistory({ className: "w-1/2", height: 300 })}
+          {renderSwapHistory({ className: "w-1/2", height: 300 })}
         </div>
       </div>
-      <div>
-        <NetworkUsageHistory height={400} />
-      </div>
+      <div>{renderNetworkHistory({ height: 400 })}</div>
+      <div>{renderDiskHistory({ height: 300 })}</div>
     </motion.div>
   );
 }
@@ -139,246 +489,22 @@ function UsageGuage({
   );
 }
 
-function CPUUsageHistory({
-  className,
-  height,
-}: {
-  className?: string;
-  height?: number;
-}) {
-  const theme = useTheme();
-  const data = [
-    { time: "08:00", usage: 45 },
-    { time: "08:10", usage: 62 },
-    { time: "08:20", usage: 58 },
-    { time: "08:30", usage: 75 },
-    { time: "08:40", usage: 82 },
-    { time: "08:50", usage: 70 },
-    { time: "09:00", usage: 65 },
-    { time: "09:10", usage: 88 },
-    { time: "09:20", usage: 95 },
-  ];
-
-  return (
-    <Card className={className}>
-      <Line
-        theme={theme.theme}
-        title="CPU 用量历史"
-        height={height}
-        data={data}
-        encode={{
-          x: "time",
-          y: "usage",
-        }}
-        axis={{
-          y: {
-            title: "CPU 用量 (%)",
-            min: 0,
-            max: 100,
-            grid: true,
-            label: {
-              formatter: (v: number) => `${v}%`,
-            },
-          },
-        }}
-        scale={{
-          y: {
-            nice: true,
-          },
-        }}
-        style={{
-          smooth: true,
-        }}
-        tooltip={{
-          items: [
-            {
-              channel: "y",
-              valueFormatter: (v) => `${v}%`,
-            },
-          ],
-        }}
-      />
-    </Card>
-  );
+interface HistoryData {
+  time: string;
+  value: number;
+  type?: string;
 }
 
-function MemoryUsageHistory({
-  className,
-  height,
-}: {
-  className?: string;
-  height?: number;
-}) {
-  const theme = useTheme();
-  const data = [
-    { time: "08:00", used: 4.2 },
-    { time: "08:10", used: 5.8 },
-    { time: "08:20", used: 7.1 },
-    { time: "08:30", used: 6.5 },
-    { time: "08:40", used: 8.2 },
-    { time: "08:50", used: 9.6 },
-    { time: "09:00", used: 8.8 },
-    { time: "09:10", used: 11.2 },
-    { time: "09:20", used: 10.5 },
-  ];
+function extractTime(dateString: string) {
+  const date = new Date(dateString);
 
-  return (
-    <Card className={className}>
-      <Line
-        theme={theme.theme}
-        title="内存用量历史"
-        data={data}
-        height={height}
-        encode={{
-          x: "time",
-          y: "used",
-        }}
-        axis={{
-          y: {
-            title: "内存用量 (GB)",
-            min: 0,
-            max: 16,
-            label: {
-              formatter: (v: string) => `${v}GB`,
-            },
-          },
-        }}
-        smooth={true}
-        tooltip={{
-          items: [
-            {
-              channel: "y",
-              valueFormatter: (v: number) => `${v}GB`,
-            },
-          ],
-        }}
-      />
-    </Card>
-  );
+  const hours = date.getUTCHours();
+  const minutes = date.getUTCMinutes();
+  const seconds = date.getUTCSeconds();
+
+  return `${hours}:${minutes}:${seconds}`;
 }
-
-function SwapUsageHistory({
-  className,
-  height,
-}: {
+interface GraphProps {
   className?: string;
   height?: number;
-}) {
-  const theme = useTheme();
-  const data = [
-    { time: "08:00", used: 0.5 },
-    { time: "08:10", used: 0.8 },
-    { time: "08:20", used: 1.2 },
-    { time: "08:30", used: 0.9 },
-    { time: "08:40", used: 1.5 },
-    { time: "08:50", used: 1.8 },
-    { time: "09:00", used: 1.4 },
-    { time: "09:10", used: 2.1 },
-    { time: "09:20", used: 1.9 },
-  ];
-
-  return (
-    <Card className={className}>
-      <Line
-        theme={theme.theme}
-        title="交换空间用量历史"
-        data={data}
-        height={height}
-        encode={{
-          x: "time",
-          y: "used",
-        }}
-        axis={{
-          y: {
-            title: "交换空间用量 (GB)",
-            min: 0,
-            max: 4,
-            label: {
-              formatter: (v: string) => `${v}GB`,
-            },
-          },
-        }}
-        smooth={true}
-        tooltip={{
-          items: [
-            {
-              channel: "y",
-              valueFormatter: (v: number) => `${v}GB`,
-            },
-          ],
-        }}
-      />
-    </Card>
-  );
-}
-
-function NetworkUsageHistory({
-  className,
-  height,
-}: {
-  className?: string;
-  height?: number;
-}) {
-  const theme = useTheme();
-  const data = [
-    { time: "08:00", type: "下载", value: 2.5 },
-    { time: "08:00", type: "上传", value: 0.8 },
-    { time: "08:10", type: "下载", value: 3.2 },
-    { time: "08:10", type: "上传", value: 1.1 },
-    { time: "08:20", type: "下载", value: 4.5 },
-    { time: "08:20", type: "上传", value: 1.5 },
-    { time: "08:30", type: "下载", value: 3.8 },
-    { time: "08:30", type: "上传", value: 1.2 },
-    { time: "08:40", type: "下载", value: 5.1 },
-    { time: "08:40", type: "上传", value: 1.8 },
-    { time: "08:50", type: "下载", value: 4.2 },
-    { time: "08:50", type: "上传", value: 1.4 },
-    { time: "09:00", type: "下载", value: 3.9 },
-    { time: "09:00", type: "上传", value: 1.3 },
-    { time: "09:10", type: "下载", value: 5.5 },
-    { time: "09:10", type: "上传", value: 2.0 },
-    { time: "09:20", type: "下载", value: 4.8 },
-    { time: "09:20", type: "上传", value: 1.7 },
-  ];
-
-  return (
-    <Card className={className}>
-      <Line
-        theme={theme.theme}
-        title="网络用量历史"
-        data={data}
-        height={height}
-        encode={{
-          x: "time",
-          y: "value",
-          color: "type",
-        }}
-        axis={{
-          y: {
-            title: "网络速度 (MB/s)",
-            min: 0,
-            max: 8,
-            label: {
-              formatter: (v: string) => `${v}MB/s`,
-            },
-          },
-        }}
-        color={(type: string) => {
-          return type === "下载" ? "#2196F3" : "#4CAF50";
-        }}
-        smooth={true}
-        tooltip={{
-          items: [
-            {
-              channel: "y",
-              valueFormatter: (v: number) => `${v}MB/s`,
-            },
-          ],
-        }}
-        legend={{
-          position: "top",
-        }}
-      />
-    </Card>
-  );
 }

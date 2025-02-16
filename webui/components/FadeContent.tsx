@@ -61,3 +61,23 @@ const FadeContent: React.FC<FadeContentProps> = ({
 };
 
 export default FadeContent;
+
+export function FadeContentDefault({
+  children,
+  className = "",
+  duration = 500,
+  blur = true,
+  initialOpacity = 0,
+}: FadeContentProps) {
+  return (
+    <FadeContent
+      className={className}
+      blur={blur}
+      duration={duration}
+      easing="ease-out"
+      initialOpacity={initialOpacity}
+    >
+      {children}
+    </FadeContent>
+  );
+}

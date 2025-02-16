@@ -21,8 +21,6 @@ import ReactCountryFlag from "react-country-flag";
 import {
   FaArrowDown,
   FaArrowUp,
-  FaCirclePause,
-  FaCirclePlay,
   FaLocationDot,
   FaMemory,
   FaMicrochip,
@@ -30,8 +28,8 @@ import {
 } from "react-icons/fa6";
 import { ClipedLabel } from "./CilpedLabel";
 import { MetricData } from "@/api/internal/model/response/metric";
-import { useMemo, useState } from "react";
-import { totalmem } from "os";
+import { useState } from "react";
+import MachineStatus from "./MachineStatus";
 
 export default function ServerCard({
   data,
@@ -98,17 +96,7 @@ export default function ServerCard({
           </button>
         </div>
         <div className="flex-shrink-0 pl-2">
-          {online ? (
-            <div className="text-success-500 flex items-center gap-2">
-              <FaCirclePlay />
-              <div>运行中</div>
-            </div>
-          ) : (
-            <div className="text-danger-500 flex items-center gap-1">
-              <FaCirclePause />
-              <div>关闭</div>
-            </div>
-          )}
+          <MachineStatus status={online ? "online" : "offline"} />
         </div>
       </div>
       <div className="text-xs flex items-center justify-between">

@@ -8,16 +8,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import xyz.beriholic.beeyes.cache.MachineCache;
+import xyz.beriholic.beeyes.entity.dto.ClientDetail;
 import xyz.beriholic.beeyes.entity.dto.Machine;
 import xyz.beriholic.beeyes.entity.vo.request.MachineNewVO;
 import xyz.beriholic.beeyes.entity.vo.request.MachineUpdateVO;
 import xyz.beriholic.beeyes.entity.vo.request.RenameClientVO;
+import xyz.beriholic.beeyes.entity.vo.response.MachineInfoVO;
 import xyz.beriholic.beeyes.mapper.ClientDetailMapper;
 import xyz.beriholic.beeyes.mapper.ClientMapper;
 import xyz.beriholic.beeyes.service.MachineService;
 
 import java.security.SecureRandom;
 import java.util.Date;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -27,15 +30,16 @@ public class MachineServiceImpl extends ServiceImpl<ClientMapper, Machine> imple
     @Resource
     ClientDetailMapper clientDetailMapper;
 
-
     @Override
     @Transactional
     public void renameMachine(RenameClientVO vo) {
         this.update(Wrappers.<Machine>update().eq("id", vo.getId()).set("name", vo.getName()));
 
         Machine machine = machineCache.getIdCache(vo.getId());
+        if (Objects.isNull(machine)) {
+            machine = this.getById(vo.getId());
+        }
         machine.setName(vo.getName());
-
         machineCache.putIdCache(vo.getId(), machine);
     }
 
@@ -88,6 +92,25 @@ public class MachineServiceImpl extends ServiceImpl<ClientMapper, Machine> imple
         this.updateById(machine);
     }
 
+    @Override
+    @Transactional
+    public MachineInfoVO machineInfo(long id) {
+        Machine machine = machineCache.getIdCache(id);
+
+        if (Objects.isNull(machine)) {
+            machine = this.getById(id);
+            machineCache.putIdCache(id, machine);
+        }
+
+        ClientDetail clientDetail = clientDetailMapper.selectById(id);
+
+        MachineInfoVO vo = new MachineInfoVO();
+
+        vo.copyFrom(machine);
+        vo.copyFrom(clientDetail);
+
+        return vo;
+    }
 
     private String generateRandomToken() {
         String token = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

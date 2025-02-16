@@ -4,6 +4,7 @@ import com.influxdb.annotations.Column;
 import com.influxdb.annotations.Measurement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import xyz.beriholic.beeyes.entity.vo.request.RuntimeInfoVO;
 
 import java.time.Instant;
@@ -11,6 +12,7 @@ import java.util.Date;
 
 @Measurement(name = "runtime_info")
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class RuntimeInfoDB {
     @Column(tag = true)

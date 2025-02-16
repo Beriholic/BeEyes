@@ -6,7 +6,7 @@ import lombok.experimental.Accessors;
 import xyz.beriholic.beeyes.entity.dto.ClientDetail;
 import xyz.beriholic.beeyes.entity.dto.Machine;
 import xyz.beriholic.beeyes.entity.dto.RuntimeInfo;
-import xyz.beriholic.beeyes.entity.vo.request.MachineInfoVO;
+import xyz.beriholic.beeyes.entity.vo.request.MachineInfoReportVO;
 
 import java.util.List;
 import java.util.Objects;
@@ -61,8 +61,7 @@ public class ClientMetricVO {
 
         CopyOnWriteArrayList<String> ipList = new CopyOnWriteArrayList<>();
 
-        MachineInfoVO.NetworkInterfaceInfo networkInterfaceInfo = JSONObject.parseObject(detail.getNetworkInterfaceInfoJSON(), MachineInfoVO.NetworkInterfaceInfo.class);
-
+        MachineInfoReportVO.NetworkInterfaceInfo networkInterfaceInfo = JSONObject.parseObject(detail.getNetworkInterfaceInfoJSON(), MachineInfoReportVO.NetworkInterfaceInfo.class);
 
         if (Objects.nonNull(networkInterfaceInfo)) {
             ipList.addAll(networkInterfaceInfo.getIpv4());

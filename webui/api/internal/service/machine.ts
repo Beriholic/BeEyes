@@ -56,4 +56,13 @@ export class MachineService {
       body: req,
     });
   }
+  async info(
+    id: string
+  ): Promise<RestBean<MachineServiceResponse["MACHINE_SERVICE/INFO"]>> {
+    const _uri = `/api/machine/info?id=${id}`;
+    return await this.executor({
+      uri: _uri,
+      method: "GET",
+    });
+  }
 }

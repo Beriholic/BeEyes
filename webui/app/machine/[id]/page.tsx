@@ -1,6 +1,6 @@
 "use client";
 import MachineLayout from "@/layout/MachineLayout";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import MachineDashboardPage from "./_module/dashbord";
 import MachineTerminalPage from "./_module/terminal";
 import MachineSettingPage from "./_module/setting";
@@ -8,9 +8,9 @@ import MachineSettingPage from "./_module/setting";
 export default function MachinePage({
   params,
 }: {
-  params: Promise<{ id: number }>;
+  params: Promise<{ id: string }>;
 }) {
-  const [id, setId] = useState<number | null>(null);
+  const [id, setId] = useState<string | null>(null);
 
   const [moduleIndex, setModuleIndex] = useState(0);
 
@@ -22,6 +22,21 @@ export default function MachinePage({
     fetchId();
   }, [params]);
 
+  const renderModule = useCallback(() => {
+    if (!id) return <></>;
+
+    switch (moduleIndex) {
+      case 0:
+        return <MachineDashboardPage id={id!} />;
+      case 1:
+        return <MachineTerminalPage />;
+      case 2:
+        return <MachineSettingPage />;
+      default:
+        return <></>;
+    }
+  }, [id, moduleIndex]);
+
   return (
     <MachineLayout
       moduleIndex={moduleIndex}
@@ -29,15 +44,7 @@ export default function MachinePage({
         setModuleIndex(index);
       }}
     >
-      {moduleIndex === 0 ? (
-        <MachineDashboardPage />
-      ) : moduleIndex === 1 ? (
-        <MachineTerminalPage />
-      ) : moduleIndex === 2 ? (
-        <MachineSettingPage />
-      ) : (
-        <></>
-      )}
+      {renderModule()}
     </MachineLayout>
   );
 }
