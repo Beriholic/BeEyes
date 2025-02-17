@@ -3,7 +3,6 @@ import MachineLayout from "@/layout/MachineLayout";
 import { useCallback, useEffect, useState } from "react";
 import MachineDashboardPage from "./_module/dashbord";
 import MachineTerminalPage from "./_module/terminal";
-import MachineSettingPage from "./_module/setting";
 
 export default function MachinePage({
   params,
@@ -12,7 +11,7 @@ export default function MachinePage({
 }) {
   const [id, setId] = useState<string | null>(null);
 
-  const [moduleIndex, setModuleIndex] = useState(0);
+  const [moduleIndex, setModuleIndex] = useState(1);
 
   useEffect(() => {
     const fetchId = async () => {
@@ -27,11 +26,9 @@ export default function MachinePage({
 
     switch (moduleIndex) {
       case 0:
-        return <MachineDashboardPage id={id!} />;
+        return <MachineDashboardPage id={id} />;
       case 1:
-        return <MachineTerminalPage />;
-      case 2:
-        return <MachineSettingPage />;
+        return <MachineTerminalPage id={id} />;
       default:
         return <></>;
     }

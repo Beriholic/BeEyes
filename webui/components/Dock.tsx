@@ -9,7 +9,6 @@ import {
   type SpringOptions,
   AnimatePresence,
 } from "framer-motion";
-import { useRouter } from "next/navigation";
 import React, {
   Children,
   cloneElement,
@@ -18,7 +17,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { FaBox, FaGauge, FaGear, FaTerminal } from "react-icons/fa6";
 
 export type DockItemData = {
   icon: React.ReactNode;

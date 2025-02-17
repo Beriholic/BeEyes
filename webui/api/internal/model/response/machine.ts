@@ -1,6 +1,9 @@
+import { exportPages } from "next/dist/export/worker";
+
 export type MachineServiceResponse = {
   "MACHINE_SERVICE/LIST": Array<MachineType>;
   "MACHINE_SERVICE/INFO": MachineInfoType;
+  "MACHINE_SERVICE/SSH_INFO": MachineSSHInfoType;
 };
 
 export interface MachineType {
@@ -25,4 +28,8 @@ export interface MachineInfoType {
   readonly totalMemory: number;
   readonly totalSwap: number;
   readonly totalDiskSize: number;
+}
+export interface MachineSSHInfoType {
+  readonly username: string;
+  readonly port: number;
 }

@@ -62,18 +62,7 @@ export default function MachineSidebar({
           />
         </div>
 
-        <div className="flex flex-col gap-2">
-          <MenuItem
-            hide={hide}
-            icon={<FaBars />}
-            text="设置"
-            isSelected={curIndex === 2}
-            onClick={() => {
-              onIndexChange(2);
-            }}
-          />
-          <ThemeSwitch />
-        </div>
+        <ThemeSwitch />
       </div>
     </div>
   );

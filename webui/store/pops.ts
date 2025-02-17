@@ -2,14 +2,7 @@ import { create } from "zustand";
 
 export interface AlertContent {
   id?: string;
-  type:
-    | "success"
-    | "primary"
-    | "default"
-    | "secondary"
-    | "warning"
-    | "danger"
-    | undefined;
+  type?: "success" | "primary" | "default" | "secondary" | "warning" | "danger";
   description?: string;
   title: string;
 }
@@ -39,4 +32,14 @@ export const usePopsStore = create<PopsProps>((set) => ({
 
 export const PopMsg = (msg: AlertContent) => {
   usePopsStore.getState().pushMsg(msg);
+};
+
+export const PopMsgOK = (msg: AlertContent) => {
+  PopMsg({ ...msg, type: "success" });
+};
+export const PopMsgErr = (msg: AlertContent) => {
+  PopMsg({ ...msg, type: "danger" });
+};
+export const PopMsgWarn = (msg: AlertContent) => {
+  PopMsg({ ...msg, type: "warning" });
 };

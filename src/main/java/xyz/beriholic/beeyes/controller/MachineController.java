@@ -5,11 +5,9 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import xyz.beriholic.beeyes.entity.RestBean;
 import xyz.beriholic.beeyes.entity.dto.Machine;
-import xyz.beriholic.beeyes.entity.vo.request.MachineDeleteVO;
-import xyz.beriholic.beeyes.entity.vo.request.MachineNewVO;
-import xyz.beriholic.beeyes.entity.vo.request.MachineUpdateVO;
-import xyz.beriholic.beeyes.entity.vo.request.RenameClientVO;
+import xyz.beriholic.beeyes.entity.vo.request.*;
 import xyz.beriholic.beeyes.entity.vo.response.MachineInfoVO;
+import xyz.beriholic.beeyes.entity.vo.response.SSHInfoSaveVO;
 import xyz.beriholic.beeyes.service.MachineService;
 
 import java.util.List;
@@ -65,5 +63,20 @@ public class MachineController {
     ) {
         MachineInfoVO vo = service.machineInfo(id);
         return RestBean.success(vo);
+    }
+
+    @GetMapping("/ssh/info/{id}")
+    public RestBean<SSHInfoVO> sshInfo(
+            @PathVariable long id) {
+        SSHInfoVO vo = service.sshInfo(id);
+        return RestBean.success(vo);
+    }
+
+    @PostMapping("/ssh/save")
+    public RestBean<Void> saveSSHInfo(
+            @RequestBody @Valid SSHInfoSaveVO vo
+    ) {
+        service.saveSSHInfo(vo);
+        return RestBean.success();
     }
 }

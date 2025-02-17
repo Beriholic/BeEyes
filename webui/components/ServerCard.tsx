@@ -51,8 +51,6 @@ export default function ServerCard({
     cpuArch,
     cpuCoreCount,
     totalMemory,
-    // totalSwap,
-    // totalDisk,
     cpuUsage,
     memoryUsage,
     swapUsage,
@@ -151,7 +149,7 @@ export default function ServerCard({
         </div>
         <div className="flex items-center gap-1">
           <FaMemory />
-          <div>{totalMemory} GB</div>
+          <div>{Math.ceil(totalMemory)} GB</div>
         </div>
       </div>
       <div className="flex flex-col gap-y-2 text-xs mt-2">

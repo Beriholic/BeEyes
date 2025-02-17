@@ -7,8 +7,6 @@ import {
   DrawerHeader,
   DrawerBody,
   DrawerFooter,
-  Select,
-  SelectItem,
 } from "@heroui/react";
 import { motion } from "framer-motion";
 import { FaServer, FaEarthAsia, FaCircleNodes, FaPlug } from "react-icons/fa6";

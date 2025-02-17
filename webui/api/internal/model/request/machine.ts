@@ -17,4 +17,10 @@ export type MachineServiceRequest = {
     readonly location: string;
     readonly nodeName: string;
   };
+  "MACHINE_SERVICE/SSH_INFO_SAVE": {
+    readonly id: string;
+    readonly username: string;
+    readonly password: string;
+    readonly port: number;
+  };
 };

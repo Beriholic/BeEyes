@@ -45,7 +45,7 @@ public class InfluxDBUtils {
                 |> filter(fn: (r) => r["_measurement"] == "runtime_info" )
                 |> filter(fn: (r) => r["clientId"] == "%s" )
                 """;
-        query = String.format(query, bucket, "-1h", clientId);
+        query = String.format(query, bucket, "-8h", clientId);
 
         List<FluxTable> tables = client.getQueryApi().query(query, org);
 

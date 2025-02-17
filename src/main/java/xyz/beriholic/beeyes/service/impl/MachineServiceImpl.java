@@ -9,13 +9,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import xyz.beriholic.beeyes.cache.MachineCache;
 import xyz.beriholic.beeyes.entity.dto.ClientDetail;
+import xyz.beriholic.beeyes.entity.dto.ClientSSH;
 import xyz.beriholic.beeyes.entity.dto.Machine;
 import xyz.beriholic.beeyes.entity.vo.request.MachineNewVO;
 import xyz.beriholic.beeyes.entity.vo.request.MachineUpdateVO;
 import xyz.beriholic.beeyes.entity.vo.request.RenameClientVO;
+import xyz.beriholic.beeyes.entity.vo.request.SSHInfoVO;
 import xyz.beriholic.beeyes.entity.vo.response.MachineInfoVO;
+import xyz.beriholic.beeyes.entity.vo.response.SSHInfoSaveVO;
 import xyz.beriholic.beeyes.mapper.ClientDetailMapper;
 import xyz.beriholic.beeyes.mapper.ClientMapper;
+import xyz.beriholic.beeyes.mapper.ClientSSHMapper;
 import xyz.beriholic.beeyes.service.MachineService;
 
 import java.security.SecureRandom;
@@ -29,6 +33,8 @@ public class MachineServiceImpl extends ServiceImpl<ClientMapper, Machine> imple
     MachineCache machineCache;
     @Resource
     ClientDetailMapper clientDetailMapper;
+    @Resource
+    ClientSSHMapper clientSSHMapper;
 
     @Override
     @Transactional
@@ -110,6 +116,40 @@ public class MachineServiceImpl extends ServiceImpl<ClientMapper, Machine> imple
         vo.copyFrom(clientDetail);
 
         return vo;
+    }
+
+    @Override
+    public SSHInfoVO sshInfo(long id) {
+        ClientSSH ssh = clientSSHMapper.selectById(id);
+        SSHInfoVO vo = new SSHInfoVO();
+        vo.setUsername(ssh.getUsername());
+        vo.setPort(ssh.getPort());
+        return vo;
+    }
+
+    @Override
+    public void saveSSHInfo(SSHInfoSaveVO vo) {
+        ClientSSH ssh = clientSSHMapper.selectById(vo.getId());
+        if (Objects.nonNull(ssh)) {
+            if (!vo.getPassword().isBlank()) {
+                ssh.setPassword(vo.getPassword());
+            }
+            if (!vo.getUsername().isBlank()) {
+                ssh.setUsername(vo.getUsername());
+            }
+            ssh.setPort(vo.getPort());
+
+            clientSSHMapper.updateById(ssh);
+            return;
+        }
+
+        ssh = new ClientSSH();
+        ssh.setId(vo.getId());
+        ssh.setPort(vo.getPort());
+        ssh.setUsername(vo.getUsername());
+        ssh.setPassword(vo.getPassword());
+        clientSSHMapper.insert(ssh);
+        return;
     }
 
     private String generateRandomToken() {

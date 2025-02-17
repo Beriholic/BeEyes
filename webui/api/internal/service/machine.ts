@@ -65,4 +65,23 @@ export class MachineService {
       method: "GET",
     });
   }
+  async sshInfo(
+    id: string
+  ): Promise<RestBean<MachineServiceResponse["MACHINE_SERVICE/SSH_INFO"]>> {
+    const _uri = `/api/machine/ssh/info/${id}`;
+    return await this.executor({
+      uri: _uri,
+      method: "GET",
+    });
+  }
+  async saveSSHInfo(
+    req: MachineServiceRequest["MACHINE_SERVICE/SSH_INFO_SAVE"]
+  ): Promise<RestBean<Void>> {
+    const _uri = "/api/machine/ssh/save";
+    return await this.executor({
+      uri: _uri,
+      method: "POST",
+      body: req,
+    });
+  }
 }

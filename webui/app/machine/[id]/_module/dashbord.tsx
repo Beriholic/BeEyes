@@ -19,7 +19,7 @@ import {
 } from "react-icons/fa6";
 import { MachineInfoType } from "@/api/internal/model/response/machine";
 import { api } from "@/api/instance";
-import { PopMsg } from "@/store/pops";
+import { PopMsg, PopMsgErr } from "@/store/pops";
 import { CurrentRuntimeInfoType } from "@/api/internal/model/response/metric";
 import MachineStatus, { MachineStatusType } from "@/components/MachineStatus";
 import { FadeContentDefault } from "@/components/FadeContent";
