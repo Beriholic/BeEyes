@@ -19,6 +19,8 @@ export default function Home() {
 
   useEffect(() => {
     const ctrl = new AbortController();
+    api.authService.ping();
+
     api.metricService.getClientMetricList({
       onmessage: (data) => {
         setServerList(data);

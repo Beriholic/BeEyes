@@ -52,6 +52,8 @@ export default function MachineDashboardPage({ id }: { id: string }) {
 
   useEffect(() => {
     const ctrl = new AbortController();
+    api.authService.ping();
+
     api.metricService.getCurrentRuntimeInfo({
       id: id,
       onmessage: (data) => {

@@ -53,7 +53,7 @@ public class SaTokenConfiguration implements WebMvcConfigurer {
             });
 
             SaRouter.match("/**")
-                    .notMatch("/api/auth/**", "/error")
+                    .notMatch("/api/auth/login", "/api/auth/register", "/error")
                     .notMatch("/swagger-ui/**", "/v3/api-docs/**")
                     .notMatch("/api/client/**")
                     .check(_ -> StpUtil.checkLogin());

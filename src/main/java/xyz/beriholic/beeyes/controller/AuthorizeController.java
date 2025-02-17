@@ -95,4 +95,9 @@ public class AuthorizeController {
         else
             return RestBean.failed(400, message);
     }
+
+    @PostMapping("/ping")
+    public RestBean<Boolean> ping() {
+        return RestBean.success(StpUtil.isLogin());
+    }
 }
