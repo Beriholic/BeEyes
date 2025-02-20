@@ -1,11 +1,15 @@
 "use client";
 import { api } from "@/api/instance";
-import TerminalComponent from "@/components/Terminal";
 import { PopMsgErr, PopMsgOK } from "@/store/pops";
 import { Button, Card, Input } from "@heroui/react";
 import clsx from "clsx";
+import dynamic from "next/dynamic";
 import { useState } from "react";
 import { FaTerminal } from "react-icons/fa6";
+
+const TerminalComponent = dynamic(() => import("@/components/Terminal"), {
+  ssr: false,
+});
 
 interface SSHInfo {
   username: string;

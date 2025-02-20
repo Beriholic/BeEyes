@@ -1,12 +1,12 @@
 "use client";
 import { api } from "@/api/instance";
 import { MachineActiveType } from "@/api/internal/model/response/machine";
-import MachineActiveListSidebar from "@/components/MachineActiveListSidebar";
 import { PopMsgErr } from "@/store/pops";
 import { useCallback, useEffect, useState } from "react";
-import MachineTerminalPage from "../machine/[id]/_module/terminal";
 import { useRouter } from "next/navigation";
-import { TerminalLayout } from "@/components/TerminalLayout";
+import { TerminalLayout } from "@/layout/TerminalLayout";
+import MachineActiveListSidebar from "@/components/MachineActiveListSidebar";
+import MachineTerminalPage from "../machine/[id]/_module/terminal";
 
 export default function TerminalPage() {
   const router = useRouter();

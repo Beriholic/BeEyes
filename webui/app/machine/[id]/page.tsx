@@ -11,7 +11,7 @@ export default function MachinePage({
 }) {
   const [id, setId] = useState<string | null>(null);
 
-  const [moduleIndex, setModuleIndex] = useState(1);
+  const [moduleIndex, setModuleIndex] = useState(0);
 
   useEffect(() => {
     const fetchId = async () => {
