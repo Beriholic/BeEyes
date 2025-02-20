@@ -4,6 +4,7 @@ export type MachineServiceResponse = {
   "MACHINE_SERVICE/LIST": Array<MachineType>;
   "MACHINE_SERVICE/INFO": MachineInfoType;
   "MACHINE_SERVICE/SSH_INFO": MachineSSHInfoType;
+  "MACHINE_SERVICE/LIST_ACTIVE": Array<MachineActiveType>;
 };
 
 export interface MachineType {
@@ -32,4 +33,10 @@ export interface MachineInfoType {
 export interface MachineSSHInfoType {
   readonly username: string;
   readonly port: number;
+}
+
+export interface MachineActiveType {
+  readonly id: string;
+  readonly name: string;
+  readonly location: string;
 }

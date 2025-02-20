@@ -1,6 +1,7 @@
 package xyz.beriholic.beeyes.service.impl;
 
 import cn.hutool.core.util.IdUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
@@ -15,6 +16,7 @@ import xyz.beriholic.beeyes.entity.vo.request.MachineNewVO;
 import xyz.beriholic.beeyes.entity.vo.request.MachineUpdateVO;
 import xyz.beriholic.beeyes.entity.vo.request.RenameClientVO;
 import xyz.beriholic.beeyes.entity.vo.request.SSHInfoVO;
+import xyz.beriholic.beeyes.entity.vo.response.MachineActiveVO;
 import xyz.beriholic.beeyes.entity.vo.response.MachineInfoVO;
 import xyz.beriholic.beeyes.entity.vo.response.SSHInfoSaveVO;
 import xyz.beriholic.beeyes.mapper.ClientDetailMapper;
@@ -24,6 +26,7 @@ import xyz.beriholic.beeyes.service.MachineService;
 
 import java.security.SecureRandom;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 @Slf4j
@@ -150,6 +153,16 @@ public class MachineServiceImpl extends ServiceImpl<ClientMapper, Machine> imple
         ssh.setPassword(vo.getPassword());
         clientSSHMapper.insert(ssh);
         return;
+    }
+
+    @Override
+    public List<MachineActiveVO> listActiveMachine() {
+
+        List<Machine> machines = this.list(new QueryWrapper<Machine>().eq("active", "yes").select("id", "name", "location"));
+
+        return machines.stream().map(item ->
+                new MachineActiveVO(item.getId(), item.getName(), item.getLocation())
+        ).toList();
     }
 
     private String generateRandomToken() {

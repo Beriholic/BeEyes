@@ -7,8 +7,11 @@ import xyz.beriholic.beeyes.entity.vo.request.MachineNewVO;
 import xyz.beriholic.beeyes.entity.vo.request.MachineUpdateVO;
 import xyz.beriholic.beeyes.entity.vo.request.RenameClientVO;
 import xyz.beriholic.beeyes.entity.vo.request.SSHInfoVO;
+import xyz.beriholic.beeyes.entity.vo.response.MachineActiveVO;
 import xyz.beriholic.beeyes.entity.vo.response.MachineInfoVO;
 import xyz.beriholic.beeyes.entity.vo.response.SSHInfoSaveVO;
+
+import java.util.List;
 
 public interface MachineService extends IService<Machine> {
     void renameMachine(@Valid RenameClientVO vo);
@@ -24,4 +27,6 @@ public interface MachineService extends IService<Machine> {
     SSHInfoVO sshInfo(long id);
 
     void saveSSHInfo(@Valid SSHInfoSaveVO vo);
+
+    List<MachineActiveVO> listActiveMachine();
 }

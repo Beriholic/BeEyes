@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import xyz.beriholic.beeyes.entity.RestBean;
 import xyz.beriholic.beeyes.entity.dto.Machine;
 import xyz.beriholic.beeyes.entity.vo.request.*;
+import xyz.beriholic.beeyes.entity.vo.response.MachineActiveVO;
 import xyz.beriholic.beeyes.entity.vo.response.MachineInfoVO;
 import xyz.beriholic.beeyes.entity.vo.response.SSHInfoSaveVO;
 import xyz.beriholic.beeyes.service.MachineService;
@@ -21,6 +22,12 @@ public class MachineController {
     @GetMapping("/list")
     public RestBean<List<Machine>> listMachine() {
         List<Machine> list = service.list();
+        return RestBean.success(list);
+    }
+
+    @GetMapping("/list/active")
+    public RestBean<List<MachineActiveVO>> listActiveMachine() {
+        List<MachineActiveVO> list = service.listActiveMachine();
         return RestBean.success(list);
     }
 

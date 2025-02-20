@@ -4,7 +4,6 @@ import TerminalComponent from "@/components/Terminal";
 import { PopMsgErr, PopMsgOK } from "@/store/pops";
 import { Button, Card, Input } from "@heroui/react";
 import clsx from "clsx";
-import { setegid } from "process";
 import { useState } from "react";
 import { FaTerminal } from "react-icons/fa6";
 

@@ -84,4 +84,14 @@ export class MachineService {
       body: req,
     });
   }
+
+  async listActive(): Promise<
+    RestBean<MachineServiceResponse["MACHINE_SERVICE/LIST_ACTIVE"]>
+  > {
+    const _uri = "/api/machine/list/active";
+    return await this.executor({
+      uri: _uri,
+      method: "GET",
+    });
+  }
 }
