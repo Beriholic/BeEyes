@@ -78,10 +78,12 @@ export class MetricService {
 
   async getHistoryInfo({
     id,
+    timeline,
   }: {
     id: string;
+    timeline: number;
   }): Promise<RestBean<MetricServiceResponse["METRIC_SERVICE/HISTORY_INFO"]>> {
-    const _uri = `/api/metric/history?id=${id}`;
+    const _uri = `/api/metric/history?id=${id}&timeline=${timeline}`;
 
     return await this.executor({
       uri: _uri,

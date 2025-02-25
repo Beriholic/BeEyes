@@ -1,6 +1,7 @@
 package xyz.beriholic.beeyes.controller;
 
 import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,9 +39,13 @@ public class MetricController {
 
     @GetMapping("/history")
     public RestBean<RuntimeInfoHistoryVO> runtimeInfoHistory(
-            @RequestParam long id
+            @RequestParam long id,
+            @RequestParam @Valid int timeline
     ) {
-        RuntimeInfoHistoryVO vo = clientService.runtimeInfoHistory(id);
+        if(timeline < 0){
+            timeline=1;
+        }
+        RuntimeInfoHistoryVO vo = clientService.runtimeInfoHistory(id,timeline);
         return RestBean.success(vo);
     }
 

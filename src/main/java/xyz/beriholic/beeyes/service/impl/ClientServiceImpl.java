@@ -127,8 +127,8 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Machine> implem
     }
 
     @Override
-    public RuntimeInfoHistoryVO runtimeInfoHistory(long clientId) {
-        return influxDBUtils.readRuntimeInfo(clientId);
+    public RuntimeInfoHistoryVO runtimeInfoHistory(long clientId,int timeline) {
+        return influxDBUtils.readRuntimeInfo(clientId,timeline);
     }
 
     @Override

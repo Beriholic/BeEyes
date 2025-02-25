@@ -1,6 +1,6 @@
 "use client";
 import { Line } from "@ant-design/charts";
-import { Card } from "@heroui/react";
+import { Button, Card, DatePicker } from "@heroui/react";
 import clsx from "clsx";
 import { useTheme } from "next-themes";
 import { useCallback, useEffect, useState } from "react";
@@ -9,20 +9,25 @@ import { motion } from "framer-motion";
 import { GaugeComponent } from "react-gauge-component";
 import {
   FaArrowRightArrowLeft,
+  FaCircle,
   FaCodepen,
   FaEye,
   FaEyeSlash,
   FaFloppyDisk,
   FaMemory,
   FaMicrochip,
+  FaR,
+  FaRecycle,
+  FaRepeat,
   FaServer,
 } from "react-icons/fa6";
 import { MachineInfoType } from "@/api/internal/model/response/machine";
 import { api } from "@/api/instance";
-import { PopMsg, PopMsgErr } from "@/store/pops";
+import { PopMsg } from "@/store/pops";
 import { CurrentRuntimeInfoType } from "@/api/internal/model/response/metric";
 import MachineStatus, { MachineStatusType } from "@/components/MachineStatus";
 import { FadeContentDefault } from "@/components/FadeContent";
+import { DateValue, getLocalTimeZone, today } from "@internationalized/date";
 
 export default function MachineDashboardPage({ id }: { id: string }) {
   const theme = useTheme();
@@ -49,6 +54,7 @@ export default function MachineDashboardPage({ id }: { id: string }) {
   const [diskHistory, setDiskHistory] = useState<Array<HistoryData> | null>(
     null
   );
+  const [showHistory, setShowHistory] = useState(false);
 
   useEffect(() => {
     const ctrl = new AbortController();
@@ -87,50 +93,57 @@ export default function MachineDashboardPage({ id }: { id: string }) {
     fetchMachineInfo();
   }, []);
 
+  const fetchHistoryInfo = async (timeline: number) => {
+    const res = await api.metricService.getHistoryInfo({
+      id: id,
+      timeline: timeline,
+    });
+    if (res.code !== 200) {
+      PopMsg({
+        title: "获取历史信息失败",
+        type: "danger",
+        description: res.message,
+      });
+    }
+    let cpu: Array<HistoryData> = [];
+    let memory: Array<HistoryData> = [];
+    let disk: Array<HistoryData> = [];
+    let swap: Array<HistoryData> = [];
+    let network: Array<HistoryData> = [];
+
+    if (res.data.list.length === 0) {
+      return;
+    }
+    setShowHistory(true);
+
+    res.data.list.forEach((history) => {
+      const time = extractTime(history.timestamp);
+
+      cpu.push({ time: time, value: history.cpuUsage });
+      memory.push({ time: time, value: history.memoryUsage * 100.0 });
+      disk.push({ time: time, value: history.diskUsage });
+      swap.push({ time: time, value: history.swapUsage * 100.0 });
+      network.push({
+        time: time,
+        value: history.networkDownloadSpeed,
+        type: "download",
+      });
+      network.push({
+        time: time,
+        value: history.networkUploadSpeed,
+        type: "upload",
+      });
+    });
+
+    setCPUHistory(cpu);
+    setMemoryHistory(memory);
+    setSwapHistory(swap);
+    setNetworkHistory(network);
+    setDiskHistory(disk);
+  };
+
   useEffect(() => {
-    const fetchHistoryInfo = async () => {
-      const res = await api.metricService.getHistoryInfo({
-        id: id,
-      });
-      if (res.code !== 200) {
-        PopMsg({
-          title: "获取历史信息失败",
-          type: "danger",
-          description: res.message,
-        });
-      }
-      let cpu: Array<HistoryData> = [];
-      let memory: Array<HistoryData> = [];
-      let disk: Array<HistoryData> = [];
-      let swap: Array<HistoryData> = [];
-      let network: Array<HistoryData> = [];
-
-      res.data.list.forEach((history) => {
-        const time = extractTime(history.timestamp);
-
-        cpu.push({ time: time, value: history.cpuUsage });
-        memory.push({ time: time, value: history.memoryUsage * 100.0 });
-        disk.push({ time: time, value: history.diskUsage });
-        swap.push({ time: time, value: history.swapUsage * 100.0 });
-        network.push({
-          time: time,
-          value: history.networkDownloadSpeed,
-          type: "download",
-        });
-        network.push({
-          time: time,
-          value: history.networkUploadSpeed,
-          type: "upload",
-        });
-      });
-
-      setCPUHistory(cpu);
-      setMemoryHistory(memory);
-      setSwapHistory(swap);
-      setNetworkHistory(network);
-      setDiskHistory(disk);
-    };
-    fetchHistoryInfo();
+    fetchHistoryInfo(1);
   }, []);
 
   const renderUsageInfo = useCallback(() => {
@@ -380,6 +393,26 @@ export default function MachineDashboardPage({ id }: { id: string }) {
     },
     [diskHistory, theme.theme]
   );
+
+  const [endHistoryTime, setEndHistoryTime] = useState<DateValue | null>(
+    today(getLocalTimeZone())
+  );
+  const [startHistoryTime, setStartHistoryTime] = useState<DateValue | null>(
+    endHistoryTime?.subtract({ days: 1 }) ?? null
+  );
+
+  const flashHistoryData = async () => {
+    console.log(startHistoryTime);
+    console.log(endHistoryTime);
+
+    const year = (endHistoryTime?.year ?? 0) - (startHistoryTime?.year ?? 0);
+    const month = (endHistoryTime?.month ?? 0) - (startHistoryTime?.month ?? 0);
+    const day = (endHistoryTime?.day ?? 0) - (startHistoryTime?.day ?? 0);
+
+    const timeline = year * 365 + month * 30 + day;
+    fetchHistoryInfo(timeline);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, x: -50 }}
@@ -405,6 +438,7 @@ export default function MachineDashboardPage({ id }: { id: string }) {
             {showMachineInfo ? <FaEye /> : <FaEyeSlash />}
           </button>
         </div>
+
         {showMachineInfo && machineInfo && (
           <Card className="flex flex-col gap-2 p-4 text-lg">
             <div className="flex gap-2 items-center">
@@ -445,15 +479,45 @@ export default function MachineDashboardPage({ id }: { id: string }) {
 
       {renderUsageInfo()}
 
-      <div className="flex flex-col gap-4">
-        {renderCPUHistory({ height: 300 })}
-        <div className="flex items-center justify-between gap-4">
-          {renderMemoryHistory({ className: "w-1/2", height: 300 })}
-          {renderSwapHistory({ className: "w-1/2", height: 300 })}
+      <div className="flex flex-col mt-8 gap-4">
+        <div className="text-xl">历史监测数据</div>
+        <div className="flex items-center gap-4">
+          <DatePicker
+            className="max-w-[284px]"
+            label="开始时间"
+            value={startHistoryTime}
+            onChange={setStartHistoryTime}
+          />
+          <div className="text-2xl">~</div>
+          <DatePicker
+            className="max-w-[284px]"
+            label="结束时间"
+            value={endHistoryTime}
+            onChange={setEndHistoryTime}
+          />
+          <button>
+            <FaRepeat onClick={() => flashHistoryData()} />
+          </button>
         </div>
       </div>
-      <div>{renderNetworkHistory({ height: 400 })}</div>
-      <div>{renderDiskHistory({ height: 300 })}</div>
+
+      {showHistory ? (
+        <>
+          <div className="flex flex-col gap-4">
+            {renderCPUHistory({ height: 300 })}
+            <div className="flex items-center justify-between gap-4">
+              {renderMemoryHistory({ className: "w-1/2", height: 300 })}
+              {renderSwapHistory({ className: "w-1/2", height: 300 })}
+            </div>
+          </div>
+          <div>{renderNetworkHistory({ height: 400 })}</div>
+          <div>{renderDiskHistory({ height: 300 })}</div>
+        </>
+      ) : (
+        <Card className="p-4 h-72 flex items-center justify-center">
+          <div className="text-2xl">历史无数据</div>
+        </Card>
+      )}
     </motion.div>
   );
 }

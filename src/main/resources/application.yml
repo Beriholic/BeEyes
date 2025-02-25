@@ -2,6 +2,10 @@ springdoc:
   paths-to-match: /api/**
   swagger-ui:
     operations-sorter: alpha
+server:
+  compression:
+    enabled: true
+
 spring:
   mail:
     host: ""

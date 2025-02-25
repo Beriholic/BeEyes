@@ -24,7 +24,7 @@ public interface ClientService extends IService<Machine> {
 
     List<ClientMetricVO> getAllClientMetric();
 
-    RuntimeInfoHistoryVO runtimeInfoHistory(long clientId);
+    RuntimeInfoHistoryVO runtimeInfoHistory(long clientId,int timeline);
 
     RuntimeInfoCurrentVO runtimeInfoCurrent(long clientId);
 }
