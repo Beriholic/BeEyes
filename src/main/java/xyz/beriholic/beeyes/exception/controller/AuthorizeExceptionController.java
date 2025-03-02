@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import xyz.beriholic.beeyes.entity.RestBean;
 import xyz.beriholic.beeyes.exception.LoginFrequencyException;
+import xyz.beriholic.beeyes.exception.PasswordError;
 import xyz.beriholic.beeyes.exception.UserNameOrEmailNotFound;
 import xyz.beriholic.beeyes.exception.UserNameOrPasswordError;
 
@@ -24,5 +25,9 @@ public class AuthorizeExceptionController {
     @ExceptionHandler(LoginFrequencyException.class)
     public RestBean<Void> loginFrequencyException(LoginFrequencyException exception) {
         return RestBean.forbidden(exception.getMessage());
+    }
+    @ExceptionHandler(PasswordError.class)
+    public RestBean<Void> passwordError(PasswordError exception) {
+        return RestBean.failed(403,exception.getMessage());
     }
 }

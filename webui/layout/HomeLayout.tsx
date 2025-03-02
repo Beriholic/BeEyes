@@ -1,5 +1,5 @@
 import Dock from "@/components/Dock";
-import { Navbar } from "@/components/navbar";
+import { Navbar } from "@/components/Navbar";
 import dockConfig from "@/config/dock";
 import { ScrollShadow } from "@heroui/react";
 export function HomeLayout({ children }: { children: React.ReactNode }) {

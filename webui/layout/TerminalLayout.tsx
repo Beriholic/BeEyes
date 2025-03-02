@@ -1,5 +1,5 @@
 import { FadeContentDefault } from "@/components/FadeContent";
-import { Navbar } from "@/components/navbar";
+import { Navbar } from "@/components/Navbar";
 
 export function TerminalLayout({ children }: { children: React.ReactNode }) {
   return (

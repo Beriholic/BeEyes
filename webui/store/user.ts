@@ -4,6 +4,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 export interface UserInfo {
   username: string;
   role: string;
+  avatar: string;
 }
 
 interface UserInfoStoreProps {
@@ -17,6 +18,7 @@ export const useUserInfoStore = create(
       userInfo: {
         username: "",
         role: "",
+        avatar: "",
       },
       save: (userInfo: UserInfo) => {
         set({ userInfo });

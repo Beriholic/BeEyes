@@ -1,5 +1,5 @@
 import FadeContent, { FadeContentDefault } from "@/components/FadeContent";
-import { Navbar } from "@/components/navbar";
+import { Navbar } from "@/components/Navbar";
 
 export default function ApiKeyLayout({
   children,

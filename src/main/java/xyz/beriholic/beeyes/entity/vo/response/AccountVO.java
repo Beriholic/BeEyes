@@ -3,11 +3,13 @@ package xyz.beriholic.beeyes.entity.vo.response;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.util.Date;
+
 @Data
-@Accessors(chain = true)
-public class AuthorizeVO {
+public class AccountVO {
+    Long id;
     String username;
-    String role;
-    String token;
+    String email;
     String avatar;
+    Date registerTime;
 }

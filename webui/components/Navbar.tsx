@@ -49,6 +49,10 @@ export const Navbar = () => {
       router.push("/login");
     }, 600);
   };
+
+  const goto = (url: string) => {
+    router.push(url);
+  };
   return (
     <HeroUINavbar maxWidth="2xl" position="sticky">
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
@@ -88,9 +92,9 @@ export const Navbar = () => {
               as="button"
               className="transition-transform"
               color="secondary"
-              name="Jason Hughes"
+              name={userInfo.username}
               size="sm"
-              src="https://avatars.githubusercontent.com/u/96678707?v=4&size=64"
+              src={userInfo.avatar}
             />
           </DropdownTrigger>
           <DropdownMenu aria-label="Profile Actions" variant="flat">
@@ -98,8 +102,9 @@ export const Navbar = () => {
               <p className="font-semibold">登陆于</p>
               <p className="font-semibold">{userInfo.username}</p>
             </DropdownItem>
-            <DropdownItem key="settings">设置</DropdownItem>
-            <DropdownItem key="analytics">分析</DropdownItem>
+            <DropdownItem key="settings" onPress={() => goto("/setting")}>
+              设置
+            </DropdownItem>
             <DropdownItem key="logout" color="danger" onPress={logout}>
               登出
             </DropdownItem>

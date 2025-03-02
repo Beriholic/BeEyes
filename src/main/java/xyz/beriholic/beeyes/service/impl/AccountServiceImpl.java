@@ -1,9 +1,12 @@
 package xyz.beriholic.beeyes.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -11,7 +14,9 @@ import xyz.beriholic.beeyes.entity.dto.Account;
 import xyz.beriholic.beeyes.entity.dto.UserSession;
 import xyz.beriholic.beeyes.entity.vo.request.ConfirmResetVO;
 import xyz.beriholic.beeyes.entity.vo.request.EmailResetVO;
+import xyz.beriholic.beeyes.entity.vo.response.AccountVO;
 import xyz.beriholic.beeyes.entity.vo.response.AuthorizeVO;
+import xyz.beriholic.beeyes.exception.PasswordError;
 import xyz.beriholic.beeyes.exception.UserNameOrEmailNotFound;
 import xyz.beriholic.beeyes.exception.UserNameOrPasswordError;
 import xyz.beriholic.beeyes.mapper.AccountMapper;
@@ -20,6 +25,7 @@ import xyz.beriholic.beeyes.utils.Const;
 import xyz.beriholic.beeyes.utils.FlowUtils;
 import xyz.beriholic.beeyes.utils.PasswordUtil;
 
+import java.beans.BeanProperty;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
@@ -52,42 +58,6 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
     @Value("${spring.security.jwt.limit.frequency}")
     private int limit_frequency;
 
-    public String registerEmailVerifyCode(String type, String email, String address) {
-        synchronized (address.intern()) {
-            if (!this.verifyLimit(address))
-                return "请求频繁，请稍后再试";
-            Random random = new Random();
-            int code = random.nextInt(899999) + 100000;
-            Map<String, Object> data = Map.of("type", type, "email", email, "code", code);
-            rabbitTemplate.convertAndSend(Const.MQ_MAIL, data);
-            stringRedisTemplate.opsForValue()
-                    .set(Const.VERIFY_EMAIL_DATA + email, String.valueOf(code), 3, TimeUnit.MINUTES);
-            return null;
-        }
-    }
-
-    @Override
-    public String resetEmailAccountPassword(EmailResetVO info) {
-        String verify = resetConfirm(new ConfirmResetVO(info.getEmail(), info.getCode()));
-        if (verify != null) return verify;
-        String email = info.getEmail();
-        String password = passwordUtil.encrypt(info.getPassword());
-        boolean update = this.update().eq("email", email).set("password", password).update();
-        if (update) {
-            this.deleteEmailVerifyCode(email);
-        }
-        return update ? null : "更新失败，请联系管理员";
-    }
-
-    @Override
-    public String resetConfirm(ConfirmResetVO info) {
-        String email = info.getEmail();
-        String code = this.getEmailVerifyCode(email);
-        if (code == null) return "请先获取验证码";
-        if (!code.equals(info.getCode())) return "验证码错误，请重新输入";
-        return null;
-    }
-
     @Override
     public AuthorizeVO authenticate(String username, String password) {
         Account account = this.findAccountByNameOrEmail(username);
@@ -110,7 +80,48 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
         );
         String token = StpUtil.getTokenValue();
 
-        return new AuthorizeVO().setUsername(account.getUsername()).setRole(account.getRole()).setToken(token);
+        return new AuthorizeVO().setUsername(account.getUsername()).setRole(account.getRole()).setToken(token).setAvatar(account.getAvatar());
+    }
+
+    @Override
+    public AccountVO getAccountInfoById(Long id) {
+        Account account= this.getById(id);
+        AccountVO vo=new AccountVO();
+        BeanUtils.copyProperties(account, vo);
+        return vo;
+    }
+
+    @Override
+    public void changeUserNameById(Long id, String username) {
+        this.update(Wrappers.<Account>update().eq("id",id).set("username",username));
+    }
+
+    @Override
+    public void changeEmailById(Long id, String email) {
+        this.update(Wrappers.<Account>update().eq("id",id).set("email",email));
+    }
+
+    @Override
+    public void changePasswordById(Long id, String old, String password) {
+        Account dbAccount=this.getById(id);
+
+        if(Objects.isNull(dbAccount)){
+            throw new UserNameOrPasswordError();
+        }
+
+        if(!passwordUtil.check(old,dbAccount.getPassword())){
+            throw  new PasswordError();
+        }
+
+        String hash=passwordUtil.encrypt(password);
+
+        this.update(Wrappers.<Account>update().eq("id",id).set("password",hash));
+        StpUtil.logout();
+    }
+
+    @Override
+    public void changeAvatar(Long id, String avatar) {
+        this.update(Wrappers.<Account>update().eq("id",id).set("avatar",avatar));
     }
 
     private void deleteEmailVerifyCode(String email) {

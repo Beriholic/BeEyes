@@ -50,6 +50,7 @@ export default function LoginPage() {
     saveUserInfo({
       username: res.data.username,
       role: res.data.role,
+      avatar: res.data.avatar,
     });
     localStorage.setItem("token", res.data.token);
 

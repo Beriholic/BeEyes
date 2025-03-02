@@ -3,5 +3,6 @@ export type AuthServiceResponse = {
     readonly username: string;
     readonly role: string;
     readonly token: string;
+    readonly avatar: string;
   };
 };
