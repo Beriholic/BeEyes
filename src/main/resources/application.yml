@@ -21,6 +21,14 @@ spring:
     username: root
     password: 114514
     driver-class-name: com.mysql.cj.jdbc.Driver
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      auto-offset-reset: latest
+      max-poll-records: 100
+      value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
   data:
     redis:
       host: localhost
@@ -64,3 +72,6 @@ sa-token:
   is-share: true
   token-style: tik
   is-log: false
+
+monitor:
+  time: 5

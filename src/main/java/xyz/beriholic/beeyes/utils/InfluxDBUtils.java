@@ -13,7 +13,9 @@ import org.springframework.stereotype.Component;
 import xyz.beriholic.beeyes.entity.dto.RuntimeInfoDB;
 import xyz.beriholic.beeyes.entity.vo.response.RuntimeInfoHistoryVO;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Component
 public class InfluxDBUtils {
@@ -27,6 +29,7 @@ public class InfluxDBUtils {
     private String org;
     private InfluxDBClient client;
 
+
     @PostConstruct
     public void initClient() {
         client = InfluxDBClientFactory.create(url, token.toCharArray());
@@ -37,7 +40,7 @@ public class InfluxDBUtils {
         writeApi.writeMeasurement(bucket, org, WritePrecision.NS, info);
     }
 
-    public RuntimeInfoHistoryVO readRuntimeInfo(long clientId,int timeline) {
+    public RuntimeInfoHistoryVO readRuntimeInfo(long clientId, int timeline) {
         RuntimeInfoHistoryVO vo = new RuntimeInfoHistoryVO();
         String query = """
                 from(bucket: "%s")
@@ -45,7 +48,7 @@ public class InfluxDBUtils {
                 |> filter(fn: (r) => r["_measurement"] == "runtime_info" )
                 |> filter(fn: (r) => r["clientId"] == "%s" )
                 """;
-        query = String.format(query, bucket, "-"+timeline+"d", clientId);
+        query = String.format(query, bucket, "-" + timeline + "d", clientId);
 
         List<FluxTable> tables = client.getQueryApi().query(query, org);
 
@@ -65,4 +68,32 @@ public class InfluxDBUtils {
         }
         return vo;
     }
+
+    public List<Long> queryCPUUsageLimited(int timeRange) {
+        String query = """
+                from(bucket: "%s")
+                |> range(start: -%s)
+                |> filter(fn: (r) => r["_measurement"] == "runtime_info" and r["_field"] == "cpuUsage")
+                |> group(columns: ["clientId"])
+                |> mean()
+                |> filter(fn: (r) => r["_value"] >= 80.0)
+                |> keep(columns: ["clientId"])
+                """;
+        query = String.format(query, bucket, timeRange);
+        List<Long> clientIds = new CopyOnWriteArrayList<>();
+
+        List<FluxTable> tables = client.getQueryApi().query(query, org);
+        if (tables.isEmpty()) return Collections.emptyList();
+
+        for (FluxTable table : tables) {
+            for (FluxRecord record : table.getRecords()) {
+                Object clientId = record.getValueByKey("clientId");
+                if (clientId != null) {
+                    clientIds.add(Long.valueOf((String) clientId));
+                }
+            }
+        }
+        return clientIds;
+    }
 }
+
