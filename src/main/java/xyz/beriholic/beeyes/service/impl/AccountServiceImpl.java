@@ -1,19 +1,15 @@
 package xyz.beriholic.beeyes.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
-import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import xyz.beriholic.beeyes.entity.dto.Account;
 import xyz.beriholic.beeyes.entity.dto.UserSession;
-import xyz.beriholic.beeyes.entity.vo.request.ConfirmResetVO;
-import xyz.beriholic.beeyes.entity.vo.request.EmailResetVO;
 import xyz.beriholic.beeyes.entity.vo.response.AccountVO;
 import xyz.beriholic.beeyes.entity.vo.response.AuthorizeVO;
 import xyz.beriholic.beeyes.exception.PasswordError;
@@ -25,11 +21,7 @@ import xyz.beriholic.beeyes.utils.Const;
 import xyz.beriholic.beeyes.utils.FlowUtils;
 import xyz.beriholic.beeyes.utils.PasswordUtil;
 
-import java.beans.BeanProperty;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 import static xyz.beriholic.beeyes.utils.Const.USER_SESSION;
 
@@ -38,9 +30,6 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
 
     @Value("${spring.web.verify.mail-limit}")
     int verifyLimit;
-
-    @Resource
-    AmqpTemplate rabbitTemplate;
 
     @Resource
     StringRedisTemplate stringRedisTemplate;

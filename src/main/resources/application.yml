@@ -16,11 +16,6 @@ spring:
     token: "vCtq0Ih1b-n6RPR75bCP-_nTPXjKvxEcod_GPVMAkjOeN54JABbBqHfUKQy-WOcrBxOo7BLj7FxVPtl6Ua6g7w=="
     bucket: "BeEyes"
     org: "docs"
-  rabbitmq:
-    addresses: localhost
-    username: root
-    password: 114514
-    virtual-host: /
   datasource:
     url: jdbc:mysql://localhost:3306/be_eyes
     username: root
