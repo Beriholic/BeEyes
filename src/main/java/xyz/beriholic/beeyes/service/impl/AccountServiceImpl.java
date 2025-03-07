@@ -27,25 +27,8 @@ import static xyz.beriholic.beeyes.utils.Const.USER_SESSION;
 
 @Service
 public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> implements AccountService {
-
-    @Value("${spring.web.verify.mail-limit}")
-    int verifyLimit;
-
-    @Resource
-    StringRedisTemplate stringRedisTemplate;
-
     @Resource
     PasswordUtil passwordUtil;
-
-    @Resource
-    FlowUtils flow;
-
-    @Value("${spring.security.jwt.limit.base}")
-    private int limit_base;
-    @Value("${spring.security.jwt.limit.upgrade}")
-    private int limit_upgrade;
-    @Value("${spring.security.jwt.limit.frequency}")
-    private int limit_frequency;
 
     @Override
     public AuthorizeVO authenticate(String username, String password) {
@@ -113,21 +96,6 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
         this.update(Wrappers.<Account>update().eq("id",id).set("avatar",avatar));
     }
 
-    private void deleteEmailVerifyCode(String email) {
-        String key = Const.VERIFY_EMAIL_DATA + email;
-        stringRedisTemplate.delete(key);
-    }
-
-    private String getEmailVerifyCode(String email) {
-        String key = Const.VERIFY_EMAIL_DATA + email;
-        return stringRedisTemplate.opsForValue().get(key);
-    }
-
-    private boolean verifyLimit(String address) {
-        String key = Const.VERIFY_EMAIL_LIMIT + address;
-        return flow.limitOnceCheck(key, verifyLimit);
-    }
-
     public Account findAccountByNameOrEmail(String text) {
         return this.query()
                 .eq("username", text).or()
@@ -135,9 +103,8 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
                 .one();
     }
 
-    private boolean frequencyCheck(int userId) {
-        String key = Const.JWT_FREQUENCY + userId;
-        return flow.limitOnceUpgradeCheck(key, limit_frequency, limit_base, limit_upgrade);
+    public String getUserMail(){
+        return this.query().one().getEmail();
     }
 }
 
