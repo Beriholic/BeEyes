@@ -38,3 +38,5 @@ out/
 .vscode/
 
 log/
+
+.env

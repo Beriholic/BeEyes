@@ -22,7 +22,7 @@
     },
     {
       "name": "monitor.time",
-      "type": "java.lang.Integer",
+      "type": "java.lang.String",
       "description": "Description for monitor.rangeTime."
     }
   ]
