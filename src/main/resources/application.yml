@@ -8,21 +8,21 @@ server:
 
 spring:
   mail:
-    host: ""
-    username: ""
-    password: ""
+    host: ${MAIL_HOST}
+    username: ${MAIL_USER_NAME}
+    password: ${MAIL_PASSWORD}
   influx-db:
-    url: http://localhost:8086
-    token: "vCtq0Ih1b-n6RPR75bCP-_nTPXjKvxEcod_GPVMAkjOeN54JABbBqHfUKQy-WOcrBxOo7BLj7FxVPtl6Ua6g7w=="
-    bucket: "BeEyes"
-    org: "docs"
+    url: ${INFLUXDB_URL}
+    token: ${INFLUXDB_TOKEN}
+    bucket: ${INFLUXDB_BUCKET}
+    org: ${INFLUXDB_ORG}
   datasource:
-    url: jdbc:mysql://localhost:3306/be_eyes
-    username: root
-    password: 114514
+    url: ${MYSQL_URL}
+    username: ${MYSQL_USER_NAME}
+    password: ${MYSQL_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
     producer:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     consumer:
@@ -31,10 +31,10 @@ spring:
       value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
   data:
     redis:
-      host: localhost
-      port: 6379
-      database: 0
-      password:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      database: ${REDIS_DATABASE}
+      password: ${REDIS_PASSWORD}
       timeout: 2000
       lettuce:
         pool:
@@ -42,27 +42,11 @@ spring:
           max-wait: -1ms
           max-idle: 10
           min-idle: 0
-  security:
-    jwt:
-      key: 'abcdefghijklmn'
-      expire: 72
-      limit:
-        base: 10
-        upgrade: 300
-        frequency: 30
-    filter:
-      order: -100
   web:
-    verify:
-      mail-limit: 60
     flow:
       period: 3
       limit: 50
       block: 30
-    cors:
-      origin: '*'
-      credentials: false
-      methods: '*'
 
 sa-token:
   token-name: jinyum

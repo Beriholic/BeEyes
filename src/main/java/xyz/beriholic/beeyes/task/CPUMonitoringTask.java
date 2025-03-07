@@ -21,14 +21,12 @@ public class CPUMonitoringTask {
     @Resource
     MachineService machineService;
 
-
     @Value("monitor.time")
-    Integer time;
-
+    String time;
 
     @Scheduled(fixedRate = 300000) // 5min
     public void monitorCpuUsage() {
-        List<Long> ids = influxDBUtils.queryCPUUsageLimited(time);
+        List<Long> ids = influxDBUtils.queryCPUUsageLimited(Integer.parseInt(time));
 
         ids.forEach(id -> {
             MachineInfoVO machineInfoVO = machineService.machineInfo(id);
