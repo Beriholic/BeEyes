@@ -22,4 +22,6 @@ public interface AccountService extends IService<Account> {
     void changePasswordById(Long id, @NotBlank String old, @NotBlank String password);
 
     void changeAvatar(Long id, String avatar);
+
+     String getUserMail();
 }

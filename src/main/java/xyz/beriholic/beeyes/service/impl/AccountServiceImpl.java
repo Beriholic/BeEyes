@@ -102,5 +102,9 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
                 .eq("email", text)
                 .one();
     }
+
+    public String getUserMail(){
+        return this.query().one().getEmail();
+    }
 }
 
