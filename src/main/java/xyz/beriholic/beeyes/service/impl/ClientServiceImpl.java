@@ -95,7 +95,6 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Machine> implem
     }
 
     @Override
-    @Transactional
     public void reportRuntimeInfo(long clientId, RuntimeInfoVO vo) {
         RuntimeInfo runtimeInfo = RuntimeInfo.from(clientId, vo);
         machineCache.putRuntimeInfoCache(clientId, runtimeInfo);
@@ -103,7 +102,6 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Machine> implem
     }
 
     @Override
-    @Transactional
     public List<ClientMetricVO> getAllClientMetric() {
         return machineCache.getAllIdCache().stream().map(client -> {
             ClientMetricVO metric = ClientMetricVO.from(client);
