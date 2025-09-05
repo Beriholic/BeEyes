@@ -1,0 +1,9 @@
+[package]
+name = "reporter"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.99"
+tokio = { version = "1", features = ["full"] }
+tokio-cron-scheduler = "0.14.0"
