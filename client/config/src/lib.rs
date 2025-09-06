@@ -1,5 +1,7 @@
 mod manage;
 
+pub use manage::{load_config, save_config, verify_config};
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -16,7 +18,3 @@ impl BeEyesConfig {
         }
     }
 }
-
-pub use manage::{load_config, save_config, verify_config};
-
-

@@ -1,5 +1,6 @@
 use crate::BeEyesConfig;
 use anyhow::{Context, Result};
+use common::errors::beeyes_config_validation_error::BeEyesConfigValidationError;
 use std::fs::{self, File};
 use std::io::{Read, Write};
 use std::path::Path;
@@ -23,16 +24,9 @@ pub fn save_config(config: &BeEyesConfig) -> Result<()> {
 
 pub fn load_config() -> Result<BeEyesConfig> {
     let config_path = get_config_path()?;
-
-    // 检查文件是否存在
-    if !Path::new(&config_path).exists() {
-        let default_config = BeEyesConfig::default();
-        save_config(&default_config).context("无法创建默认配置文件")?;
-        return Ok(default_config);
-    }
+    let mut contents = String::new();
 
     let mut file = File::open(&config_path).context("无法打开配置文件")?;
-    let mut contents = String::new();
     file.read_to_string(&mut contents).context("无法读取配置文件")?;
 
     let config: BeEyesConfig = toml::from_str(&contents).context("无法解析配置文件")?;
@@ -40,24 +34,30 @@ pub fn load_config() -> Result<BeEyesConfig> {
     Ok(config)
 }
 
-pub fn verify_config() -> Result<bool> {
+pub fn verify_config() -> Result<()> {
+    let config_path = get_config_path()?;
+
+    if !Path::new(&config_path).exists() {
+        let default_config = BeEyesConfig::default();
+        save_config(&default_config).context("无法创建默认配置文件")?;
+        return Ok(());
+    }
+
     let config = load_config()?;
 
-    // 验证token不为空
     if config.token.trim().is_empty() {
-        return Ok(false);
+        return Err(BeEyesConfigValidationError::TokenEmpty.into());
     }
 
-    // 验证URL格式
     if config.url.trim().is_empty() {
-        return Ok(false);
+        return Err(BeEyesConfigValidationError::URLEmpty.into());
     }
 
-    Ok(true)
+    Ok(())
 }
 
 fn get_config_path() -> Result<String> {
-    let home = std::env::var("HOME").context("无法获取HOME环境变量")?;
+    let home = std::env::var("HOME")?;
     let config_path = CONFIG_FILE_PATH.replace("$HOME", &home);
     Ok(config_path)
 }

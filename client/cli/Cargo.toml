@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+common = { path = "../common" }
 reporter = { path = "../reporter" }
 config = { path = "../config" }
 anyhow = "1.0.99"
