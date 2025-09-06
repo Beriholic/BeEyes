@@ -1,4 +1,4 @@
 [workspace]
 resolver = "3"
-members = ["cli", "metric", "reporter"]
+members = ["cli", "common", "config", "metric", "reporter"]
 

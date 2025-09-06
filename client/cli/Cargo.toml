@@ -4,9 +4,11 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+reporter = { path = "../reporter" }
+config = { path = "../config" }
 anyhow = "1.0.99"
 clap = { version = "4.5.47", features = ["derive"] }
 clap_complete = "4.5.57"
-reporter = { path = "../reporter" }
 tokio = { version = "1", features = ["full"] }
+inquire = "0.7.5"
 

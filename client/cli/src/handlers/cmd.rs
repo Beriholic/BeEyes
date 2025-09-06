@@ -1,6 +1,7 @@
+use crate::handlers::config::config_setting;
 use crate::handlers::{report, version};
 use crate::models::cli::{Cli, Commands};
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use clap::{CommandFactory, Parser};
 use clap_complete::generate;
 use std::io;
@@ -24,8 +25,10 @@ pub async fn handle_commands() -> Result<()> {
             Ok(())
         }
 
-        Commands::Config(args) => {
-            println!("Configuration file path set to: {}", args.file);
+        Commands::Config => {
+            if let Err(e) = config_setting() {
+                return Err(anyhow!("配置文件保存出错: {}", e));
+            }
             Ok(())
         }
 

@@ -18,25 +18,15 @@ pub struct Cli {
 pub enum Commands {
     Run,
     Completion(CompletionArgs),
-    Config(ConfigArgs),
+    Config,
     Register(RegisterArgs),
     Version,
 }
-
-
-#[derive(Parser, Debug)]
-pub struct Run {}
 
 #[derive(Parser, Debug)]
 pub struct CompletionArgs {
     #[arg(value_enum)]
     pub shell: Shell,
-}
-
-#[derive(Parser, Debug)]
-pub struct ConfigArgs {
-    #[arg(short, long, value_name = "FILE_PATH")]
-    pub file: String,
 }
 
 #[derive(Parser, Debug)]
