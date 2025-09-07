@@ -8,7 +8,7 @@ pub struct RestResp {
 
 impl RestResp {
     pub fn is_success(&self) -> bool {
-        self.code == 200
+        self.code == 0
     }
 }
 

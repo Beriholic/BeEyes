@@ -2,3 +2,7 @@
 resolver = "3"
 members = ["cli", "common", "config", "metric", "reporter"]
 
+[profile.release]
+strip = true
+opt-level = "s"
+lto = true

@@ -1,3 +1,4 @@
+use crate::utils::banner::print_logo;
 use tklog::error;
 
 mod models;
@@ -6,6 +7,7 @@ mod utils;
 
 #[tokio::main]
 pub async fn main() {
+    print_logo();
     match handlers::cmd::handle_commands().await {
         Ok(_) => {}
         Err(e) => {
