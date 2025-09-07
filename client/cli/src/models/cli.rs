@@ -19,7 +19,6 @@ pub enum Commands {
     Run,
     Completion(CompletionArgs),
     Config,
-    Register(RegisterArgs),
     Version,
 }
 

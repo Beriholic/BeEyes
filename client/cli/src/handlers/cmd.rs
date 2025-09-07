@@ -33,11 +33,6 @@ pub async fn handle_commands() -> Result<()> {
             Ok(())
         }
 
-        Commands::Register(args) => {
-            println!("Attempting to register with server at: {}", args.server_url);
-            Ok(())
-        }
-
         Commands::Version => {
             version::print_version()
         }
