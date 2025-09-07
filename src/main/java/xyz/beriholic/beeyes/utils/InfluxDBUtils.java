@@ -1,6 +1,6 @@
 package xyz.beriholic.beeyes.utils;
 
-import com.alibaba.fastjson2.JSONObject;
+import cn.hutool.json.JSONObject;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.InfluxDBClientFactory;
 import com.influxdb.client.WriteApiBlocking;
@@ -59,10 +59,10 @@ public class InfluxDBUtils {
 
         for (int i = 0; i < records.size(); i++) {
             JSONObject object = new JSONObject();
-            object.put("timestamp", records.get(i).getTime());
+            object.set("timestamp", records.get(i).getTime());
             for (FluxTable table : tables) {
                 FluxRecord record = table.getRecords().get(i);
-                object.put(record.getField(), record.getValue());
+                object.set(record.getField(), record.getValue());
             }
             vo.getList().add(object);
         }

@@ -2,7 +2,7 @@ package xyz.beriholic.beeyes.filter;
 
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.IdUtil;
-import com.alibaba.fastjson2.JSONObject;
+import cn.hutool.json.JSONObject;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -65,7 +65,7 @@ public class RequestLogFilter extends OncePerRequestFilter {
         Long traceId = Long.valueOf(Optional.ofNullable(request.getHeader("BeEyes-Trace")).orElse(IdUtil.getSnowflakeNextIdStr()));
         MDC.put("traceId", String.valueOf(traceId));
         JSONObject object = new JSONObject();
-        request.getParameterMap().forEach((k, v) -> object.put(k, v.length > 0 ? v[0] : null));
+        request.getParameterMap().forEach((k, v) -> object.set(k, v.length > 0 ? v[0] : null));
         Object id = request.getAttribute(Const.ATTR_USER_ID);
         if (id != null) {
             UserSession user = UserSession.get();

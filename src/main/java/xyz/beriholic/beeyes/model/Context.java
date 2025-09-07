@@ -8,7 +8,6 @@ import xyz.beriholic.beeyes.entity.dto.UserSession;
 @Data
 @Accessors(chain = true)
 public class Context {
-    Long traceId;
     Machine machine;
     UserSession userSession;
 }

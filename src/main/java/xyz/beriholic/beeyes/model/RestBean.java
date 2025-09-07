@@ -1,30 +1,31 @@
 package xyz.beriholic.beeyes.model;
 
-import com.alibaba.fastjson2.JSONObject;
-import com.alibaba.fastjson2.JSONWriter;
 import org.slf4j.MDC;
+import xyz.beriholic.beeyes.exception.AbstractBeEyesException;
+import xyz.beriholic.beeyes.exception.ErrorCode;
+import xyz.beriholic.beeyes.utils.JsonUtils;
 
 import java.util.Optional;
 
 public record RestBean<T>(long id, int code, T data, String message) {
     public static <T> RestBean<T> success(T data) {
-        return new RestBean<>(requestId(), 200, data, "请求成功");
+        return new RestBean<>(requestId(), 0, data, "请求成功");
     }
 
     public static <T> RestBean<T> success() {
         return success(null);
     }
 
-    public static <T> RestBean<T> forbidden(String message) {
-        return failed(403, message);
-    }
-
-    public static <T> RestBean<T> unauthorized(String message) {
-        return failed(401, message);
-    }
-
     public static <T> RestBean<T> failed(int code, String message) {
         return new RestBean<>(requestId(), code, null, message);
+    }
+
+    public static <T> RestBean<T> failed(AbstractBeEyesException exception) {
+        return failed(exception.getCode(), exception.getMsg());
+    }
+
+    public static <T> RestBean<T> failed(ErrorCode errorCode) {
+        return failed(errorCode.getCode(), errorCode.getMsg());
     }
 
     private static long requestId() {
@@ -33,6 +34,6 @@ public record RestBean<T>(long id, int code, T data, String message) {
     }
 
     public String asJsonString() {
-        return JSONObject.toJSONString(this, JSONWriter.Feature.WriteNulls);
+        return JsonUtils.toJson(this);
     }
 }

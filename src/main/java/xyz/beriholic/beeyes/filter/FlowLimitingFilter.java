@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
+import xyz.beriholic.beeyes.exception.ErrorCode;
 import xyz.beriholic.beeyes.model.RestBean;
 import xyz.beriholic.beeyes.utils.Const;
 import xyz.beriholic.beeyes.utils.FlowUtils;
@@ -49,7 +50,7 @@ public class FlowLimitingFilter extends HttpFilter {
 
     private boolean tryCount(String address) {
         synchronized (address.intern()) {
-            if (Boolean.TRUE.equals(template.hasKey(Const.FLOW_LIMIT_BLOCK + address)))
+            if (template.hasKey(Const.FLOW_LIMIT_BLOCK + address))
                 return false;
             String counterKey = Const.FLOW_LIMIT_COUNTER + address;
             String blockKey = Const.FLOW_LIMIT_BLOCK + address;
@@ -61,6 +62,6 @@ public class FlowLimitingFilter extends HttpFilter {
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType("application/json;charset=utf-8");
         PrintWriter writer = response.getWriter();
-        writer.write(RestBean.forbidden("操作频繁，请稍后再试").asJsonString());
+        writer.write(RestBean.failed(ErrorCode.REQUEST_FREQUENCY).asJsonString());
     }
 }

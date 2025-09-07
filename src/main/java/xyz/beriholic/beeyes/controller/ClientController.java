@@ -10,6 +10,7 @@ import xyz.beriholic.beeyes.model.RestBean;
 import xyz.beriholic.beeyes.model.request.ReportMachineInfoRequest;
 import xyz.beriholic.beeyes.model.request.ReportRuntimeInfoRequest;
 import xyz.beriholic.beeyes.service.ClientService;
+import xyz.beriholic.beeyes.utils.JsonUtils;
 
 @Slf4j
 @RestController
@@ -22,6 +23,7 @@ public class ClientController {
     public RestBean<Void> registerClient(
             @RequestHeader("Authorization") String token
     ) {
+        log.info("[registerClient] biz start token: {}", token);
         boolean ok = service.verifyAndRegister(token);
 
         if (!ok) {
@@ -36,8 +38,9 @@ public class ClientController {
             @RequestAttribute(ContextConst.CONTEXT_ATTRIBUTE) Context context,
             @RequestBody @Valid ReportMachineInfoRequest request
     ) {
+        log.info("[reportMachineInfo] biz start context: {}, request: {}", JsonUtils.toJson(context), JsonUtils.toJson(request));
         //TODO
-//        service.reportClientInfo(machine.getId(), vo);
+        //service.reportClientInfo(machine.getId(), vo);
         return RestBean.success();
     }
 
@@ -46,8 +49,10 @@ public class ClientController {
             @RequestAttribute(ContextConst.CONTEXT_ATTRIBUTE) Context context,
             @RequestBody @Valid ReportRuntimeInfoRequest request
     ) {
+        log.info("[reportRuntimeInfo] biz start, context: {}, request: {}", JsonUtils.toJson(context), JsonUtils.toJson(request));
         //TODO
-//        service.reportRuntimeInfo(machine.getId(), vo);
+        //service.reportRuntimeInfo(machine.getId(), vo);
+        log.info("context: {}, request: {}", context, request);
         return RestBean.success();
     }
 }

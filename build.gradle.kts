@@ -39,7 +39,6 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok")
     runtimeOnly("com.mysql:mysql-connector-j")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    implementation("com.alibaba.fastjson2:fastjson2:2.0.53")
     implementation("com.auth0:java-jwt:4.3.0")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
     implementation("com.influxdb:influxdb-client-java:7.2.0")

@@ -1,6 +1,6 @@
 package xyz.beriholic.beeyes.model.response;
 
-import com.alibaba.fastjson2.JSONObject;
+import cn.hutool.json.JSONObject;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

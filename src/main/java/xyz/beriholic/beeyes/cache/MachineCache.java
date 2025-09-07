@@ -1,12 +1,11 @@
 package xyz.beriholic.beeyes.cache;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
 import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import xyz.beriholic.beeyes.entity.dto.Machine;
 import xyz.beriholic.beeyes.entity.dto.RuntimeInfo;
+import xyz.beriholic.beeyes.utils.JsonUtils;
 
 import java.util.Collection;
 import java.util.Map;
@@ -35,7 +34,7 @@ public class MachineCache {
     }
 
     public void putTokenCache(String token, Machine machine) {
-        String json = JSON.toJSONString(machine);
+        String json = JsonUtils.toJson(machine);
         clientTokenCache.opsForValue().set(CLIENT_TOKEN_CACHE + token, json);
     }
 
@@ -45,7 +44,7 @@ public class MachineCache {
 
     public Machine getTokenCache(String token) {
         String json = clientTokenCache.opsForValue().get(CLIENT_TOKEN_CACHE + token);
-        return JSONObject.parseObject(json, Machine.class);
+        return JsonUtils.parseJson(json, Machine.class);
     }
 
     public void putRuntimeInfoCache(long clientId, RuntimeInfo info) {
