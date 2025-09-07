@@ -5,11 +5,13 @@ edition = "2024"
 
 [dependencies]
 common = { path = "../common" }
-reporter = { path = "../reporter" }
 config = { path = "../config" }
+reporter = { path = "../reporter" }
+metric = { path = "../metric" }
 anyhow = "1.0.99"
 clap = { version = "4.5.47", features = ["derive"] }
 clap_complete = "4.5.57"
 tokio = { version = "1", features = ["full"] }
 inquire = "0.7.5"
+tklog = "0.3.0"
 

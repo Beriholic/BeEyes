@@ -6,6 +6,7 @@ use once_cell::sync::Lazy;
 use reqwest::Client;
 use serde::Serialize;
 use std::sync::Arc;
+use tklog::error;
 
 pub struct ReporterClient {
     client: Client,
@@ -29,12 +30,21 @@ impl ReporterClient {
             Some(body) => req.json(&body),
             None => req,
         };
-        let resp = req.send().await?;
+        let resp = req.send().await;
 
-        if !resp.status().is_success() {
-            return Err(ReportError::RequestError.into());
-        }
-
+        let resp = match resp {
+            Ok(resp) => {
+                if !resp.status().is_success() {
+                    error!("发起post请求失败: ", resp.status());
+                    return Err(ReportError::RequestError(resp.status().to_string()).into());
+                }
+                resp
+            }
+            Err(e) => {
+                error!("发起post请求失败: ", e);
+                return Err(ReportError::RequestError(e.to_string()).into());
+            }
+        };
         let resp = resp.text().await?;
         let resp = serde_json::from_str(&resp)?;
         Ok(resp)
