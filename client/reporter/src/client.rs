@@ -5,8 +5,10 @@ use config::BeEyesConfig;
 use once_cell::sync::Lazy;
 use reqwest::Client;
 use serde::Serialize;
+use snowflaked::Generator;
 use std::sync::Arc;
 use tklog::error;
+
 
 pub struct ReporterClient {
     client: Client,
@@ -22,8 +24,11 @@ impl ReporterClient {
     }
 
     pub async fn post<T: Serialize>(&self, url: &str, body: Option<T>) -> Result<RestResp> {
+        let trace_id: u64 = Generator::new(0).generate();
+
         let req = self.client
             .post(format!("{}{}", self.config.url, url))
+            .header("BeEyes-Trace", trace_id.to_string())
             .header("Content-Type", "application/json")
             .header("Authorization", &self.config.token);
         let req = match body {

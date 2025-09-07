@@ -18,8 +18,8 @@ async fn register_to_server() -> Result<()> {
 }
 
 async fn reporter_machine_info() -> Result<()> {
-    info!("开始上报机器数据");
     let machine_info = metric::machine_info::MachineInfo::fetch();
+    info!("开始上报机器数据: ", json_utils::to_json(&machine_info)?);
     reporter::apis::report_machine_info(&machine_info).await?;
     info!("上报机器数据成功", json_utils::to_json(&machine_info)?);
     Ok(())
