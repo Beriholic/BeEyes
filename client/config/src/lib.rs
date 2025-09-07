@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 pub struct BeEyesConfig {
     pub url: String,
     pub token: String,
+    pub detail: bool,
 }
 
 impl BeEyesConfig {
@@ -15,6 +16,7 @@ impl BeEyesConfig {
         Self {
             url: "".to_string(),
             token: "".to_string(),
+            detail: false,
         }
     }
 }

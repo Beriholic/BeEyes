@@ -10,9 +10,13 @@ pub fn config_setting() -> Result<()> {
     let token = Text::new("Token")
         .with_default(config.token.as_str())
         .prompt()?;
+    let detail = Confirm::new("是否展示上报数据?")
+        .with_default(config.detail)
+        .prompt()?;
 
     config.url = url;
     config.token = token;
+    config.detail = detail;
 
     println!("新配置文件: {:?}", config);
 

@@ -8,5 +8,3 @@ common = { path = "../common" }
 anyhow = "1.0.99"
 toml = "0.9.5"
 serde = { version = "1.0", features = ["derive"] }
-[dev-dependencies]
-
