@@ -5,7 +5,7 @@ import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import xyz.beriholic.beeyes.entity.RestBean;
+import xyz.beriholic.beeyes.model.RestBean;
 
 @Slf4j
 @RestControllerAdvice

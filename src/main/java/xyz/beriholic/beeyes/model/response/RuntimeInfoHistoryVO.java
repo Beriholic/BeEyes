@@ -1,4 +1,4 @@
-package xyz.beriholic.beeyes.entity.vo.response;
+package xyz.beriholic.beeyes.model.response;
 
 import com.alibaba.fastjson2.JSONObject;
 import lombok.Data;

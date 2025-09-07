@@ -4,12 +4,12 @@ import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import xyz.beriholic.beeyes.entity.RestBean;
-import xyz.beriholic.beeyes.entity.dto.Machine;
-import xyz.beriholic.beeyes.entity.vo.request.MachineInfoReportVO;
-import xyz.beriholic.beeyes.entity.vo.request.RuntimeInfoVO;
+import xyz.beriholic.beeyes.consts.ContextConst;
+import xyz.beriholic.beeyes.model.Context;
+import xyz.beriholic.beeyes.model.RestBean;
+import xyz.beriholic.beeyes.model.request.ReportMachineInfoRequest;
+import xyz.beriholic.beeyes.model.request.ReportRuntimeInfoRequest;
 import xyz.beriholic.beeyes.service.ClientService;
-import xyz.beriholic.beeyes.utils.Const;
 
 @Slf4j
 @RestController
@@ -32,20 +32,22 @@ public class ClientController {
     }
 
     @PostMapping("/report/machine")
-    public RestBean<Void> reportClientInfo(
-            @RequestAttribute(Const.ATTR_CLIENT) Machine machine,
-            @RequestBody @Valid MachineInfoReportVO vo
+    public RestBean<Void> reportMachineInfo(
+            @RequestAttribute(ContextConst.CONTEXT_ATTRIBUTE) Context context,
+            @RequestBody @Valid ReportMachineInfoRequest request
     ) {
-        service.reportClientInfo(machine.getId(), vo);
+        //TODO
+//        service.reportClientInfo(machine.getId(), vo);
         return RestBean.success();
     }
 
     @PostMapping("/report/runtime")
     public RestBean<Void> reportRuntimeInfo(
-            @RequestAttribute(Const.ATTR_CLIENT) Machine machine,
-            @RequestBody @Valid RuntimeInfoVO vo
+            @RequestAttribute(ContextConst.CONTEXT_ATTRIBUTE) Context context,
+            @RequestBody @Valid ReportRuntimeInfoRequest request
     ) {
-        service.reportRuntimeInfo(machine.getId(), vo);
+        //TODO
+//        service.reportRuntimeInfo(machine.getId(), vo);
         return RestBean.success();
     }
 }

@@ -7,7 +7,7 @@ import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import xyz.beriholic.beeyes.entity.RestBean;
+import xyz.beriholic.beeyes.model.RestBean;
 
 import java.util.Map;
 import java.util.Optional;

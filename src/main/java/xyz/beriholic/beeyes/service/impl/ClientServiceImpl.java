@@ -12,13 +12,13 @@ import xyz.beriholic.beeyes.cache.MachineCache;
 import xyz.beriholic.beeyes.entity.dto.ClientDetail;
 import xyz.beriholic.beeyes.entity.dto.Machine;
 import xyz.beriholic.beeyes.entity.dto.RuntimeInfo;
-import xyz.beriholic.beeyes.entity.vo.request.MachineInfoReportVO;
-import xyz.beriholic.beeyes.entity.vo.request.RuntimeInfoVO;
-import xyz.beriholic.beeyes.entity.vo.response.ClientMetricVO;
-import xyz.beriholic.beeyes.entity.vo.response.RuntimeInfoCurrentVO;
-import xyz.beriholic.beeyes.entity.vo.response.RuntimeInfoHistoryVO;
 import xyz.beriholic.beeyes.mapper.ClientDetailMapper;
 import xyz.beriholic.beeyes.mapper.ClientMapper;
+import xyz.beriholic.beeyes.model.request.ReportMachineInfoRequest;
+import xyz.beriholic.beeyes.model.request.ReportRuntimeInfoRequest;
+import xyz.beriholic.beeyes.model.response.ClientMetricVO;
+import xyz.beriholic.beeyes.model.response.RuntimeInfoCurrentVO;
+import xyz.beriholic.beeyes.model.response.RuntimeInfoHistoryVO;
 import xyz.beriholic.beeyes.service.ClientService;
 import xyz.beriholic.beeyes.utils.InfluxDBUtils;
 
@@ -79,7 +79,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Machine> implem
 
     @Override
     @Transactional
-    public void reportClientInfo(long clientId, MachineInfoReportVO vo) {
+    public void reportClientInfo(long clientId, ReportMachineInfoRequest vo) {
         ClientDetail clientDetail = ClientDetail.from(clientId, vo);
         if (Objects.nonNull(clientDetailMapper.selectById(clientId))) {
             clientDetailMapper.updateById(clientDetail);
@@ -95,7 +95,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Machine> implem
     }
 
     @Override
-    public void reportRuntimeInfo(long clientId, RuntimeInfoVO vo) {
+    public void reportRuntimeInfo(long clientId, ReportRuntimeInfoRequest vo) {
         RuntimeInfo runtimeInfo = RuntimeInfo.from(clientId, vo);
         machineCache.putRuntimeInfoCache(clientId, runtimeInfo);
         influxDBUtils.writeRuntimeInfo(runtimeInfo.toDB());
@@ -125,8 +125,8 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Machine> implem
     }
 
     @Override
-    public RuntimeInfoHistoryVO runtimeInfoHistory(long clientId,int timeline) {
-        return influxDBUtils.readRuntimeInfo(clientId,timeline);
+    public RuntimeInfoHistoryVO runtimeInfoHistory(long clientId, int timeline) {
+        return influxDBUtils.readRuntimeInfo(clientId, timeline);
     }
 
     @Override

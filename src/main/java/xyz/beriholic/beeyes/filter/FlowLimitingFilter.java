@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
-import xyz.beriholic.beeyes.entity.RestBean;
+import xyz.beriholic.beeyes.model.RestBean;
 import xyz.beriholic.beeyes.utils.Const;
 import xyz.beriholic.beeyes.utils.FlowUtils;
 

@@ -2,7 +2,7 @@ package xyz.beriholic.beeyes.entity.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import xyz.beriholic.beeyes.entity.vo.request.RuntimeInfoVO;
+import xyz.beriholic.beeyes.model.request.ReportRuntimeInfoRequest;
 
 import java.util.Date;
 
@@ -18,16 +18,19 @@ public class RuntimeInfo {
     Double networkUploadSpeed;
     Double networkDownloadSpeed;
 
-    public static RuntimeInfo from(long clientId, RuntimeInfoVO vo) {
+    public static RuntimeInfo from(long clientId, ReportRuntimeInfoRequest vo) {
         return new RuntimeInfo(
                 clientId,
                 vo.getTimestamp(),
                 vo.getCpuInfo().getUsage(),
                 vo.getMemoryInfo().getPercentMemory(),
                 vo.getMemoryInfo().getPercentSwap(),
-                vo.getDiskInfo().getPercent(),
-                vo.getNetworkInfo().getInterfaces().getFirst().getUploadSpeed(),
-                vo.getNetworkInfo().getInterfaces().getFirst().getDownloadSpeed()
+                0D,
+                0D,
+                0D
+//                vo.getDiskInfo().getPercent(),
+//                vo.getNetworkInfo().getInterfaces().getFirst().getUploadSpeed(),
+//                vo.getNetworkInfo().getInterfaces().getFirst().getDownloadSpeed()
         );
     }
 

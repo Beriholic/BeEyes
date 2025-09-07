@@ -1,4 +1,4 @@
-package xyz.beriholic.beeyes.entity;
+package xyz.beriholic.beeyes.model;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

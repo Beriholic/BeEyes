@@ -3,10 +3,8 @@ package xyz.beriholic.beeyes.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import jakarta.validation.constraints.NotBlank;
 import xyz.beriholic.beeyes.entity.dto.Account;
-import xyz.beriholic.beeyes.entity.vo.request.ConfirmResetVO;
-import xyz.beriholic.beeyes.entity.vo.request.EmailResetVO;
-import xyz.beriholic.beeyes.entity.vo.response.AccountVO;
-import xyz.beriholic.beeyes.entity.vo.response.AuthorizeVO;
+import xyz.beriholic.beeyes.model.response.AccountVO;
+import xyz.beriholic.beeyes.model.response.AuthorizeVO;
 
 public interface AccountService extends IService<Account> {
     Account findAccountByNameOrEmail(String text);

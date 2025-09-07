@@ -5,7 +5,7 @@ import com.influxdb.annotations.Measurement;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import xyz.beriholic.beeyes.entity.vo.request.RuntimeInfoVO;
+import xyz.beriholic.beeyes.model.request.ReportRuntimeInfoRequest;
 
 import java.time.Instant;
 import java.util.Date;
@@ -33,16 +33,19 @@ public class RuntimeInfoDB {
     @Column
     Double networkDownloadSpeed;
 
-    public static RuntimeInfoDB from(long clientId, RuntimeInfoVO vo) {
+    public static RuntimeInfoDB from(long clientId, ReportRuntimeInfoRequest vo) {
         return new RuntimeInfoDB(
                 clientId,
                 new Date(vo.getTimestamp()).toInstant(),
                 vo.getCpuInfo().getUsage(),
                 vo.getMemoryInfo().getPercentMemory(),
                 vo.getMemoryInfo().getPercentSwap(),
-                vo.getDiskInfo().getPercent(),
-                vo.getNetworkInfo().getInterfaces().getFirst().getUploadSpeed(),
-                vo.getNetworkInfo().getInterfaces().getFirst().getDownloadSpeed()
+                0D,
+                0D,
+                0D
+//                vo.getDiskInfo().getPercent(),
+//                vo.getNetworkInfo().getInterfaces().getFirst().getUploadSpeed(),
+//                vo.getNetworkInfo().getInterfaces().getFirst().getDownloadSpeed()
         );
     }
 }

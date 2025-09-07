@@ -3,11 +3,11 @@ package xyz.beriholic.beeyes.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import jakarta.validation.Valid;
 import xyz.beriholic.beeyes.entity.dto.Machine;
-import xyz.beriholic.beeyes.entity.vo.request.MachineInfoReportVO;
-import xyz.beriholic.beeyes.entity.vo.request.RuntimeInfoVO;
-import xyz.beriholic.beeyes.entity.vo.response.ClientMetricVO;
-import xyz.beriholic.beeyes.entity.vo.response.RuntimeInfoCurrentVO;
-import xyz.beriholic.beeyes.entity.vo.response.RuntimeInfoHistoryVO;
+import xyz.beriholic.beeyes.model.request.ReportMachineInfoRequest;
+import xyz.beriholic.beeyes.model.request.ReportRuntimeInfoRequest;
+import xyz.beriholic.beeyes.model.response.ClientMetricVO;
+import xyz.beriholic.beeyes.model.response.RuntimeInfoCurrentVO;
+import xyz.beriholic.beeyes.model.response.RuntimeInfoHistoryVO;
 
 import java.util.List;
 
@@ -18,13 +18,13 @@ public interface ClientService extends IService<Machine> {
 
     boolean verifyAndRegister(String token);
 
-    void reportClientInfo(long clientId, MachineInfoReportVO vo);
+    void reportClientInfo(long clientId, ReportMachineInfoRequest vo);
 
-    void reportRuntimeInfo(long clientId, @Valid RuntimeInfoVO vo);
+    void reportRuntimeInfo(long clientId, @Valid ReportRuntimeInfoRequest vo);
 
     List<ClientMetricVO> getAllClientMetric();
 
-    RuntimeInfoHistoryVO runtimeInfoHistory(long clientId,int timeline);
+    RuntimeInfoHistoryVO runtimeInfoHistory(long clientId, int timeline);
 
     RuntimeInfoCurrentVO runtimeInfoCurrent(long clientId);
 }

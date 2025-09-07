@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import xyz.beriholic.beeyes.entity.dto.WarnMessage;
-import xyz.beriholic.beeyes.entity.vo.response.MachineInfoVO;
+import xyz.beriholic.beeyes.model.response.MachineInfoVO;
 import xyz.beriholic.beeyes.service.MachineService;
 import xyz.beriholic.beeyes.service.MessageService;
 import xyz.beriholic.beeyes.utils.InfluxDBUtils;

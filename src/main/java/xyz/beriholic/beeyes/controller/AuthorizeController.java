@@ -4,19 +4,11 @@ import cn.dev33.satoken.stp.StpUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Pattern;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import xyz.beriholic.beeyes.entity.RestBean;
-import xyz.beriholic.beeyes.entity.vo.request.ConfirmResetVO;
-import xyz.beriholic.beeyes.entity.vo.request.EmailResetVO;
-import xyz.beriholic.beeyes.entity.vo.response.AuthorizeVO;
+import xyz.beriholic.beeyes.model.RestBean;
+import xyz.beriholic.beeyes.model.response.AuthorizeVO;
 import xyz.beriholic.beeyes.service.AccountService;
-
-import java.util.function.Supplier;
 
 @Validated
 @RestController

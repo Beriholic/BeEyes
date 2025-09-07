@@ -1,15 +1,12 @@
-package xyz.beriholic.beeyes.entity.vo.response;
+package xyz.beriholic.beeyes.model.response;
 
-import com.alibaba.fastjson2.JSONObject;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import xyz.beriholic.beeyes.entity.dto.ClientDetail;
 import xyz.beriholic.beeyes.entity.dto.Machine;
 import xyz.beriholic.beeyes.entity.dto.RuntimeInfo;
-import xyz.beriholic.beeyes.entity.vo.request.MachineInfoReportVO;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Data
@@ -61,12 +58,12 @@ public class ClientMetricVO {
 
         CopyOnWriteArrayList<String> ipList = new CopyOnWriteArrayList<>();
 
-        MachineInfoReportVO.NetworkInterfaceInfo networkInterfaceInfo = JSONObject.parseObject(detail.getNetworkInterfaceInfoJSON(), MachineInfoReportVO.NetworkInterfaceInfo.class);
+//        MachineInfoReportVO.NetworkInterfaceInfo networkInterfaceInfo = JSONObject.parseObject(detail.getNetworkInterfaceInfoJSON(), MachineInfoReportVO.NetworkInterfaceInfo.class);
 
-        if (Objects.nonNull(networkInterfaceInfo)) {
-            ipList.addAll(networkInterfaceInfo.getIpv4());
-            ipList.addAll(networkInterfaceInfo.getIpv6());
-        }
+//        if (Objects.nonNull(networkInterfaceInfo)) {
+//            ipList.addAll(networkInterfaceInfo.getIpv4());
+//            ipList.addAll(networkInterfaceInfo.getIpv6());
+//        }
 
         this.ipList = ipList;
     }

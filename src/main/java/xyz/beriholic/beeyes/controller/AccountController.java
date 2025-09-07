@@ -5,10 +5,10 @@ import cn.dev33.satoken.stp.StpUtil;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
-import xyz.beriholic.beeyes.entity.RestBean;
-import xyz.beriholic.beeyes.entity.vo.request.AccountPasswordChangeVO;
-import xyz.beriholic.beeyes.entity.vo.request.ChangeAvatarVO;
-import xyz.beriholic.beeyes.entity.vo.response.AccountVO;
+import xyz.beriholic.beeyes.model.RestBean;
+import xyz.beriholic.beeyes.model.request.AccountPasswordChangeVO;
+import xyz.beriholic.beeyes.model.request.ChangeAvatarVO;
+import xyz.beriholic.beeyes.model.response.AccountVO;
 import xyz.beriholic.beeyes.service.AccountService;
 
 

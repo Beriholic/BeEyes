@@ -3,13 +3,13 @@ package xyz.beriholic.beeyes.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import jakarta.validation.Valid;
 import xyz.beriholic.beeyes.entity.dto.Machine;
-import xyz.beriholic.beeyes.entity.vo.request.MachineNewVO;
-import xyz.beriholic.beeyes.entity.vo.request.MachineUpdateVO;
-import xyz.beriholic.beeyes.entity.vo.request.RenameClientVO;
-import xyz.beriholic.beeyes.entity.vo.request.SSHInfoVO;
-import xyz.beriholic.beeyes.entity.vo.response.MachineActiveVO;
-import xyz.beriholic.beeyes.entity.vo.response.MachineInfoVO;
-import xyz.beriholic.beeyes.entity.vo.response.SSHInfoSaveVO;
+import xyz.beriholic.beeyes.model.request.MachineNewVO;
+import xyz.beriholic.beeyes.model.request.MachineUpdateVO;
+import xyz.beriholic.beeyes.model.request.RenameClientVO;
+import xyz.beriholic.beeyes.model.request.SSHInfoVO;
+import xyz.beriholic.beeyes.model.response.MachineActiveVO;
+import xyz.beriholic.beeyes.model.response.MachineInfoVO;
+import xyz.beriholic.beeyes.model.response.SSHInfoSaveVO;
 
 import java.util.List;
 

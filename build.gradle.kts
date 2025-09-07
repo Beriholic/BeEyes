@@ -47,6 +47,7 @@ dependencies {
     implementation("com.influxdb:influxdb-client-java:6.6.0")
     implementation("org.apache.commons:commons-pool2")
     implementation("com.jcraft:jsch:0.1.55")
+    implementation("com.google.guava:guava:11.0.2")
 }
 
 tasks.withType<Test> {

@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import xyz.beriholic.beeyes.entity.RestBean;
-import xyz.beriholic.beeyes.entity.vo.response.ClientMetricVO;
-import xyz.beriholic.beeyes.entity.vo.response.RuntimeInfoCurrentVO;
-import xyz.beriholic.beeyes.entity.vo.response.RuntimeInfoHistoryVO;
+import xyz.beriholic.beeyes.model.RestBean;
+import xyz.beriholic.beeyes.model.response.ClientMetricVO;
+import xyz.beriholic.beeyes.model.response.RuntimeInfoCurrentVO;
+import xyz.beriholic.beeyes.model.response.RuntimeInfoHistoryVO;
 import xyz.beriholic.beeyes.service.ClientService;
 
 import java.time.Duration;

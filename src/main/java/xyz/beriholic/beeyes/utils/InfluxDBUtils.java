@@ -11,7 +11,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import xyz.beriholic.beeyes.entity.dto.RuntimeInfoDB;
-import xyz.beriholic.beeyes.entity.vo.response.RuntimeInfoHistoryVO;
+import xyz.beriholic.beeyes.model.response.RuntimeInfoHistoryVO;
 
 import java.util.Collections;
 import java.util.List;

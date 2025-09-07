@@ -1,4 +1,4 @@
-package xyz.beriholic.beeyes.entity.vo.request;
+package xyz.beriholic.beeyes.model.request;
 
 import lombok.Data;
 

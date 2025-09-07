@@ -3,7 +3,7 @@ package xyz.beriholic.beeyes.exception.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import xyz.beriholic.beeyes.entity.RestBean;
+import xyz.beriholic.beeyes.model.RestBean;
 import xyz.beriholic.beeyes.exception.LoginFrequencyException;
 import xyz.beriholic.beeyes.exception.PasswordError;
 import xyz.beriholic.beeyes.exception.UserNameOrEmailNotFound;

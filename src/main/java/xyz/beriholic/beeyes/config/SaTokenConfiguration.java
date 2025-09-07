@@ -10,10 +10,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import xyz.beriholic.beeyes.entity.RestBean;
 import xyz.beriholic.beeyes.entity.dto.Machine;
+import xyz.beriholic.beeyes.helper.ContextHelper;
+import xyz.beriholic.beeyes.model.Context;
+import xyz.beriholic.beeyes.model.RestBean;
 import xyz.beriholic.beeyes.service.ClientService;
-import xyz.beriholic.beeyes.utils.Const;
 
 import java.io.IOException;
 
@@ -46,7 +47,9 @@ public class SaTokenConfiguration implements WebMvcConfigurer {
                                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                             }
                         } else {
-                            request.setAttribute(Const.ATTR_CLIENT, machine);
+                            Context context = ContextHelper.getOrCreateContext(request);
+                            context.setMachine(machine);
+                            ContextHelper.setContext(request, context);
                         }
                     }
                 }

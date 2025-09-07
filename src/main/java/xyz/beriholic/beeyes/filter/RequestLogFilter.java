@@ -12,16 +12,19 @@ import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingResponseWrapper;
+import xyz.beriholic.beeyes.consts.ContextConst;
 import xyz.beriholic.beeyes.entity.dto.UserSession;
+import xyz.beriholic.beeyes.helper.ContextHelper;
+import xyz.beriholic.beeyes.model.Context;
 import xyz.beriholic.beeyes.utils.Const;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
 @Component
 public class RequestLogFilter extends OncePerRequestFilter {
-
     private final Set<String> ignores = Set.of("/swagger-ui", "/v3/api-docs", "/api/metric/list", "/api/metric/current");
 
     @Override
@@ -29,12 +32,17 @@ public class RequestLogFilter extends OncePerRequestFilter {
         if (this.isIgnoreUrl(request.getServletPath())) {
             filterChain.doFilter(request, response);
         } else {
-            long startTime = System.currentTimeMillis();
-            this.logRequestStart(request);
-            ContentCachingResponseWrapper wrapper = new ContentCachingResponseWrapper(response);
-            filterChain.doFilter(request, wrapper);
-            this.logRequestEnd(wrapper, startTime);
-            wrapper.copyBodyToResponse();
+            try {
+                long startTime = System.currentTimeMillis();
+                this.logRequestStart(request);
+                ContentCachingResponseWrapper wrapper = new ContentCachingResponseWrapper(response);
+                filterChain.doFilter(request, wrapper);
+                this.logRequestEnd(wrapper, startTime);
+                wrapper.copyBodyToResponse();
+            } finally {
+                // 清理 MDC，避免内存泄漏
+                MDC.clear();
+            }
         }
     }
 
@@ -54,15 +62,17 @@ public class RequestLogFilter extends OncePerRequestFilter {
     }
 
     public void logRequestStart(HttpServletRequest request) {
-        long reqId = IdUtil.getSnowflakeNextId();
-        MDC.put("reqId", String.valueOf(reqId));
+        Long traceId = Long.valueOf(Optional.ofNullable(request.getHeader("BeEyes-Trace")).orElse(IdUtil.getSnowflakeNextIdStr()));
+        MDC.put("traceId", String.valueOf(traceId));
         JSONObject object = new JSONObject();
         request.getParameterMap().forEach((k, v) -> object.put(k, v.length > 0 ? v[0] : null));
         Object id = request.getAttribute(Const.ATTR_USER_ID);
         if (id != null) {
             UserSession user = UserSession.get();
             String token = StpUtil.getTokenValue();
-            log.info("请求URL: \"{}\" ({}) | 远程IP地址: {} │ 身份: {} (UID: {}) | 角色: {} | 请求参数列表: {}",
+            Context context = ContextHelper.getOrCreateContext(request);
+            request.setAttribute(ContextConst.CONTEXT_ATTRIBUTE, context);
+            log.info("请求URL: \"{}\" ({}) | 远程IP地址: {} │ user: {} id: {} token: {} | 请求参数列表: {}",
                     request.getServletPath(), request.getMethod(), request.getRemoteAddr(),
                     user.getUsername(), id, token, object);
         } else {

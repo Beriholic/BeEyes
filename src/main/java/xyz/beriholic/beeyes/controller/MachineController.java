@@ -3,12 +3,12 @@ package xyz.beriholic.beeyes.controller;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
-import xyz.beriholic.beeyes.entity.RestBean;
+import xyz.beriholic.beeyes.model.RestBean;
 import xyz.beriholic.beeyes.entity.dto.Machine;
-import xyz.beriholic.beeyes.entity.vo.request.*;
-import xyz.beriholic.beeyes.entity.vo.response.MachineActiveVO;
-import xyz.beriholic.beeyes.entity.vo.response.MachineInfoVO;
-import xyz.beriholic.beeyes.entity.vo.response.SSHInfoSaveVO;
+import xyz.beriholic.beeyes.model.request.*;
+import xyz.beriholic.beeyes.model.response.MachineActiveVO;
+import xyz.beriholic.beeyes.model.response.MachineInfoVO;
+import xyz.beriholic.beeyes.model.response.SSHInfoSaveVO;
 import xyz.beriholic.beeyes.service.MachineService;
 
 import java.util.List;

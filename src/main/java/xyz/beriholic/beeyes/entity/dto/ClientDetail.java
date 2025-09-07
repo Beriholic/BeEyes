@@ -1,6 +1,5 @@
 package xyz.beriholic.beeyes.entity.dto;
 
-import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -9,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
-import xyz.beriholic.beeyes.entity.vo.request.MachineInfoReportVO;
+import xyz.beriholic.beeyes.model.request.ReportMachineInfoRequest;
 
 @Slf4j
 @Data
@@ -33,7 +32,7 @@ public class ClientDetail {
     @TableField("network_interface_info")
     String networkInterfaceInfoJSON;
 
-    public static ClientDetail from(long clientId, MachineInfoReportVO vo) {
+    public static ClientDetail from(long clientId, ReportMachineInfoRequest vo) {
         return new ClientDetail()
                 .setId(clientId)
                 .setOsName(vo.getSystemInfo().getOsName())
@@ -42,10 +41,14 @@ public class ClientDetail {
                 .setCpuArch(vo.getSystemInfo().getCpuArch())
                 .setCpuName(vo.getCpuInfo().getName())
                 .setCpuCoreCount(vo.getCpuInfo().getCoreCount())
-                .setTotalMemory(vo.getMemoryInfo().getTotalMemory())
-                .setTotalSwap(vo.getMemoryInfo().getTotalSwap())
-                .setTotalDiskSize(vo.getDiskInfo().getTotal())
-                .setNetworkInterfaceInfoJSON(JSON.toJSONString(vo.getNetworkInterfaceInfo().getFirst()));
+                .setTotalMemory(100D)
+                .setTotalSwap(10D)
+                .setTotalDiskSize(100D)
+                .setNetworkInterfaceInfoJSON("");
+//                .setTotalMemory(vo.getMemoryInfo().getTotalMemory().doubleValue())//FIXME Unit
+//                .setTotalSwap(vo.getMemoryInfo().getTotalSwap().doubleValue())//FIXME Unit
+//                .setTotalDiskSize(vo.getDiskInfo().getTotal().)
+//                .setNetworkInterfaceInfoJSON(JSON.toJSONString(vo.getNetworkInterfaceInfo().getFirst()));
 
     }
 }

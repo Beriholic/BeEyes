@@ -1,7 +1,6 @@
 package xyz.beriholic.beeyes.websocket;
 
 import cn.dev33.satoken.stp.StpUtil;
-import com.alibaba.fastjson2.JSON;
 import com.jcraft.jsch.ChannelShell;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
@@ -13,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import xyz.beriholic.beeyes.entity.dto.ClientDetail;
 import xyz.beriholic.beeyes.entity.dto.ClientSSH;
-import xyz.beriholic.beeyes.entity.vo.request.MachineInfoReportVO;
 import xyz.beriholic.beeyes.mapper.ClientDetailMapper;
 import xyz.beriholic.beeyes.mapper.ClientSSHMapper;
 
@@ -70,24 +68,24 @@ public class TerminalWebSocket {
             return;
         }
 
-        MachineInfoReportVO.NetworkInterfaceInfo networkInterfaceInfo = JSON.parseObject(
-                clientDetail.getNetworkInterfaceInfoJSON(),
-                MachineInfoReportVO.NetworkInterfaceInfo.class
-        );
-
-        for (String ipv4 : networkInterfaceInfo.getIpv4()) {
-            if (this.createSSHConnection(session, ssh, ipv4)) {
-                log.info("主机 {} SSH连接创建成功[ipv4]", ipv4);
-                return;
-            }
-        }
-
-        for (String ipv6 : networkInterfaceInfo.getIpv6()) {
-            if (this.createSSHConnection(session, ssh, ipv6)) {
-                log.info("主机 {} SSH连接创建成功[ipv6]", ipv6);
-                return;
-            }
-        }
+//        MachineInfoReportVO.NetworkInterfaceInfo networkInterfaceInfo = JSON.parseObject(
+//                clientDetail.getNetworkInterfaceInfoJSON(),
+//                MachineInfoReportVO.NetworkInterfaceInfo.class
+//        );
+//
+//        for (String ipv4 : networkInterfaceInfo.getIpv4()) {
+//            if (this.createSSHConnection(session, ssh, ipv4)) {
+//                log.info("主机 {} SSH连接创建成功[ipv4]", ipv4);
+//                return;
+//            }
+//        }
+//
+//        for (String ipv6 : networkInterfaceInfo.getIpv6()) {
+//            if (this.createSSHConnection(session, ssh, ipv6)) {
+//                log.info("主机 {} SSH连接创建成功[ipv6]", ipv6);
+//                return;
+//            }
+//        }
     }
 
     @OnMessage

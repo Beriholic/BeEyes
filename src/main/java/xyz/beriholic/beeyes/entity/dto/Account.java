@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import xyz.beriholic.beeyes.entity.BaseData;
+import xyz.beriholic.beeyes.model.BaseData;
 
 import java.util.Date;
 
