@@ -1225,6 +1225,7 @@ dependencies = [
  "anyhow",
  "common",
  "config",
+ "metric",
  "once_cell",
  "reqwest",
  "serde",

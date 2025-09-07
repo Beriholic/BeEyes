@@ -1,4 +1,4 @@
-use crate::models::{CPUInfo, MemoryInfo, NetworkInfo, SystemInfo};
+use crate::models::{CPUInfo, DiskInfo, MemoryInfo, NetworkInfo, SystemInfo};
 use serde::Serialize;
 
 #[derive(Serialize, Debug)]
@@ -7,6 +7,7 @@ pub struct MachineInfo {
     cpu_info: CPUInfo,
     memory_info: MemoryInfo,
     network_info: NetworkInfo,
+    disk_info: Vec<DiskInfo>,
 }
 
 impl MachineInfo {
@@ -16,6 +17,7 @@ impl MachineInfo {
             cpu_info: CPUInfo::fetch(),
             memory_info: MemoryInfo::fetch(),
             network_info: NetworkInfo::fetch(),
+            disk_info: DiskInfo::fetch(),
         }
     }
 }

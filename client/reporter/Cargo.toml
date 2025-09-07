@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 common = { path = "../common" }
+metric = { path = "../metric" }
 config = { path = "../config" }
 anyhow = "1.0.99"
 reqwest = { version = "0.12.23", features = ["json"] }
