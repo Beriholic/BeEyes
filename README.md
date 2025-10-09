@@ -15,4 +15,4 @@
     \|_______|\|_______|\|_______|\___/ /        \|_______|\_________\
                                  \|___|/                  \|_________|                                                                                                                                     
 ```
-![](https://img.beriholic.xyz/beeyes.png)
+![](https://img.beriholic.cv/beeyes.png)
