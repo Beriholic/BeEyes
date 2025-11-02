@@ -1,0 +1,13 @@
+export cv.beriholic.beeyes.models.entity.UserDO
+
+specification AuthUserSpec {
+    phone
+    username
+    email
+    passwordHash
+}
+
+AuthUserView {
+    id,
+    passwordHash
+}

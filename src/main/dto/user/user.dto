@@ -1,0 +1,10 @@
+export cv.beriholic.beeyes.models.entity.UserDO
+
+UserBaseView {
+    id
+    username
+    fullName
+    email
+    phone
+}
+

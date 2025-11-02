@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: BeEyes
+
+  # PostgreSQL Database Configuration
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  # Redis Configuration
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+      database: ${REDIS_DATABASE}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 200
+          max-idle: 0
+          min-idle: 0
+          max-wait: -1ms
+
+jimmer:
+  dialect: org.babyfish.jimmer.sql.dialect.PostgresDialect
+  show-sql: true
+  pretty-sql: true
+  database-validation-mode: ERROR
+  client:
+    ts:
+      path: /api/gen/ts.zip
+    openapi:
+      path: /swagger/openapi.yml
+      ui-path: /swagger/openapi.html
+      properties:
+        info:
+          title: BeEyes API
+          description: BeEyes API
+          version: 0.1.0
+
+sa-token:
+  token-name: beeyes-token
+  timeout: 2592000
+  active-timeout: -1
+  is-concurrent: true
+  is-share: false
+  token-style: tik
+  is-log: true
