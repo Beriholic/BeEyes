@@ -1,8 +1,6 @@
 use crate::client::REPORTER_CLIENT;
 use anyhow::Result;
-use common::errors::report_error::ReportError;
-use metric::machine_info::MachineInfo;
-use metric::runtime_info::RuntimeInfo;
+use models::{ReportError, MachineInfo, RuntimeInfo};
 use tklog::error;
 
 pub async fn register_to_server() -> Result<(), ReportError> {

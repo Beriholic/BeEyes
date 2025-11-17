@@ -4,9 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-common = { path = "../common" }
-metric = { path = "../metric" }
 config = { path = "../config" }
+models = { path = "../models" }
 anyhow = "1.0.99"
 reqwest = { version = "0.12.23", features = ["json"] }
 once_cell = "1.21.3"

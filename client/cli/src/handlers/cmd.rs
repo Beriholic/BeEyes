@@ -1,6 +1,6 @@
 use crate::handlers::config::config_setting;
 use crate::handlers::{report, version};
-use crate::models::cli::{Cli, Commands};
+use models::{Cli, Commands};
 use anyhow::{anyhow, Result};
 use clap::{CommandFactory, Parser};
 use clap_complete::generate;

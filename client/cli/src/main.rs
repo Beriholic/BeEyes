@@ -1,7 +1,6 @@
 use crate::utils::banner::print_logo;
 use tklog::error;
 
-mod models;
 mod handlers;
 mod utils;
 

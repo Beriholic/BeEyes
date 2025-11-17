@@ -141,6 +141,7 @@ dependencies = [
  "config",
  "inquire",
  "metric",
+ "models",
  "reporter",
  "tklog",
  "tokio",
@@ -277,6 +278,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "common",
+ "models",
  "serde",
  "toml",
 ]
@@ -971,6 +973,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "common",
+ "models",
  "serde",
  "sysinfo",
 ]
@@ -1011,6 +1014,19 @@ dependencies = [
  "libc",
  "wasi 0.11.1+wasi-snapshot-preview1",
  "windows-sys 0.59.0",
+]
+
+[[package]]
+name = "models"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "clap",
+ "clap_complete",
+ "serde",
+ "sysinfo",
+ "thiserror",
 ]
 
 [[package]]
@@ -1273,9 +1289,8 @@ name = "reporter"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "common",
  "config",
- "metric",
+ "models",
  "once_cell",
  "reqwest",
  "serde",

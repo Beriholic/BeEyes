@@ -1,7 +1,5 @@
-use crate::models::RestResp;
+use models::{RestResp, ReportError, BeEyesConfig};
 use anyhow::Result;
-use common::errors::report_error::ReportError;
-use config::BeEyesConfig;
 use once_cell::sync::Lazy;
 use reqwest::Client;
 use serde::Serialize;

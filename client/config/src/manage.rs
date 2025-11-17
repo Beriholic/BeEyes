@@ -1,6 +1,5 @@
-use crate::BeEyesConfig;
+use models::{BeEyesConfig, BeEyesConfigValidationError};
 use anyhow::{Context, Result};
-use common::errors::beeyes_config_validation_error::BeEyesConfigValidationError;
 use std::fs::{self, File};
 use std::io::{Read, Write};
 use std::path::Path;
