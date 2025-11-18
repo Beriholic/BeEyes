@@ -2,6 +2,7 @@ package cv.beriholic.beeyes.filter;
 
 
 import cn.hutool.core.util.IdUtil;
+import cv.beriholic.beeyes.utils.MDCUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -58,6 +59,6 @@ public class RequestLogFilter extends OncePerRequestFilter {
 
     private void buildTrace(HttpServletRequest request) {
         Long traceId = Long.valueOf(Optional.ofNullable(request.getHeader("BeEyes-Trace")).orElse(IdUtil.getSnowflakeNextIdStr()));
-        MDC.put("traceId", String.valueOf(traceId));
+        MDCUtil.setTraceId(String.valueOf(traceId));
     }
 }

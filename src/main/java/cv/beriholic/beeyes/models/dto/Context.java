@@ -7,21 +7,10 @@ public class Context {
     private Long userId;
     private String ip;
     private String userAgent;
-    private String requestId;
+    private String traceId;
     private Long timestamp;
 
     public Context() {
         this.timestamp = System.currentTimeMillis();
-    }
-
-    @Override
-    public String toString() {
-        return "Context{" +
-                "userId='" + userId + '\'' +
-                ", ip='" + ip + '\'' +
-                ", userAgent='" + userAgent + '\'' +
-                ", requestId='" + requestId + '\'' +
-                ", timestamp=" + timestamp +
-                '}';
     }
 }

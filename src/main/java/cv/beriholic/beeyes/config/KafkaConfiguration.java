@@ -1,0 +1,23 @@
+package cv.beriholic.beeyes.config;
+
+import cv.beriholic.beeyes.consts.KafkaTopic;
+import cv.beriholic.beeyes.models.dto.MessageEntity;
+import org.apache.kafka.clients.admin.NewTopic;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.ProducerFactory;
+
+@Configuration
+public class KafkaConfiguration {
+    @Bean
+    public KafkaTemplate<String, MessageEntity> kafkaTemplate(ProducerFactory<String, MessageEntity> producerFactory) {
+        return new KafkaTemplate<>(producerFactory);
+    }
+
+    @Bean
+    public NewTopic testTopic() {
+        return new NewTopic(KafkaTopic.TEST, 3, (short) 1);
+    }
+}
+

@@ -23,6 +23,79 @@ spring:
           max-idle: 0
           min-idle: 0
           max-wait: -1ms
+  # Kafka Configuration
+  kafka:
+    bootstrap-servers: ${KAFKA_ENDPOINT}
+    # 生产者配置
+    producer:
+      # 消息key的序列化器
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      # 消息value的序列化器
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      # 批次大小，当批次满了之后才会发送
+      batch-size: 16384
+      # 缓冲区大小
+      buffer-memory: 33554432
+      # 消息确认机制：0-不需要确认，1-只需要leader确认，all-所有副本都需要确认
+      acks: all
+      # 重试次数
+      retries: 3
+      # 重试间隔时间
+
+    # 消费者配置
+    consumer:
+      # 消息key的反序列化器
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      # 消息value的反序列化器
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      # 消费者组ID
+      group-id: default-group
+      # 自动偏移量重置策略：earliest-从头开始消费，latest-从最新的开始消费，none-如果没有偏移量则抛出异常
+      auto-offset-reset: earliest
+      # 是否自动提交偏移量
+      enable-auto-commit: false
+      # 自动提交偏移量的间隔时间
+      auto-commit-interval: 1000
+      # 指定JsonDeserializer反序列化的目标类
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "*"
+
+# 自定义应用配置
+app:
+  kafka:
+    topics: "test,alert,audit,notification"
+    consumer:
+      group-id: "beeyes-group"
+    producer:
+      retries: 3
+      timeout: 5000
+    # 监听器配置
+    listener:
+      # 消息确认模式：manual-手动确认，auto-自动确认
+      ack-mode: manual_immediate
+      # 并发消费者数量
+      concurrency: 3
+      # 批量消费配置
+      batch-listener: false
+      # 每次拉取的记录数
+      consumer:
+        max-poll-records: 500
+      # 重试配置
+      retry:
+        # 是否启用重试
+        enabled: true
+        # 初始重试间隔时间
+        initial-interval: 1000
+        # 最大重试间隔时间
+        max-interval: 10000
+        # 重试乘数
+        multiplier: 2
+        # 最大重试次数
+        max-attempts: 3
+
 
 jimmer:
   dialect: org.babyfish.jimmer.sql.dialect.PostgresDialect
