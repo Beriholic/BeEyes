@@ -7,6 +7,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum Attribute {
     USER_ID("attr_user_id", "用户ID");
-    private final String attributeName;
-    private final String attributeValue;
+    private final String name;
+    private final String key;
 }

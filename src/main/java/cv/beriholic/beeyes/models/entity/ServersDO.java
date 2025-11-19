@@ -2,20 +2,20 @@ package cv.beriholic.beeyes.models.entity;
 
 import cv.beriholic.beeyes.models.entity.common.BaseDO;
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
 import org.babyfish.jimmer.sql.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 /**
  * <p>
- * 服务器表：存储被监控服务器的详细信息
+ * 服务器表：存储被监控服务器的基本信息
  *
  * </p>
  *
  * @author Beriholic
- * @date 2025-11-01
+ * @date 2025-11-19
  */
 @Entity
 @Table(name = "servers")
@@ -38,21 +38,9 @@ public interface ServersDO extends BaseDO {
      * 主机名
      */
     @Key
-    @NotNull
-    String hostname();
-
-    /**
-     * IP地址
-     */
-    @Column(name = "ip_address")
-    @NotNull
-    String ipAddress();
-
-    /**
-     * SSH端口
-     */
+    @Column(name = "hostname")
     @Nullable
-    Integer port();
+    String hostname();
 
     /**
      * 服务器描述
@@ -61,43 +49,9 @@ public interface ServersDO extends BaseDO {
     String description();
 
     /**
-     * 操作系统类型
-     */
-    @Column(name = "os_type")
-    @Nullable
-    String osType();
-
-    /**
-     * 操作系统版本
-     */
-    @Column(name = "os_version")
-    @Nullable
-    String osVersion();
-
-    /**
-     * CPU核心数
-     */
-    @Column(name = "cpu_cores")
-    @Nullable
-    Integer cpuCores();
-
-    /**
-     * 内存大小(GB)
-     */
-    @Column(name = "memory_gb")
-    @Nullable
-    Integer memoryGb();
-
-    /**
-     * 磁盘大小(GB)
-     */
-    @Column(name = "disk_gb")
-    @Nullable
-    Integer diskGb();
-
-    /**
      * 服务器状态（应用层维护枚举映射）
      */
+    @Column(name = "status")
     @Nullable
     Integer status();
 
@@ -109,10 +63,19 @@ public interface ServersDO extends BaseDO {
     LocalDateTime lastSeen();
 
     /**
-     * API密钥
+     * 客户端API密钥
      */
     @Column(name = "api_key")
+    @Key
     @Nullable
     String apiKey();
 
+
+    @OneToOne
+    @JoinColumn(name = "hardware_id")
+    @Nullable
+    ServerHardwareDO hardware();
+
+    @OneToMany(mappedBy = "server")
+    List<ServerDiskDO> disks();
 }

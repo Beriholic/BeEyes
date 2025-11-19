@@ -6,13 +6,12 @@ import cv.beriholic.beeyes.exception.AuthorizationException;
 import cv.beriholic.beeyes.exception.ErrorCode;
 import cv.beriholic.beeyes.models.entity.Immutables;
 import cv.beriholic.beeyes.models.entity.UserDO;
-import cv.beriholic.beeyes.models.entity.dto.AuthLoginRequest;
 import cv.beriholic.beeyes.models.entity.dto.AuthUserSpec;
 import cv.beriholic.beeyes.models.entity.dto.AuthUserView;
-import cv.beriholic.beeyes.models.request.AuthChangePasswordRequest;
+import cv.beriholic.beeyes.models.request.auth.AuthChangePasswordRequest;
+import cv.beriholic.beeyes.models.request.auth.AuthLoginRequest;
 import cv.beriholic.beeyes.repository.UserRepository;
 import cv.beriholic.beeyes.service.AuthService;
-import cv.beriholic.beeyes.service.BaseService;
 import cv.beriholic.beeyes.utils.BcryptUtil;
 import cv.beriholic.beeyes.utils.JsonUtil;
 import jakarta.annotation.Resource;
@@ -24,7 +23,7 @@ import java.util.Objects;
 
 @Service
 @Slf4j
-public class AuthServiceImpl extends BaseService implements AuthService {
+public class AuthServiceImpl implements AuthService {
     @Resource
     private UserRepository userRepository;
 
@@ -67,7 +66,7 @@ public class AuthServiceImpl extends BaseService implements AuthService {
             draft.setId(authUSerView.getId());
             draft.setPasswordHash(BcryptUtil.encrypt(request.getNewPassword()));
         });
-
         userRepository.save(userDO);
+        StpUtil.logout();
     }
 }

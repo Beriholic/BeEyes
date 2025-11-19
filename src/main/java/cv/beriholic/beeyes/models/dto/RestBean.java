@@ -2,6 +2,7 @@ package cv.beriholic.beeyes.models.dto;
 
 import cv.beriholic.beeyes.exception.AbstractBeEyesException;
 import cv.beriholic.beeyes.exception.ErrorCode;
+import cv.beriholic.beeyes.utils.JsonUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -41,5 +42,9 @@ public class RestBean<T> {
 
     public static <T> RestBean<T> failure(ErrorCode errorCode) {
         return failure(errorCode.getCode(), errorCode.getMsg());
+    }
+
+    public String asJson() {
+        return JsonUtil.toJSONString(this);
     }
 }

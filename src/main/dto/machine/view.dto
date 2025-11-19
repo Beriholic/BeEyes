@@ -1,0 +1,13 @@
+export cv.beriholic.beeyes.models.entity.ServersDO
+
+ServerAllSacleView {
+    #allScalars
+
+    hardware {
+        #allScalars
+    }
+
+    disks {
+        #allScalars
+    }
+}

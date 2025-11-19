@@ -1,4 +1,4 @@
-package cv.beriholic.beeyes.models.request;
+package cv.beriholic.beeyes.models.request.auth;
 
 
 import lombok.Data;

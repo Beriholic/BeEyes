@@ -8,7 +8,7 @@ pub struct RestResp {
     /// HTTP status code
     pub code: u16,
     /// Response message
-    pub message: String,
+    pub msg: String,
 }
 
 impl RestResp {
@@ -16,7 +16,7 @@ impl RestResp {
     pub fn success() -> Self {
         Self {
             code: 0,
-            message: "Success".to_string(),
+            msg: "Success".to_string(),
         }
     }
 
@@ -24,7 +24,7 @@ impl RestResp {
     pub fn error(code: u16, message: impl Into<String>) -> Self {
         Self {
             code,
-            message: message.into(),
+            msg: message.into(),
         }
     }
 

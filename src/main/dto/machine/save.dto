@@ -1,0 +1,15 @@
+export cv.beriholic.beeyes.models.entity.ServersDO
+
+input SaveServerInput {
+    id
+
+    hostname
+
+    disks {
+        #allScalars
+    }
+
+    hardware {
+        #allScalars
+    }
+}

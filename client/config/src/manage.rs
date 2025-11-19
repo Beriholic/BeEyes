@@ -28,7 +28,13 @@ pub fn load_config() -> Result<BeEyesConfig> {
     let mut file = File::open(&config_path).context("无法打开配置文件")?;
     file.read_to_string(&mut contents).context("无法读取配置文件")?;
 
-    let config: BeEyesConfig = toml::from_str(&contents).context("无法解析配置文件")?;
+    // 处理空文件或无效TOML的情况
+    if contents.trim().is_empty() {
+        return Ok(BeEyesConfig::default());
+    }
+
+    let config: BeEyesConfig = toml::from_str(&contents)
+        .with_context(|| format!("配置文件格式错误，文件路径: {}", config_path))?;
 
     Ok(config)
 }

@@ -1,8 +1,0 @@
-export cv.beriholic.beeyes.models.entity.UserDO
-
-input AuthLoginRequest {
-    username?
-    email?
-    phone
-    passwordHash as password
-}
