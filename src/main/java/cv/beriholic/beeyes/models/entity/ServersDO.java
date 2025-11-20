@@ -78,4 +78,7 @@ public interface ServersDO extends BaseDO {
 
     @OneToMany(mappedBy = "server")
     List<ServerDiskDO> disks();
+
+    @OneToMany(mappedBy = "server")
+    List<ServerNetworkInterfacesDO> networkInterfaces();
 }

@@ -8,10 +8,12 @@ import cv.beriholic.beeyes.converter.ServerMachineConverter;
 import cv.beriholic.beeyes.models.dto.system.MachineInfo;
 import cv.beriholic.beeyes.models.dto.system.RuntimeInfo;
 import cv.beriholic.beeyes.models.entity.ServerDiskDO;
+import cv.beriholic.beeyes.models.entity.ServerNetworkInterfacesDO;
 import cv.beriholic.beeyes.models.entity.ServersDO;
 import cv.beriholic.beeyes.models.entity.dto.SaveServerInput;
 import cv.beriholic.beeyes.models.entity.dto.ServerAllSacleView;
 import cv.beriholic.beeyes.repository.ServerDiskRepository;
+import cv.beriholic.beeyes.repository.ServerNetworkInterfaceRepository;
 import cv.beriholic.beeyes.repository.ServersRepository;
 import cv.beriholic.beeyes.service.ClientService;
 import cv.beriholic.beeyes.service.MetricService;
@@ -38,6 +40,7 @@ public class ClientServiceImpl implements ClientService {
     private final ServerDiskRepository serverDiskRepository;
     private final RedisUtils redisUtils;
     private final MetricService metricService;
+    private final ServerNetworkInterfaceRepository serverNetworkInterfaceRepository;
 
     @Override
     public Long getIdByTokenWithCache(String token) {
@@ -73,18 +76,36 @@ public class ClientServiceImpl implements ClientService {
         saveServerInput.setHostname(machineInfo.getSystemInfo().getHostName());
         saveServerInput.setHardware(ServerMachineConverter.buildHardware(machineInfo, serversDO));
         saveServerInput.setDisks(ServerMachineConverter.buildDisk(machineInfo, serversDO));
+        saveServerInput.setNetworkInterfaces(ServerMachineConverter.buildNetworkInterface(machineInfo, serversDO));
 
         // 清理旧数据
-        Set<Long> oldDiskIds = Sets.newHashSet();
-        if (Objects.nonNull(serversDO) && Objects.nonNull(serversDO.disks())) {
-            oldDiskIds = serversDO.disks().stream().map(ServerDiskDO::id).collect(Collectors.toSet());
-        }
-        Set<Long> newDiskIds = saveServerInput.getDisks().stream().map(SaveServerInput.TargetOf_disks::getId).collect(Collectors.toSet());
-        List<Long> diffDiskIds = Lists.newArrayList(Sets.difference(oldDiskIds, newDiskIds));
-        serverDiskRepository.deleteByIds(diffDiskIds);
+        cleanOldMachineReportedData(machineId, serversDO, saveServerInput);
 
         // 更新
         serversRepository.save(saveServerInput, SaveMode.UPSERT);
+    }
+
+    private void cleanOldMachineReportedData(Long machineId, ServersDO serversDO, SaveServerInput saveServerInput) {
+        // disk
+        Set<Long> oldIds = Sets.newHashSet();
+        if (Objects.nonNull(serversDO) && Objects.nonNull(serversDO.disks())) {
+            oldIds = serversDO.disks().stream().map(ServerDiskDO::id).collect(Collectors.toSet());
+        }
+        Set<Long> newIds = saveServerInput.getDisks().stream().map(SaveServerInput.TargetOf_disks::getId).collect(Collectors.toSet());
+        List<Long> diffIds = Lists.newArrayList(Sets.difference(oldIds, newIds));
+        serverDiskRepository.deleteByIds(diffIds);
+
+        // network
+        oldIds.clear();
+        if (Objects.nonNull(serversDO) && Objects.nonNull(serversDO.networkInterfaces())) {
+            oldIds = serversDO.networkInterfaces().stream().map(ServerNetworkInterfacesDO::id).collect(Collectors.toSet());
+        }
+        newIds = saveServerInput.getNetworkInterfaces().stream().map(SaveServerInput.TargetOf_networkInterfaces::getId).collect(Collectors.toSet());
+        diffIds = Lists.newArrayList(Sets.difference(oldIds, newIds));
+        serverNetworkInterfaceRepository.deleteByIds(diffIds);
+
+        // cache
+        redisUtils.delete(CacheKey.USER_SERVER_LIST.getKey(machineId));
     }
 
     @Override

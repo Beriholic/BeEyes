@@ -9,6 +9,10 @@ input SaveServerInput {
         #allScalars
     }
 
+    networkInterfaces {
+        #allScalars
+    }
+
     hardware {
         #allScalars
     }

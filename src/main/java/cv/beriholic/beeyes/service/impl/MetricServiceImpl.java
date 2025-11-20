@@ -35,10 +35,9 @@ public class MetricServiceImpl implements MetricService {
             MachineRuntimeInfoDTO machineRuntimeInfoDTO = JsonUtil.parseObject(message.getContent(), MachineRuntimeInfoDTO.class);
             metricDataRepository.recordRuntimeInfo(machineRuntimeInfoDTO);
         } catch (Exception e) {
-            log.error("[recordMachineRuntimeInfo] error}", e);
+            log.error("[recordMachineRuntimeInfo] error", e);
         }
     }
-
 
     @Override
     public RuntimeInfo getMachineRuntimeInfoById(Long id) {

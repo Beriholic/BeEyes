@@ -1,6 +1,7 @@
 package cv.beriholic.beeyes.converter;
 
 import cn.hutool.core.util.IdUtil;
+import com.google.common.collect.Lists;
 import cv.beriholic.beeyes.models.dto.system.CPUInfo;
 import cv.beriholic.beeyes.models.dto.system.MachineInfo;
 import cv.beriholic.beeyes.models.dto.system.MemoryInfo;
@@ -9,6 +10,7 @@ import cv.beriholic.beeyes.models.entity.ServersDO;
 import cv.beriholic.beeyes.models.entity.dto.SaveServerInput;
 import cv.beriholic.beeyes.utils.DiffUtils;
 import org.springframework.lang.NonNull;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -90,5 +92,52 @@ public class ServerMachineConverter {
 
             return disk;
         }).toList();
+    }
+
+    public static @NonNull List<SaveServerInput.TargetOf_networkInterfaces> buildNetworkInterface(MachineInfo machineInfo, ServersDO serversDO) {
+        return machineInfo.getNetworkInfo().getInterfaces().stream().map(networkInterface -> {
+                    SaveServerInput.TargetOf_networkInterfaces network = new SaveServerInput.TargetOf_networkInterfaces();
+
+                    network.setInterfaceName(networkInterface.getName());
+                    network.setIpv4Address(networkInterface.getIpv4().toArray(new String[0]));
+                    network.setIpv6Address(networkInterface.getIpv6().toArray(new String[0]));
+
+                    if (Objects.isNull(serversDO) || Objects.isNull(serversDO.networkInterfaces())) {
+                        network.setId(IdUtil.getSnowflakeNextId());
+                        network.setCreatedAt(LocalDateTime.now());
+                        network.setUpdatedAt(LocalDateTime.now());
+                    } else {
+                        SaveServerInput.TargetOf_networkInterfaces existingInterface = serversDO.networkInterfaces().stream()
+                                .filter(iFace -> iFace.interfaceName().equals(networkInterface.getName()))
+                                .findFirst()
+                                .map(SaveServerInput.TargetOf_networkInterfaces::new)
+                                .orElse(null);
+                        if (Objects.nonNull(existingInterface)) {
+                            network.setId(existingInterface.getId());
+                            network.setUpdatedAt(LocalDateTime.now());
+
+                            List<String> ipv4Address = DiffUtils.replaceOrNotNull(
+                                    Lists.newArrayList(existingInterface.getIpv4Address()),
+                                    networkInterface.getIpv4()
+                            );
+                            List<String> ipv6Address = DiffUtils.replaceOrNotNull(
+                                    Lists.newArrayList(existingInterface.getIpv6Address()),
+                                    networkInterface.getIpv6()
+                            );
+                            if (!CollectionUtils.isEmpty(ipv4Address)) {
+                                network.setIpv4Address(ipv4Address.toArray(new String[0]));
+                            }
+                            if (!CollectionUtils.isEmpty(ipv6Address)) {
+                                network.setIpv6Address(ipv6Address.toArray(new String[0]));
+                            }
+                        } else {
+                            network.setId(IdUtil.getSnowflakeNextId());
+                            network.setCreatedAt(LocalDateTime.now());
+                            network.setUpdatedAt(LocalDateTime.now());
+                        }
+                    }
+                    return network;
+                }
+        ).toList();
     }
 }

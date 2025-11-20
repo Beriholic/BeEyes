@@ -1,30 +1,38 @@
 package cv.beriholic.beeyes.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import cv.beriholic.beeyes.exception.ErrorCode;
+import cv.beriholic.beeyes.models.dto.PageDTO;
 import cv.beriholic.beeyes.models.dto.RestBean;
-import cv.beriholic.beeyes.models.dto.system.RuntimeInfo;
-import cv.beriholic.beeyes.service.MetricService;
+import cv.beriholic.beeyes.models.entity.dto.MachineView;
+import cv.beriholic.beeyes.service.MachineService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Objects;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/runtime")
+@RequestMapping("/api/v1/machine")
 @RequiredArgsConstructor
 public class MachineController {
-    private final MetricService metricService;
+    private final MachineService machineService;
 
-
-    @GetMapping("/current/{id}")
-    public RestBean<RuntimeInfo> getMachineCurrentRuntimeInfo(@PathVariable String id) {
-        RuntimeInfo currentRuntimeInfo = metricService.getMachineRuntimeInfoById(Long.valueOf(id));
-        if (Objects.isNull(currentRuntimeInfo)) {
-            return RestBean.failed(ErrorCode.RECORD_NOT_FOUND);
+    @GetMapping("/list")
+    public RestBean<PageDTO<List<MachineView>>> getMachineList(int pageIndex, int pageSize) {
+        if (pageIndex < 0 || pageSize < 0) {
+            return RestBean.failed(ErrorCode.PARAM_INVALID);
         }
-        return RestBean.success(currentRuntimeInfo);
+        if (pageSize > 10) {
+            return RestBean.failed(ErrorCode.PARAM_INVALID.getCode(), "pageSize不能大于10");
+        }
+        long userId = StpUtil.getLoginIdAsLong();
+
+        PageDTO<List<MachineView>> machineList = machineService.getMachineListByUserId(
+                PageDTO.of(userId, pageIndex, pageSize)
+        );
+
+        return RestBean.success(machineList);
     }
 }

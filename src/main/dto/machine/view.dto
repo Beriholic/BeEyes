@@ -7,7 +7,51 @@ ServerAllSacleView {
         #allScalars
     }
 
+    networkInterfaces {
+        #allScalars
+    }
+
     disks {
         #allScalars
+    }
+}
+
+MachineView {
+    id
+
+    hostname
+
+    description
+
+    status
+
+    lastSeen
+
+    hardware {
+        cpuName
+
+        cpuArch
+
+        cpuCores
+    }
+
+    disks {
+        diskName
+
+        diskKind
+
+        fileSystem
+
+        totalBytes
+    }
+
+    networkInterfaces {
+        id
+
+        interfaceName
+
+        ipv4Address
+
+        ipv6Address
     }
 }
