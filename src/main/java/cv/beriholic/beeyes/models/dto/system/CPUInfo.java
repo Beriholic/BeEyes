@@ -32,5 +32,5 @@ public class CPUInfo implements Serializable {
     /**
      * CPU使用率
      */
-    private Float usage;
+    private Double usage;
 }

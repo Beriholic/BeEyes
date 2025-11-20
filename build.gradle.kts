@@ -52,6 +52,7 @@ dependencies {
     implementation("cn.dev33:sa-token-redis-jackson:1.40.0")
     implementation("cn.hutool:hutool-all:5.8.41")
     implementation("org.springframework.boot:spring-boot-starter-aop")
+    implementation("com.influxdb:influxdb-client-java:6.6.0")
 
 
 }

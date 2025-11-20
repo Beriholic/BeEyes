@@ -5,15 +5,18 @@ import com.google.common.collect.Sets;
 import cv.beriholic.beeyes.consts.CacheKey;
 import cv.beriholic.beeyes.consts.ServerStatus;
 import cv.beriholic.beeyes.converter.ServerMachineConverter;
+import cv.beriholic.beeyes.models.dto.MachineRuntimeInfoDTO;
 import cv.beriholic.beeyes.models.dto.system.MachineInfo;
 import cv.beriholic.beeyes.models.dto.system.RuntimeInfo;
 import cv.beriholic.beeyes.models.entity.ServerDiskDO;
 import cv.beriholic.beeyes.models.entity.ServersDO;
 import cv.beriholic.beeyes.models.entity.dto.SaveServerInput;
 import cv.beriholic.beeyes.models.entity.dto.ServerAllSacleView;
+import cv.beriholic.beeyes.mq.MetricRecordProducerService;
 import cv.beriholic.beeyes.repository.ServerDiskRepository;
 import cv.beriholic.beeyes.repository.ServersRepository;
 import cv.beriholic.beeyes.service.ClientService;
+import cv.beriholic.beeyes.utils.JsonUtil;
 import cv.beriholic.beeyes.utils.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +38,7 @@ public class ClientServiceImpl implements ClientService {
     private final ServersRepository serversRepository;
     private final ServerDiskRepository serverDiskRepository;
     private final RedisUtils redisUtils;
+    private final MetricRecordProducerService metricRecordProducerService;
 
     @Override
     public Long getIdByTokenWithCache(String token) {
@@ -83,6 +87,8 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public void reportRuntimeInfo(Long machineId, RuntimeInfo runtimeInfo) {
-
+        redisUtils.set(CacheKey.MACHINE_RUNTIME_INFO.getKey(machineId), JsonUtil.toJSONString(runtimeInfo), 10, TimeUnit.MINUTES);
+        MachineRuntimeInfoDTO runtimeInfoDTO = MachineRuntimeInfoDTO.from(runtimeInfo);
+        metricRecordProducerService.pushMachineMetricData(runtimeInfoDTO);
     }
 }

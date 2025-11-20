@@ -1,5 +1,5 @@
 package cv.beriholic.beeyes.consts;
 
 public class KafkaTopic {
-    public static final String TEST = "test_topic";
+    public static final String MACHINE_RUNTIME_METRIC = "machine_runtime_metric";
 }

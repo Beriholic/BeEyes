@@ -16,8 +16,8 @@ public class KafkaConfiguration {
     }
 
     @Bean
-    public NewTopic testTopic() {
-        return new NewTopic(KafkaTopic.TEST, 3, (short) 1);
+    public NewTopic machineRuntimeMetricTopic() {
+        return new NewTopic(KafkaTopic.MACHINE_RUNTIME_METRIC, 3, (short) 1);
     }
 }
 

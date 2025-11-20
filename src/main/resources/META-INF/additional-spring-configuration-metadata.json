@@ -1,0 +1,24 @@
+{
+  "properties": [
+    {
+      "name": "influx-db.url",
+      "type": "java.lang.String",
+      "description": "Description for influx-db.url."
+    },
+    {
+      "name": "influx-db.token",
+      "type": "java.lang.String",
+      "description": "Description for influx-db.token."
+    },
+    {
+      "name": "influx-db.bucket",
+      "type": "java.lang.String",
+      "description": "Description for influx-db.bucket."
+    },
+    {
+      "name": "influx-db.org",
+      "type": "java.lang.String",
+      "description": "Description for influx-db.org."
+    }
+  ]
+}

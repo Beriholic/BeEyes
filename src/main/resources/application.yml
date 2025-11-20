@@ -122,3 +122,9 @@ sa-token:
   is-share: false
   token-style: tik
   is-log: true
+
+influx-db:
+  url: ${INFLUXDB_URL}
+  token: ${INFLUXDB_TOKEN}
+  bucket: ${INFLUXDB_BUCKET}
+  org: ${INFLUXDB_ORG}

@@ -1,20 +1,5 @@
 package cv.beriholic.beeyes.config;
 
-//import cn.dev33.satoken.router.SaRouter;
-//import cn.dev33.satoken.stp.StpUtil;
-//import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-//
-//override fun addInterceptors(registry:InterceptorRegistry) {
-//    registry.addInterceptor(SaInterceptor {
-//        SaRouter.match("/**")
-//                .notMatch("/swagger-ui/**", "/v3/api-docs/**")
-//                .notMatchMethod("OPTIONS").check { r ->
-//                StpUtil.checkLogin()
-//        }
-//    }).addPathPatterns("/**")
-//}
-
-
 import cn.dev33.satoken.interceptor.SaInterceptor;
 import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpUtil;
