@@ -5,17 +5,16 @@ import com.google.common.collect.Sets;
 import cv.beriholic.beeyes.consts.CacheKey;
 import cv.beriholic.beeyes.consts.ServerStatus;
 import cv.beriholic.beeyes.converter.ServerMachineConverter;
-import cv.beriholic.beeyes.models.dto.MachineRuntimeInfoDTO;
 import cv.beriholic.beeyes.models.dto.system.MachineInfo;
 import cv.beriholic.beeyes.models.dto.system.RuntimeInfo;
 import cv.beriholic.beeyes.models.entity.ServerDiskDO;
 import cv.beriholic.beeyes.models.entity.ServersDO;
 import cv.beriholic.beeyes.models.entity.dto.SaveServerInput;
 import cv.beriholic.beeyes.models.entity.dto.ServerAllSacleView;
-import cv.beriholic.beeyes.mq.MetricRecordProducerService;
 import cv.beriholic.beeyes.repository.ServerDiskRepository;
 import cv.beriholic.beeyes.repository.ServersRepository;
 import cv.beriholic.beeyes.service.ClientService;
+import cv.beriholic.beeyes.service.MetricService;
 import cv.beriholic.beeyes.utils.JsonUtil;
 import cv.beriholic.beeyes.utils.RedisUtils;
 import lombok.RequiredArgsConstructor;
@@ -38,10 +37,11 @@ public class ClientServiceImpl implements ClientService {
     private final ServersRepository serversRepository;
     private final ServerDiskRepository serverDiskRepository;
     private final RedisUtils redisUtils;
-    private final MetricRecordProducerService metricRecordProducerService;
+    private final MetricService metricService;
 
     @Override
     public Long getIdByTokenWithCache(String token) {
+        log.info("[getIdByTokenWithCache] biz start, token={}", token);
         if (StringUtils.isEmpty(token)) {
             throw new IllegalArgumentException("client token为空");
         }
@@ -59,12 +59,14 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public boolean verifyAndRegister(String token) {
+        log.info("[verifyAndRegister] biz start, token={}", token);
         return Objects.nonNull(getIdByTokenWithCache(token));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void reportMachineInfo(Long machineId, MachineInfo machineInfo) {
+        log.info("[reportMachineInfo] biz start, machineId={}, machineInfo={}", machineId, JsonUtil.toJSONString(machineInfo));
         ServersDO serversDO = serversRepository.findById(machineId, ServerAllSacleView.METADATA.getFetcher());
         SaveServerInput saveServerInput = new SaveServerInput();
         saveServerInput.setId(machineId);
@@ -87,8 +89,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public void reportRuntimeInfo(Long machineId, RuntimeInfo runtimeInfo) {
-        redisUtils.set(CacheKey.MACHINE_RUNTIME_INFO.getKey(machineId), JsonUtil.toJSONString(runtimeInfo), 10, TimeUnit.MINUTES);
-        MachineRuntimeInfoDTO runtimeInfoDTO = MachineRuntimeInfoDTO.from(runtimeInfo);
-        metricRecordProducerService.pushMachineMetricData(runtimeInfoDTO);
+        log.info("[reportRuntimeInfo] biz start, machineId={}, runtimeInfo={}", machineId, JsonUtil.toJSONString(runtimeInfo));
+        metricService.saveRuntimeInfo(machineId, runtimeInfo);
     }
 }

@@ -8,12 +8,14 @@ import cv.beriholic.beeyes.models.dto.system.RuntimeInfo;
 import cv.beriholic.beeyes.service.ClientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.babyfish.jimmer.client.ApiIgnore;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/client")
 @RequiredArgsConstructor
 @Slf4j
+@ApiIgnore
 public class ClientController {
     private final ClientService clientService;
 
