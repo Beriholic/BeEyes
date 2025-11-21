@@ -1,5 +1,6 @@
 package cv.beriholic.beeyes.controller;
 
+import cv.beriholic.beeyes.aspect.IgnoreContextFill;
 import cv.beriholic.beeyes.consts.RequestAttributeConst;
 import cv.beriholic.beeyes.exception.ErrorCode;
 import cv.beriholic.beeyes.models.dto.RestBean;
@@ -20,6 +21,7 @@ public class ClientController {
     private final ClientService clientService;
 
     @PostMapping("/register")
+    @IgnoreContextFill
     public RestBean<Void> registerMachine(@RequestHeader("Authorization") String authorization) {
         boolean pass = clientService.verifyAndRegister(authorization);
         if (pass) {
@@ -29,6 +31,7 @@ public class ClientController {
     }
 
     @PostMapping("/report/machine")
+    @IgnoreContextFill
     public RestBean<Void> reportMachine(
             @RequestAttribute(RequestAttributeConst.CLIENT_MACHINE_ID) Long machineId,
             @RequestBody MachineInfo machineInfo
@@ -38,6 +41,7 @@ public class ClientController {
     }
 
     @PostMapping("/report/runtime")
+    @IgnoreContextFill
     public RestBean<Void> reportRuntimeInfo(
             @RequestAttribute(RequestAttributeConst.CLIENT_MACHINE_ID) Long machineId,
             @RequestBody RuntimeInfo runtimeInfo

@@ -20,7 +20,6 @@ public class MetricController {
 
     private final MetricService metricService;
 
-
     @GetMapping("/runtime/current/{id}")
     public RestBean<RuntimeInfo> getMachineCurrentRuntimeInfo(@PathVariable String id) {
         RuntimeInfo currentRuntimeInfo = metricService.getMachineRuntimeInfoById(Long.valueOf(id));

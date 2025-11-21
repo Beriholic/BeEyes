@@ -53,9 +53,7 @@ public class SaTokenConfiguration implements WebMvcConfigurer {
 
             SaRouter.match("/**")
                     .notMatch("/api/client/**")
-                    .notMatch("/api/v1/auth/login")  // 排除登录接口
                     .notMatch("/api/v1/auth/**")     // 排除所有认证相关接口
-                    .notMatch("/api/gen/**")
                     .notMatch("/swagger/**")
                     .notMatch("/error")
                     .notMatchMethod("OPTIONS")       // 排除 OPTIONS 请求

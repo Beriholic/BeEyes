@@ -118,8 +118,6 @@ jimmer:
   pretty-sql: true
   database-validation-mode: ERROR
   client:
-    ts:
-      path: /api/gen/ts.zip
     openapi:
       path: /swagger/openapi.yml
       ui-path: /swagger/openapi.html

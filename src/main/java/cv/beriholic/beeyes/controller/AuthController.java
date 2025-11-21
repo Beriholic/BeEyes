@@ -1,5 +1,6 @@
 package cv.beriholic.beeyes.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import cv.beriholic.beeyes.aspect.IgnoreContextFill;
 import cv.beriholic.beeyes.models.dto.RestBean;
 import cv.beriholic.beeyes.models.request.auth.AuthChangePasswordRequest;
@@ -26,6 +27,12 @@ public class AuthController {
     @PutMapping("/change/password")
     public RestBean<Void> changePassword(@RequestBody AuthChangePasswordRequest request) {
         authService.changePassword(request);
+        return RestBean.success();
+    }
+
+    @PutMapping("/logout")
+    public RestBean<Void> logout() {
+        StpUtil.logout();
         return RestBean.success();
     }
 }

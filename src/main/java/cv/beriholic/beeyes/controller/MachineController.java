@@ -24,7 +24,7 @@ public class MachineController {
         if (pageIndex < 0 || pageSize < 0) {
             return RestBean.failed(ErrorCode.PARAM_INVALID);
         }
-        if (pageSize > 10) {
+        if (pageSize > 20) {
             return RestBean.failed(ErrorCode.PARAM_INVALID.getCode(), "pageSize不能大于10");
         }
         long userId = StpUtil.getLoginIdAsLong();
