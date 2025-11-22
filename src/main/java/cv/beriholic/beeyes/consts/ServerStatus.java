@@ -9,7 +9,8 @@ import java.util.Objects;
 @AllArgsConstructor
 public enum ServerStatus {
     UNKNOW(0, "未知"),
-    REGISTER(1, "已注册");
+    REGISTER(1, "已注册"),
+    UNREGISTER(2, "未注册");
 
     private final Integer key;
     private final String desc;

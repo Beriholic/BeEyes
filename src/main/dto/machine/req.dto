@@ -1,0 +1,16 @@
+export cv.beriholic.beeyes.models.entity.ServersDO
+
+input CreateMachineRequest {
+    description
+    region
+}
+
+input UpdateMachineRequest {
+    id
+    description
+    region
+}
+
+input DeleteMachineRequest {
+    serverId: Long
+}

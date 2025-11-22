@@ -70,6 +70,12 @@ public interface ServersDO extends BaseDO {
     @Nullable
     String apiKey();
 
+    /**
+     * 服务器地区
+     */
+    @Nullable
+    String region();
+
 
     @OneToOne
     @JoinColumn(name = "hardware_id")

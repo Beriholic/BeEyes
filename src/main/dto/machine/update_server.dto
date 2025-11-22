@@ -1,0 +1,7 @@
+export cv.beriholic.beeyes.models.entity.ServersDO
+
+input UpdateServerInfoInput {
+    id
+    description
+    region
+}

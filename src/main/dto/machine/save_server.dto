@@ -17,3 +17,12 @@ input SaveServerInput {
         #allScalars
     }
 }
+
+
+input SaveCreateMachineInput {
+    id
+    description
+    region
+    apiKey
+    status
+}

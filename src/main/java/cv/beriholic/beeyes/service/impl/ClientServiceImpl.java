@@ -48,7 +48,7 @@ public class ClientServiceImpl implements ClientService {
         if (StringUtils.isEmpty(token)) {
             throw new IllegalArgumentException("client token为空");
         }
-        String cacheKey = CacheKey.MACHINE_ID_TOKEN.getKey(token);
+        String cacheKey = CacheKey.machineIdToken(token);
         if (redisUtils.hasKey(cacheKey)) {
             return Long.valueOf(redisUtils.get(cacheKey));
         }
@@ -105,7 +105,7 @@ public class ClientServiceImpl implements ClientService {
         serverNetworkInterfaceRepository.deleteByIds(diffIds);
 
         // cache
-        redisUtils.delete(CacheKey.USER_SERVER_LIST.getKey(machineId));
+        redisUtils.delete(CacheKey.userServerList(machineId));
     }
 
     @Override

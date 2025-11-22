@@ -42,7 +42,7 @@ public class MetricServiceImpl implements MetricService {
     @Override
     public RuntimeInfo getMachineRuntimeInfoById(Long id) {
         log.info("[getMachineRuntimeInfoById] biz start id={}", id);
-        String machineRuntimeInfoJson = redisUtils.get(CacheKey.MACHINE_RUNTIME_INFO.getKey(id));
+        String machineRuntimeInfoJson = redisUtils.get(CacheKey.machineRuntimeInfo(id));
         if (StringUtils.isEmpty(machineRuntimeInfoJson)) {
             return null;
         }
@@ -52,7 +52,7 @@ public class MetricServiceImpl implements MetricService {
     @Override
     public void saveRuntimeInfo(Long machineId, RuntimeInfo runtimeInfo) {
         log.info("[saveRuntimeInfo] biz start, machineId={}, runtimeInfo={}", machineId, JsonUtil.toJSONString(runtimeInfo));
-        redisUtils.set(CacheKey.MACHINE_RUNTIME_INFO.getKey(machineId), JsonUtil.toJSONString(runtimeInfo), 10, TimeUnit.MINUTES);
+        redisUtils.set(CacheKey.machineRuntimeInfo(machineId), JsonUtil.toJSONString(runtimeInfo), 10, TimeUnit.MINUTES);
         MachineRuntimeInfoDTO runtimeInfoDTO = MachineRuntimeInfoDTO.from(runtimeInfo);
         metricRecordProducerService.pushMachineMetricData(runtimeInfoDTO);
     }

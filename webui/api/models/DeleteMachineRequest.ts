@@ -4,12 +4,11 @@
 /* eslint-disable */
 /**
  * <p>
- * 用户表：存储系统用户基本信息和账户状态
+ * 服务器表：存储被监控服务器的基本信息
  * </p>
  *
  */
-export type AuthChangePasswordRequest = {
-    oldPassword?: string;
-    newPassword?: string;
+export type DeleteMachineRequest = {
+    serverId?: number;
 };
 

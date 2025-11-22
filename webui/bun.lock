@@ -7,8 +7,10 @@
         "lucide-react": "^0.554.0",
         "next": "16.0.3",
         "react": "19.2.0",
+        "react-country-flag": "^3.1.0",
         "react-dom": "19.2.0",
         "react-jdenticon": "^1.5.0",
+        "react-select-country-list": "^2.2.3",
       },
       "devDependencies": {
         "@tailwindcss/postcss": "^4",
@@ -734,11 +736,15 @@
 
     "react": ["react@19.2.0", "https://registry.npmmirror.com/react/-/react-19.2.0.tgz", {}, "sha512-tmbWg6W31tQLeB5cdIBOicJDJRR2KzXsV7uSK9iNfLWQ5bIZfxuPEHp7M8wiHyHnn0DD1i7w3Zmin0FtkrwoCQ=="],
 
+    "react-country-flag": ["react-country-flag@3.1.0", "https://registry.npmmirror.com/react-country-flag/-/react-country-flag-3.1.0.tgz", { "peerDependencies": { "react": ">=16" } }, "sha512-JWQFw1efdv9sTC+TGQvTKXQg1NKbDU2mBiAiRWcKM9F1sK+/zjhP2yGmm8YDddWyZdXVkR8Md47rPMJmo4YO5g=="],
+
     "react-dom": ["react-dom@19.2.0", "https://registry.npmmirror.com/react-dom/-/react-dom-19.2.0.tgz", { "dependencies": { "scheduler": "^0.27.0" }, "peerDependencies": { "react": "^19.2.0" } }, "sha512-UlbRu4cAiGaIewkPyiRGJk0imDN2T3JjieT6spoL2UeSf5od4n5LB/mQ4ejmxhCFT1tYe8IvaFulzynWovsEFQ=="],
 
     "react-is": ["react-is@16.13.1", "https://registry.npmmirror.com/react-is/-/react-is-16.13.1.tgz", {}, "sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ=="],
 
     "react-jdenticon": ["react-jdenticon@1.5.0", "https://registry.npmmirror.com/react-jdenticon/-/react-jdenticon-1.5.0.tgz", { "dependencies": { "jdenticon": "^3.1.1", "prop-types": "^15.8.1" }, "peerDependencies": { "react": "^19.1.0" } }, "sha512-N9D+tRDWcd3jJYHwUkAhV6fa01ZjnKnLwk9t2O64XiYhjVlA0fmABrbYt/Kx41sAHUzgWyuukFLIPgm6lHmx8Q=="],
+
+    "react-select-country-list": ["react-select-country-list@2.2.3", "https://registry.npmmirror.com/react-select-country-list/-/react-select-country-list-2.2.3.tgz", {}, "sha512-eRgXL613dVyJiE99yKDYLvSBKDxvIlhkmvO2DVIjdKVyUQq6kBqoMUV/2zuRIAsbRXgBGmKjeL1dxjf7zTfszg=="],
 
     "reflect.getprototypeof": ["reflect.getprototypeof@1.0.10", "https://registry.npmmirror.com/reflect.getprototypeof/-/reflect.getprototypeof-1.0.10.tgz", { "dependencies": { "call-bind": "^1.0.8", "define-properties": "^1.2.1", "es-abstract": "^1.23.9", "es-errors": "^1.3.0", "es-object-atoms": "^1.0.0", "get-intrinsic": "^1.2.7", "get-proto": "^1.0.1", "which-builtin-type": "^1.2.1" } }, "sha512-00o4I+DVrefhv+nX0ulyi3biSHCPDe+yLv5o/p6d/UVlirijB8E16FtfwSAi4g3tcqrQ4lRAqQSoFEZJehYEcw=="],
 

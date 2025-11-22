@@ -35,11 +35,13 @@ const formatStatus = (status?: number | null) => {
       dot: "bg-slate-400",
     };
   }
-  return STATUS_MAP[status] ?? {
-    label: `状态${status}`,
-    color: "bg-slate-500/10 text-slate-400 border-slate-500/30",
-    dot: "bg-slate-400",
-  };
+  return (
+    STATUS_MAP[status] ?? {
+      label: `状态${status}`,
+      color: "bg-slate-500/10 text-slate-400 border-slate-500/30",
+      dot: "bg-slate-400",
+    }
+  );
 };
 
 const formatDate = (value?: string | null) => {
@@ -76,13 +78,18 @@ const summarizeDisks = (disks: MachineView["disks"]) => {
     };
   }
 
-  const totalBytes = disks.reduce((sum, disk) => sum + (disk.totalBytes ?? 0), 0);
+  const totalBytes = disks.reduce(
+    (sum, disk) => sum + (disk.totalBytes ?? 0),
+    0
+  );
   const mainDisk = disks[0];
   const hasMore = disks.length > 1;
 
   return {
     title: mainDisk.diskName ?? "磁盘",
-    detail: `${formatBytes(mainDisk.totalBytes)} · ${mainDisk.diskKind ?? "类型未知"}`,
+    detail: `${formatBytes(mainDisk.totalBytes)} · ${
+      mainDisk.diskKind ?? "类型未知"
+    }`,
     hint: hasMore
       ? `共 ${disks.length} 块，总计 ${formatBytes(totalBytes)}，点击查看全部`
       : "",
@@ -116,7 +123,7 @@ const summarizeNetwork = (interfaces: MachineView["networkInterfaces"]) => {
 
 export default function HomePage() {
   const [machines, setMachines] = useState<MachineView[]>([]);
-  const [pageIndex, setPageIndex] = useState(0);
+  const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(PAGE_SIZE_OPTIONS[0]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -139,7 +146,7 @@ export default function HomePage() {
     });
 
     const request = MachineControllerService.getMachineList(
-      pageIndex,
+      pageIndex - 1,
       pageSize
     );
 
@@ -152,8 +159,7 @@ export default function HomePage() {
       })
       .catch((err) => {
         if (disposed) return;
-        const message =
-          err instanceof Error ? err.message : "获取机器列表失败";
+        const message = err instanceof Error ? err.message : "获取机器列表失败";
         setError(message);
         setMachines([]);
       })
@@ -176,18 +182,18 @@ export default function HomePage() {
     return Math.max(Math.ceil(total / pageSize), 1);
   }, [total, pageSize]);
 
-  const canPrev = pageIndex > 0;
-  const canNext = pageIndex + 1 < totalPages;
+  const canPrev = pageIndex > 1;
+  const canNext = pageIndex < totalPages;
 
   const handlePageChange = (nextIndex: number) => {
-    if (nextIndex < 0 || nextIndex >= totalPages) return;
+    if (nextIndex < 1 || nextIndex > totalPages) return;
     setPageIndex(nextIndex);
   };
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
-      <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-950 to-black">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.18),_transparent_55%)]" />
+      <div className="relative overflow-hidden bg-linear-to-br from-slate-900 via-slate-950 to-black">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.18),transparent_55%)]" />
         <header className="relative mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-16 sm:px-8 lg:px-12">
           <div className="text-sm font-semibold uppercase tracking-[0.6em] text-slate-400">
             BeEyes Ops Center
@@ -214,7 +220,7 @@ export default function HomePage() {
                   当前页
                 </p>
                 <p className="text-2xl font-semibold">
-                  {pageIndex + 1}/{totalPages}
+                  {pageIndex}/{totalPages}
                 </p>
               </div>
             </div>
@@ -228,28 +234,52 @@ export default function HomePage() {
             <div>
               <p className="text-lg font-semibold text-white">机器列表</p>
               <p className="text-sm text-slate-400">
-                数据分页从 0 开始，当前为第 {pageIndex} 页（显示 {pageSize} 条）
+                当前为第 {pageIndex} 页（显示 {pageSize} 条）
               </p>
             </div>
-            <div className="flex items-center gap-3 text-sm text-slate-300">
-              <label htmlFor="page-size" className="text-slate-400">
-                每页数量
-              </label>
-              <select
-                id="page-size"
-                value={pageSize}
-                onChange={(event) => {
-                  setPageSize(Number(event.target.value));
-                  setPageIndex(0);
-                }}
-                className="rounded-2xl border border-white/10 bg-slate-900 px-4 py-2 text-white focus:border-indigo-500 focus:outline-none"
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => loadMachines()}
+                disabled={loading}
+                className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-300 transition hover:border-indigo-400 hover:bg-indigo-500/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                title="刷新列表"
               >
-                {PAGE_SIZE_OPTIONS.map((size) => (
-                  <option key={size} value={size} className="text-black">
-                    {size}
-                  </option>
-                ))}
-              </select>
+                <svg
+                  className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                <span>刷新</span>
+              </button>
+              <div className="flex items-center gap-3 text-sm text-slate-300">
+                <label htmlFor="page-size" className="text-slate-400">
+                  每页数量
+                </label>
+                <select
+                  id="page-size"
+                  value={pageSize}
+                  onChange={(event) => {
+                    setPageSize(Number(event.target.value));
+                    setPageIndex(1);
+                  }}
+                  className="rounded-2xl border border-white/10 bg-slate-900 px-4 py-2 text-white focus:border-indigo-500 focus:outline-none"
+                >
+                  {PAGE_SIZE_OPTIONS.map((size) => (
+                    <option key={size} value={size} className="text-black">
+                      {size}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 
@@ -269,19 +299,28 @@ export default function HomePage() {
               <tbody className="divide-y divide-white/5 text-slate-200">
                 {loading ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-16 text-center text-slate-400">
+                    <td
+                      colSpan={5}
+                      className="px-6 py-16 text-center text-slate-400"
+                    >
                       正在加载机器列表...
                     </td>
                   </tr>
                 ) : error ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-16 text-center text-rose-400">
+                    <td
+                      colSpan={5}
+                      className="px-6 py-16 text-center text-rose-400"
+                    >
                       {error}
                     </td>
                   </tr>
                 ) : machines.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-16 text-center text-slate-400">
+                    <td
+                      colSpan={5}
+                      className="px-6 py-16 text-center text-slate-400"
+                    >
                       暂无数据
                     </td>
                   </tr>
@@ -289,11 +328,16 @@ export default function HomePage() {
                   machines.map((machine) => {
                     const status = formatStatus(machine.status);
                     const diskInfo = summarizeDisks(machine.disks);
-                    const networkInfo = summarizeNetwork(machine.networkInterfaces);
+                    const networkInfo = summarizeNetwork(
+                      machine.networkInterfaces
+                    );
                     const hostnameLabel =
                       machine.hostname ?? `ID-${machine.id ?? "未知"}`;
                     return (
-                      <tr key={machine.id ?? machine.hostname} className="hover:bg-white/5">
+                      <tr
+                        key={machine.id ?? machine.hostname}
+                        className="hover:bg-white/5"
+                      >
                         <td className="px-6 py-4">
                           <div className="font-semibold text-white">
                             {machine.hostname ?? "-"}
@@ -384,7 +428,9 @@ export default function HomePage() {
                           <span
                             className={`inline-flex items-center gap-2 rounded-2xl border px-3 py-1 text-xs font-medium ${status.color}`}
                           >
-                            <span className={`h-2 w-2 rounded-full ${status.dot}`} />
+                            <span
+                              className={`h-2 w-2 rounded-full ${status.dot}`}
+                            />
                             {status.label}
                           </span>
                         </td>
@@ -398,7 +444,7 @@ export default function HomePage() {
 
           <div className="mt-6 flex flex-col gap-4 text-sm text-slate-300 sm:flex-row sm:items-center sm:justify-between">
             <p>
-              正在查看第 {pageIndex + 1} / {totalPages} 页，共 {total} 台机器
+              正在查看第 {pageIndex} / {totalPages} 页，共 {total} 台机器
             </p>
             <div className="flex items-center gap-3">
               <button

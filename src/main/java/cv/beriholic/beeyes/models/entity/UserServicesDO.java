@@ -1,9 +1,6 @@
 package cv.beriholic.beeyes.models.entity;
 
-import org.babyfish.jimmer.sql.Column;
-import org.babyfish.jimmer.sql.Entity;
-import org.babyfish.jimmer.sql.Id;
-import org.babyfish.jimmer.sql.Table;
+import org.babyfish.jimmer.sql.*;
 
 /**
  * <p>
@@ -20,9 +17,11 @@ public interface UserServicesDO {
     @Id
     long id();
 
+    @Key
     @Column(name = "user_id")
     long userId();
 
+    @Key
     @Column(name = "server_id")
     long serverId();
 }

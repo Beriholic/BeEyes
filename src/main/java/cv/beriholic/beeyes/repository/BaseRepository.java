@@ -4,6 +4,7 @@ import cv.beriholic.beeyes.models.dto.PageDTO;
 import org.babyfish.jimmer.View;
 import org.babyfish.jimmer.spring.repo.support.AbstractJavaRepository;
 import org.babyfish.jimmer.sql.JSqlClient;
+import org.babyfish.jimmer.sql.ast.mutation.MutableDelete;
 import org.babyfish.jimmer.sql.ast.mutation.MutableUpdate;
 import org.babyfish.jimmer.sql.ast.query.MutableRootQuery;
 import org.babyfish.jimmer.sql.ast.query.specification.JSpecification;
@@ -37,6 +38,10 @@ public abstract class BaseRepository<E, T extends TableProxy<E>, D> extends Abst
 
     protected MutableUpdate createUpdate() {
         return sql.createUpdate(table);
+    }
+
+    protected MutableDelete createDelete() {
+        return sql.createDelete(table);
     }
 
 

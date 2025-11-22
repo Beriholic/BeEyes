@@ -55,3 +55,11 @@ MachineView {
         ipv6Address
     }
 }
+
+MachineManageView {
+    id
+    description
+    hostname
+    region
+    apiKey
+}

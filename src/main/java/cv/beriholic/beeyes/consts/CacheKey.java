@@ -12,11 +12,15 @@ public enum CacheKey {
     @Getter
     private final String desc;
 
-    public String getKey(String key) {
-        return this.key + "::" + key;
+    public static String machineIdToken(String token) {
+        return MACHINE_ID_TOKEN.key + "::" + token;
     }
 
-    public String getKey(Long key) {
-        return this.key + "::" + key;
+    public static String machineRuntimeInfo(Long id) {
+        return MACHINE_RUNTIME_INFO.key + "::" + id;
+    }
+
+    public static String userServerList(Long id) {
+        return USER_SERVER_LIST.key + "::" + id;
     }
 }
