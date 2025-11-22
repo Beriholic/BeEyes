@@ -2,47 +2,14 @@
 
 import type { MachineView } from "@/api/models/MachineView";
 import { MachineControllerService } from "@/api/services/MachineControllerService";
+import { Button } from "@/components/Button";
+import { Card } from "@/components/Card";
+import { Modal } from "@/components/Modal";
+import { PageBackground } from "@/components/PageBackground";
+import { StatusBadge } from "@/components/StatusBadge";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 const PAGE_SIZE_OPTIONS = [5, 10, 20];
-
-const STATUS_MAP: Record<
-  number,
-  { label: string; color: string; dot: string }
-> = {
-  1: {
-    label: "在线",
-    color: "bg-emerald-500/10 text-emerald-500 border-emerald-500/30",
-    dot: "bg-emerald-400",
-  },
-  2: {
-    label: "告警",
-    color: "bg-amber-500/10 text-amber-600 border-amber-500/40",
-    dot: "bg-amber-400",
-  },
-  0: {
-    label: "离线",
-    color: "bg-rose-500/10 text-rose-500 border-rose-500/30",
-    dot: "bg-rose-400",
-  },
-};
-
-const formatStatus = (status?: number | null) => {
-  if (status === null || status === undefined) {
-    return {
-      label: "未知",
-      color: "bg-slate-500/10 text-slate-400 border-slate-500/30",
-      dot: "bg-slate-400",
-    };
-  }
-  return (
-    STATUS_MAP[status] ?? {
-      label: `状态${status}`,
-      color: "bg-slate-500/10 text-slate-400 border-slate-500/30",
-      dot: "bg-slate-400",
-    }
-  );
-};
 
 const formatDate = (value?: string | null) => {
   if (!value) return "-";
@@ -191,45 +158,42 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
-      <div className="relative overflow-hidden bg-linear-to-br from-slate-900 via-slate-950 to-black">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.18),transparent_55%)]" />
-        <header className="relative mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-16 sm:px-8 lg:px-12">
-          <div className="text-sm font-semibold uppercase tracking-[0.6em] text-slate-400">
-            BeEyes Ops Center
+    <PageBackground>
+      <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-16 sm:px-8 lg:px-12">
+        <div className="text-sm font-semibold uppercase tracking-[0.6em] text-slate-400">
+          BeEyes Ops Center
+        </div>
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <h1 className="text-4xl font-semibold leading-tight text-white lg:text-5xl">
+              服务器概览
+            </h1>
+            <p className="mt-4 text-base text-slate-300">
+              实时掌握各节点运行态势、健康分布与最后在线时间。
+            </p>
           </div>
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-sm text-slate-200">
             <div>
-              <h1 className="text-4xl font-semibold leading-tight text-white lg:text-5xl">
-                服务器概览
-              </h1>
-              <p className="mt-4 text-base text-slate-300">
-                实时掌握各节点运行态势、健康分布与最后在线时间。
+              <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
+                总台数
+              </p>
+              <p className="text-2xl font-semibold">{total}</p>
+            </div>
+            <div className="h-10 w-px bg-white/10" />
+            <div>
+              <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
+                当前页
+              </p>
+              <p className="text-2xl font-semibold">
+                {pageIndex}/{totalPages}
               </p>
             </div>
-            <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-sm text-slate-200">
-              <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
-                  总台数
-                </p>
-                <p className="text-2xl font-semibold">{total}</p>
-              </div>
-              <div className="h-10 w-px bg-white/10" />
-              <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
-                  当前页
-                </p>
-                <p className="text-2xl font-semibold">
-                  {pageIndex}/{totalPages}
-                </p>
-              </div>
-            </div>
           </div>
-        </header>
+        </div>
       </div>
 
       <main className="mx-auto w-full max-w-6xl px-6 pb-16 sm:px-8 lg:px-12">
-        <section className="-mt-10 rounded-3xl border border-white/5 bg-slate-950/60 p-6 shadow-2xl backdrop-blur">
+        <Card className="-mt-10 p-6">
           <div className="flex flex-col gap-4 pb-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-lg font-semibold text-white">机器列表</p>
@@ -238,15 +202,15 @@ export default function HomePage() {
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <button
+              <Button
                 type="button"
                 onClick={() => loadMachines()}
                 disabled={loading}
-                className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-300 transition hover:border-indigo-400 hover:bg-indigo-500/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                variant="outline"
                 title="刷新列表"
               >
                 <svg
-                  className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
+                  className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -258,8 +222,8 @@ export default function HomePage() {
                     d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                   />
                 </svg>
-                <span>刷新</span>
-              </button>
+                刷新
+              </Button>
               <div className="flex items-center gap-3 text-sm text-slate-300">
                 <label htmlFor="page-size" className="text-slate-400">
                   每页数量
@@ -326,7 +290,6 @@ export default function HomePage() {
                   </tr>
                 ) : (
                   machines.map((machine) => {
-                    const status = formatStatus(machine.status);
                     const diskInfo = summarizeDisks(machine.disks);
                     const networkInfo = summarizeNetwork(
                       machine.networkInterfaces
@@ -425,14 +388,7 @@ export default function HomePage() {
                           {formatDate(machine.lastSeen)}
                         </td>
                         <td className="px-6 py-4">
-                          <span
-                            className={`inline-flex items-center gap-2 rounded-2xl border px-3 py-1 text-xs font-medium ${status.color}`}
-                          >
-                            <span
-                              className={`h-2 w-2 rounded-full ${status.dot}`}
-                            />
-                            {status.label}
-                          </span>
+                          <StatusBadge status={machine.status} />
                         </td>
                       </tr>
                     );
@@ -447,158 +403,118 @@ export default function HomePage() {
               正在查看第 {pageIndex} / {totalPages} 页，共 {total} 台机器
             </p>
             <div className="flex items-center gap-3">
-              <button
+              <Button
                 type="button"
                 disabled={!canPrev}
                 onClick={() => handlePageChange(pageIndex - 1)}
-                className="rounded-2xl border border-white/10 px-4 py-2 transition hover:border-indigo-400 hover:text-white disabled:cursor-not-allowed disabled:border-white/5 disabled:text-slate-500"
+                variant="outline"
               >
                 上一页
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 disabled={!canNext}
                 onClick={() => handlePageChange(pageIndex + 1)}
-                className="rounded-2xl border border-white/10 px-4 py-2 transition hover:border-indigo-400 hover:text-white disabled:cursor-not-allowed disabled:border-white/5 disabled:text-slate-500"
+                variant="outline"
               >
                 下一页
-              </button>
+              </Button>
             </div>
           </div>
-        </section>
+        </Card>
       </main>
 
       {networkModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-10">
-          <div
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-            onClick={() => setNetworkModal(null)}
-          />
-          <div className="relative z-10 w-full max-w-3xl rounded-3xl border border-white/10 bg-slate-950 p-8 text-white shadow-2xl">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-xs uppercase tracking-[0.4em] text-slate-400">
-                  网络详情
-                </p>
-                <h3 className="mt-2 text-2xl font-semibold">
-                  {networkModal.hostname}
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setNetworkModal(null)}
-                className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-300 transition hover:border-indigo-400 hover:text-white"
+        <Modal
+          isOpen={true}
+          onClose={() => setNetworkModal(null)}
+          title={networkModal.hostname}
+        >
+          <div className="space-y-4">
+            {networkModal.interfaces.map((iface, index) => (
+              <div
+                key={`${iface.id ?? iface.interfaceName ?? "iface"}-${index}`}
+                className="rounded-2xl border border-white/10 bg-white/5 p-4"
               >
-                关闭
-              </button>
-            </div>
-
-            <div className="mt-6 max-h-[60vh] space-y-4 overflow-y-auto pr-2">
-              {networkModal.interfaces.map((iface, index) => (
-                <div
-                  key={`${iface.id ?? iface.interfaceName ?? "iface"}-${index}`}
-                  className="rounded-2xl border border-white/10 bg-white/5 p-4"
-                >
-                  <div className="flex flex-wrap items-center gap-3 text-sm">
-                    <span className="rounded-full bg-indigo-500/20 px-3 py-1 text-indigo-300">
-                      {iface.interfaceName ?? "未知接口"}
-                    </span>
-                    <span className="text-xs text-slate-400">
-                      ID: {iface.id ?? "无"}
-                    </span>
+                <div className="flex flex-wrap items-center gap-3 text-sm">
+                  <span className="rounded-full bg-indigo-500/20 px-3 py-1 text-indigo-300">
+                    {iface.interfaceName ?? "未知接口"}
+                  </span>
+                  <span className="text-xs text-slate-400">
+                    ID: {iface.id ?? "无"}
+                  </span>
+                </div>
+                <div className="mt-4 space-y-2 text-sm text-slate-200">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
+                      IPv4
+                    </p>
+                    {iface.ipv4Address && iface.ipv4Address.length > 0 ? (
+                      <ul className="mt-2 list-disc space-y-1 pl-5">
+                        {iface.ipv4Address.map((ip) => (
+                          <li key={ip} className="text-slate-100">
+                            {ip}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="mt-1 text-slate-500">暂无 IPv4 地址</p>
+                    )}
                   </div>
-                  <div className="mt-4 space-y-2 text-sm text-slate-200">
-                    <div>
-                      <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
-                        IPv4
-                      </p>
-                      {iface.ipv4Address && iface.ipv4Address.length > 0 ? (
-                        <ul className="mt-2 list-disc space-y-1 pl-5">
-                          {iface.ipv4Address.map((ip) => (
-                            <li key={ip} className="text-slate-100">
-                              {ip}
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="mt-1 text-slate-500">暂无 IPv4 地址</p>
-                      )}
-                    </div>
-                    <div>
-                      <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
-                        IPv6
-                      </p>
-                      {iface.ipv6Address && iface.ipv6Address.length > 0 ? (
-                        <ul className="mt-2 list-disc space-y-1 pl-5">
-                          {iface.ipv6Address.map((ip) => (
-                            <li key={ip} className="text-slate-100">
-                              {ip}
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="mt-1 text-slate-500">暂无 IPv6 地址</p>
-                      )}
-                    </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
+                      IPv6
+                    </p>
+                    {iface.ipv6Address && iface.ipv6Address.length > 0 ? (
+                      <ul className="mt-2 list-disc space-y-1 pl-5">
+                        {iface.ipv6Address.map((ip) => (
+                          <li key={ip} className="text-slate-100">
+                            {ip}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="mt-1 text-slate-500">暂无 IPv6 地址</p>
+                    )}
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
-        </div>
+        </Modal>
       )}
 
       {diskModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-10">
-          <div
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-            onClick={() => setDiskModal(null)}
-          />
-          <div className="relative z-10 w-full max-w-3xl rounded-3xl border border-white/10 bg-slate-950 p-8 text-white shadow-2xl">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-xs uppercase tracking-[0.4em] text-slate-400">
-                  磁盘详情
-                </p>
-                <h3 className="mt-2 text-2xl font-semibold">
-                  {diskModal.hostname}
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setDiskModal(null)}
-                className="rounded-full border border-white/10 px-4 py-2 text-sm text-slate-300 transition hover:border-indigo-400 hover:text-white"
+        <Modal
+          isOpen={true}
+          onClose={() => setDiskModal(null)}
+          title={diskModal.hostname}
+        >
+          <div className="space-y-4">
+            {diskModal.disks.map((disk, index) => (
+              <div
+                key={`${disk.diskName ?? "disk"}-${index}`}
+                className="rounded-2xl border border-white/10 bg-white/5 p-4"
               >
-                关闭
-              </button>
-            </div>
-
-            <div className="mt-6 max-h-[60vh] space-y-4 overflow-y-auto pr-2">
-              {diskModal.disks.map((disk, index) => (
-                <div
-                  key={`${disk.diskName ?? "disk"}-${index}`}
-                  className="rounded-2xl border border-white/10 bg-white/5 p-4"
-                >
-                  <div className="flex flex-wrap items-center gap-3 text-sm">
-                    <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-emerald-200">
-                      {disk.diskName ?? "未知磁盘"}
-                    </span>
-                    <span className="text-xs text-slate-400">
-                      {disk.diskKind ?? "类型未知"}
-                    </span>
-                    <span className="text-xs text-slate-400">
-                      {disk.fileSystem ?? "文件系统未知"}
-                    </span>
-                  </div>
-                  <div className="mt-3 text-sm text-slate-200">
-                    容量：{formatBytes(disk.totalBytes)}
-                  </div>
+                <div className="flex flex-wrap items-center gap-3 text-sm">
+                  <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-emerald-200">
+                    {disk.diskName ?? "未知磁盘"}
+                  </span>
+                  <span className="text-xs text-slate-400">
+                    {disk.diskKind ?? "类型未知"}
+                  </span>
+                  <span className="text-xs text-slate-400">
+                    {disk.fileSystem ?? "文件系统未知"}
+                  </span>
                 </div>
-              ))}
-            </div>
+                <div className="mt-3 text-sm text-slate-200">
+                  容量：{formatBytes(disk.totalBytes)}
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+        </Modal>
       )}
-    </div>
+    </PageBackground>
   );
 }
