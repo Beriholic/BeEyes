@@ -27,6 +27,10 @@ public abstract class BaseRepository<E, T extends TableProxy<E>, D> extends Abst
         this.table = table;
     }
 
+    public JSqlClient getSql() {
+        return this.sql;
+    }
+
     protected MutableRootQuery<T> createQuery() {
         return sql.createQuery(table);
     }

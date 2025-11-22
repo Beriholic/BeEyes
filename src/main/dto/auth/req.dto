@@ -1,0 +1,13 @@
+export cv.beriholic.beeyes.models.entity.UserDO
+
+input AuthLoginRequest {
+    username
+    password: String
+    email
+    phone
+}
+
+input AuthChangePasswordRequest {
+    oldPassword: String
+    newPassword: String
+}
