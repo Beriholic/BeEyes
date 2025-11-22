@@ -1,6 +1,6 @@
 export cv.beriholic.beeyes.models.entity.ServersDO
 
-ServerAllSacleView {
+ServerAllScaleView {
     #allScalars
 
     hardware {

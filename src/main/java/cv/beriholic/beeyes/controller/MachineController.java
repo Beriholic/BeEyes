@@ -2,6 +2,7 @@ package cv.beriholic.beeyes.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
 import cv.beriholic.beeyes.exception.ErrorCode;
+import cv.beriholic.beeyes.helper.ValidateHelper;
 import cv.beriholic.beeyes.models.dto.PageDTO;
 import cv.beriholic.beeyes.models.dto.RestBean;
 import cv.beriholic.beeyes.models.entity.dto.*;
@@ -19,19 +20,11 @@ public class MachineController {
     private final MachineService machineService;
 
     @GetMapping("/list")
-    public RestBean<PageDTO<List<MachineView>>> getMachineList(int pageIndex, int pageSize) {
-        if (pageIndex < 0 || pageSize < 0) {
-            return RestBean.failed(ErrorCode.PARAM_INVALID);
-        }
-        if (pageSize > 20) {
-            return RestBean.failed(ErrorCode.PARAM_INVALID.getCode(), "pageSize不能大于10");
-        }
+    public RestBean<PageDTO<List<MachineView>>> getMachineList(QueryMachineListRequest request) {
+        ValidateHelper.validatePageParma(request.getPageIndex(), request.getPageSize(), 20);
         long userId = StpUtil.getLoginIdAsLong();
 
-        PageDTO<List<MachineView>> machineList = machineService.getMachineListByUserId(
-                PageDTO.of(userId, pageIndex, pageSize)
-        );
-
+        PageDTO<List<MachineView>> machineList = machineService.queryMachineList(userId, request, MachineView.class);
         return RestBean.success(machineList);
     }
 
@@ -53,19 +46,11 @@ public class MachineController {
     }
 
     @GetMapping("/manage/list")
-    public RestBean<PageDTO<List<MachineManageView>>> getMachineManageList(int pageIndex, int pageSize) {
-        if (pageIndex < 0 || pageSize < 0) {
-            return RestBean.failed(ErrorCode.PARAM_INVALID);
-        }
-        if (pageSize > 20) {
-            return RestBean.failed(ErrorCode.PARAM_INVALID.getCode(), "pageSize不能大于10");
-        }
+    public RestBean<PageDTO<List<MachineManageView>>> getMachineManageList(QueryMachineListRequest request) {
+        ValidateHelper.validatePageParma(request.getPageIndex(), request.getPageSize(), 20);
         long userId = StpUtil.getLoginIdAsLong();
 
-        PageDTO<List<MachineManageView>> machineList = machineService.getMachineManageListByUserId(
-                PageDTO.of(userId, pageIndex, pageSize)
-        );
-
+        PageDTO<List<MachineManageView>> machineList = machineService.queryMachineList(userId, request, MachineManageView.class);
         return RestBean.success(machineList);
     }
 

@@ -5,6 +5,8 @@ input SaveServerInput {
 
     hostname
 
+    status
+
     disks {
         #allScalars
     }
@@ -25,4 +27,8 @@ input SaveCreateMachineInput {
     region
     apiKey
     status
+
+    users {
+        id
+    }
 }

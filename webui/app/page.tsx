@@ -46,7 +46,7 @@ const summarizeDisks = (disks: MachineView["disks"]) => {
   }
 
   const totalBytes = disks.reduce(
-    (sum, disk) => sum + (disk.totalBytes ?? 0),
+    (sum, disk) => sum + Number(disk.totalBytes ?? 0),
     0
   );
   const mainDisk = disks[0];
@@ -92,6 +92,7 @@ export default function HomePage() {
   const [machines, setMachines] = useState<MachineView[]>([]);
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(PAGE_SIZE_OPTIONS[0]);
+  const [hostname, setHostname] = useState("");
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -114,7 +115,8 @@ export default function HomePage() {
 
     const request = MachineControllerService.getMachineList(
       pageIndex - 1,
-      pageSize
+      pageSize,
+      hostname || undefined
     );
 
     request
@@ -140,7 +142,7 @@ export default function HomePage() {
       cancelAnimationFrame(frame);
       request.cancel();
     };
-  }, [pageIndex, pageSize]);
+  }, [pageIndex, pageSize, hostname]);
 
   useEffect(() => loadMachines(), [loadMachines]);
 
@@ -202,15 +204,40 @@ export default function HomePage() {
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <Button
+              <div className="relative">
+                <input
+                  type="text"
+                  value={hostname}
+                  onChange={(e) => {
+                    setHostname(e.target.value);
+                    setPageIndex(1);
+                  }}
+                  placeholder="搜索主机名..."
+                  className="w-48 rounded-2xl border border-white/10 bg-slate-900 px-4 py-2 pl-10 text-sm text-white placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none"
+                />
+                <svg
+                  className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+              <button
                 type="button"
                 onClick={() => loadMachines()}
                 disabled={loading}
-                variant="outline"
+                className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-300 transition hover:border-indigo-400 hover:bg-indigo-500/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
                 title="刷新列表"
               >
                 <svg
-                  className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`}
+                  className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -222,8 +249,8 @@ export default function HomePage() {
                     d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                   />
                 </svg>
-                刷新
-              </Button>
+                <span>刷新</span>
+              </button>
               <div className="flex items-center gap-3 text-sm text-slate-300">
                 <label htmlFor="page-size" className="text-slate-400">
                   每页数量
@@ -247,24 +274,35 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-2xl border border-white/5 bg-slate-950">
+          <div className="rounded-2xl border border-white/5 bg-slate-950">
             <table className="min-w-full divide-y divide-white/5 text-left text-sm">
-              <thead className="bg-slate-900/80 text-xs uppercase tracking-wide text-slate-400">
+              <thead className="text-xs uppercase tracking-wide text-slate-400">
                 <tr>
-                  <th className="px-6 py-4 font-medium">主机名</th>
-                  <th className="px-6 py-4 font-medium">描述</th>
-                  <th className="px-6 py-4 font-medium">硬件信息</th>
-                  <th className="px-6 py-4 font-medium">磁盘</th>
-                  <th className="px-6 py-4 font-medium">网络</th>
-                  <th className="px-6 py-4 font-medium">最后在线</th>
-                  <th className="px-6 py-4 font-medium">状态</th>
+                  <th className="bg-slate-900/80 px-6 py-4 font-medium first:rounded-tl-2xl">
+                    主机名
+                  </th>
+                  <th className="bg-slate-900/80 px-6 py-4 font-medium">
+                    描述
+                  </th>
+                  <th className="bg-slate-900/80 px-6 py-4 font-medium">
+                    硬件信息
+                  </th>
+                  <th className="bg-slate-900/80 px-6 py-4 font-medium">
+                    磁盘
+                  </th>
+                  <th className="bg-slate-900/80 px-6 py-4 font-medium">
+                    网络
+                  </th>
+                  <th className="bg-slate-900/80 px-6 py-4 font-medium last:rounded-tr-2xl">
+                    状态
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5 text-slate-200">
                 {loading ? (
                   <tr>
                     <td
-                      colSpan={5}
+                      colSpan={6}
                       className="px-6 py-16 text-center text-slate-400"
                     >
                       正在加载机器列表...
@@ -273,7 +311,7 @@ export default function HomePage() {
                 ) : error ? (
                   <tr>
                     <td
-                      colSpan={5}
+                      colSpan={6}
                       className="px-6 py-16 text-center text-rose-400"
                     >
                       {error}
@@ -282,7 +320,7 @@ export default function HomePage() {
                 ) : machines.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={5}
+                      colSpan={6}
                       className="px-6 py-16 text-center text-slate-400"
                     >
                       暂无数据
@@ -299,7 +337,7 @@ export default function HomePage() {
                     return (
                       <tr
                         key={machine.id ?? machine.hostname}
-                        className="hover:bg-white/5"
+                        className="hover:bg-white/5 whitespace-nowrap"
                       >
                         <td className="px-6 py-4">
                           <div className="font-semibold text-white">
@@ -384,11 +422,11 @@ export default function HomePage() {
                             <span className="text-slate-500">暂无网络信息</span>
                           )}
                         </td>
-                        <td className="px-6 py-4 text-sm text-slate-300">
-                          {formatDate(machine.lastSeen)}
-                        </td>
                         <td className="px-6 py-4">
-                          <StatusBadge status={machine.status} />
+                          <StatusBadge
+                            status={machine.status}
+                            lastSeen={machine.lastSeen}
+                          />
                         </td>
                       </tr>
                     );

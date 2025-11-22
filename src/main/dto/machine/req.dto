@@ -14,3 +14,9 @@ input UpdateMachineRequest {
 input DeleteMachineRequest {
     serverId: Long
 }
+
+input QueryMachineListRequest {
+    hostname: String?
+    pageIndex: Int
+    pageSize: Int
+}

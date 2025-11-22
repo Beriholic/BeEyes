@@ -15,6 +15,7 @@ export default function MachinesPage() {
   const [machines, setMachines] = useState<MachineManageView[]>([]);
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(PAGE_SIZE_OPTIONS[0]);
+  const [hostname, setHostname] = useState("");
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -79,7 +80,8 @@ export default function MachinesPage() {
 
     const request = MachineControllerService.getMachineManageList(
       pageIndex - 1,
-      pageSize
+      pageSize,
+      hostname || undefined
     );
 
     request
@@ -105,7 +107,7 @@ export default function MachinesPage() {
       cancelAnimationFrame(frame);
       request.cancel();
     };
-  }, [pageIndex, pageSize]);
+  }, [pageIndex, pageSize, hostname]);
 
   useEffect(() => loadMachines(), [loadMachines]);
 
@@ -299,6 +301,31 @@ export default function MachinesPage() {
               </p>
             </div>
             <div className="flex items-center gap-3">
+              <div className="relative">
+                <input
+                  type="text"
+                  value={hostname}
+                  onChange={(e) => {
+                    setHostname(e.target.value);
+                    setPageIndex(1);
+                  }}
+                  placeholder="搜索主机名..."
+                  className="w-48 rounded-2xl border border-white/10 bg-slate-900 px-4 py-2 pl-10 text-sm text-white placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none"
+                />
+                <svg
+                  className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
               <button
                 type="button"
                 onClick={() => setShowCreateModal(true)}
@@ -395,7 +422,7 @@ export default function MachinesPage() {
                     return (
                       <tr
                         key={`${machine.hostname ?? index}`}
-                        className="hover:bg-white/5"
+                        className="hover:bg-white/5 whitespace-nowrap"
                       >
                         <td className="px-6 py-4">
                           <div className="font-semibold text-white">

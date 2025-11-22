@@ -3,11 +3,13 @@ package cv.beriholic.beeyes.service.impl;
 import cv.beriholic.beeyes.consts.CacheKey;
 import cv.beriholic.beeyes.consts.KafkaGroup;
 import cv.beriholic.beeyes.consts.KafkaTopic;
+import cv.beriholic.beeyes.consts.ServerStatus;
 import cv.beriholic.beeyes.models.dto.MachineRuntimeInfoDTO;
 import cv.beriholic.beeyes.models.dto.MessageEntity;
 import cv.beriholic.beeyes.models.dto.system.RuntimeInfo;
 import cv.beriholic.beeyes.mq.MetricRecordProducerService;
 import cv.beriholic.beeyes.repository.MetricDataRepository;
+import cv.beriholic.beeyes.service.MachineStatusService;
 import cv.beriholic.beeyes.service.MetricService;
 import cv.beriholic.beeyes.utils.JsonUtil;
 import cv.beriholic.beeyes.utils.RedisUtils;
@@ -16,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.TimeUnit;
 
@@ -25,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 public class MetricServiceImpl implements MetricService {
     private final MetricDataRepository metricDataRepository;
     private final MetricRecordProducerService metricRecordProducerService;
+    private final MachineStatusService machineStatusService;
     private final RedisUtils redisUtils;
 
     @Override
@@ -50,10 +54,12 @@ public class MetricServiceImpl implements MetricService {
     }
 
     @Override
+    @Transactional
     public void saveRuntimeInfo(Long machineId, RuntimeInfo runtimeInfo) {
         log.info("[saveRuntimeInfo] biz start, machineId={}, runtimeInfo={}", machineId, JsonUtil.toJSONString(runtimeInfo));
         redisUtils.set(CacheKey.machineRuntimeInfo(machineId), JsonUtil.toJSONString(runtimeInfo), 10, TimeUnit.MINUTES);
         MachineRuntimeInfoDTO runtimeInfoDTO = MachineRuntimeInfoDTO.from(runtimeInfo);
+        machineStatusService.setServerStatus(machineId, ServerStatus.ONLINE);
         metricRecordProducerService.pushMachineMetricData(runtimeInfoDTO);
     }
 }

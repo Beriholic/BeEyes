@@ -1,6 +1,7 @@
 package cv.beriholic.beeyes.repository;
 
 import cv.beriholic.beeyes.models.dto.PageDTO;
+import org.babyfish.jimmer.Page;
 import org.babyfish.jimmer.View;
 import org.babyfish.jimmer.spring.repo.support.AbstractJavaRepository;
 import org.babyfish.jimmer.sql.JSqlClient;
@@ -46,7 +47,7 @@ public abstract class BaseRepository<E, T extends TableProxy<E>, D> extends Abst
 
 
     public List<E> findBySpec(JSpecification<E, T> spec, Fetcher<E> fetcher) {
-        return sql.createQuery(table)
+        return createQuery()
                 .where(spec)
                 .select(table.fetch(fetcher))
                 .execute();
@@ -54,7 +55,7 @@ public abstract class BaseRepository<E, T extends TableProxy<E>, D> extends Abst
     }
 
     public List<E> findBySpec(PageDTO<? extends JSpecification<E, T>> pageDTO, Fetcher<E> fetcher) {
-        return sql.createQuery(table)
+        return createQuery()
                 .where(pageDTO.getData())
                 .select(table.fetch(fetcher))
                 .fetchPage(pageDTO.getPageIndex(), pageDTO.getPageSize())
@@ -63,36 +64,57 @@ public abstract class BaseRepository<E, T extends TableProxy<E>, D> extends Abst
 
 
     public E findBySpecOne(JSpecification<E, T> spec, Fetcher<E> fetcher) {
-        return sql.createQuery(table)
+        return createQuery()
                 .where(spec)
                 .select(table.fetch(fetcher))
                 .fetchFirst();
     }
 
     public List<E> findBySpec(JSpecification<E, T> spec) {
-        return sql.createQuery(table)
+        return createQuery()
                 .where(spec)
                 .select(table)
                 .execute();
     }
 
-    public <V extends View<E>> List<V> findBySpec(Class<V> viewClass, JSpecification<E, T> spec) {
-        return sql.createQuery(table)
+    public Page<E> findBySpecFetchPage(JSpecification<E, T> spec, Integer pageIndex, Integer pageSize) {
+        return createQuery()
                 .where(spec)
-                .select(table.fetch(viewClass))
+                .select(table)
+                .fetchPage(pageIndex, pageSize);
+    }
+
+    public Page<E> findBySpecFetchPage(JSpecification<E, T> spec, Integer pageIndex, Integer pageSize, Fetcher<E> fetcher) {
+        return createQuery()
+                .where(spec)
+                .select(table.fetch(fetcher))
+                .fetchPage(pageIndex, pageSize);
+    }
+
+    public <V extends View<E>> Page<V> findBySpecFetchPage(JSpecification<E, T> spec, Integer pageIndex, Integer pageSize, Class<V> viewType) {
+        return createQuery()
+                .where(spec)
+                .select(table.fetch(viewType))
+                .fetchPage(pageIndex, pageSize);
+    }
+
+    public <V extends View<E>> List<V> findBySpec(Class<V> viewType, JSpecification<E, T> spec) {
+        return createQuery()
+                .where(spec)
+                .select(table.fetch(viewType))
                 .execute();
     }
 
-    public <V extends View<E>> List<V> findBySpec(Class<V> viewClass, PageDTO<? extends JSpecification<E, T>> pageDTO) {
-        return sql.createQuery(table)
+    public <V extends View<E>> List<V> findBySpec(Class<V> viewType, PageDTO<? extends JSpecification<E, T>> pageDTO) {
+        return createQuery()
                 .where(pageDTO.getData())
-                .select(table.fetch(viewClass))
+                .select(table.fetch(viewType))
                 .fetchPage(pageDTO.getPageIndex(), pageDTO.getPageSize())
                 .getRows();
     }
 
     public List<E> findBySpec(PageDTO<? extends JSpecification<E, T>> pageDTO) {
-        return sql.createQuery(table)
+        return createQuery()
                 .where(pageDTO.getData())
                 .select(table)
                 .fetchPage(pageDTO.getPageIndex(), pageDTO.getPageSize())
@@ -100,16 +122,16 @@ public abstract class BaseRepository<E, T extends TableProxy<E>, D> extends Abst
     }
 
     public E findBySpecOne(JSpecification<E, T> spec) {
-        return sql.createQuery(table)
+        return createQuery()
                 .where(spec)
                 .select(table)
                 .fetchFirst();
     }
 
-    public <V extends View<E>> V findBySpecOne(Class<V> viewClass, JSpecification<E, T> spec) {
-        return sql.createQuery(table)
+    public <V extends View<E>> V findBySpecOne(Class<V> viewType, JSpecification<E, T> spec) {
+        return createQuery()
                 .where(spec)
-                .select(table.fetch(viewClass))
+                .select(table.fetch(viewType))
                 .fetchFirst();
     }
 }

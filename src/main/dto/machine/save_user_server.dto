@@ -1,7 +1,0 @@
-export cv.beriholic.beeyes.models.entity.UserServicesDO
-
-input SaveCreateUserServerInput {
-    id
-    userId
-    serverId
-}

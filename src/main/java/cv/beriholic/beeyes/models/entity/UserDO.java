@@ -5,6 +5,8 @@ import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import org.babyfish.jimmer.sql.*;
 
+import java.util.List;
+
 
 /**
  * <p>
@@ -79,4 +81,12 @@ public interface UserDO extends BaseDO {
      */
     @Nullable
     String phone();
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_servers",
+            joinColumnName = "user_id",
+            inverseJoinColumnName = "server_id"
+    )
+    List<ServersDO> servers();
 }

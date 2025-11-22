@@ -5,17 +5,19 @@ import com.google.common.collect.Sets;
 import cv.beriholic.beeyes.consts.CacheKey;
 import cv.beriholic.beeyes.consts.ServerStatus;
 import cv.beriholic.beeyes.converter.ServerMachineConverter;
+import cv.beriholic.beeyes.models.dto.ServerStatusDTO;
 import cv.beriholic.beeyes.models.dto.system.MachineInfo;
 import cv.beriholic.beeyes.models.dto.system.RuntimeInfo;
 import cv.beriholic.beeyes.models.entity.ServerDiskDO;
 import cv.beriholic.beeyes.models.entity.ServerNetworkInterfacesDO;
 import cv.beriholic.beeyes.models.entity.ServersDO;
 import cv.beriholic.beeyes.models.entity.dto.SaveServerInput;
-import cv.beriholic.beeyes.models.entity.dto.ServerAllSacleView;
+import cv.beriholic.beeyes.models.entity.dto.ServerAllScaleView;
 import cv.beriholic.beeyes.repository.ServerDiskRepository;
 import cv.beriholic.beeyes.repository.ServerNetworkInterfaceRepository;
 import cv.beriholic.beeyes.repository.ServersRepository;
 import cv.beriholic.beeyes.service.ClientService;
+import cv.beriholic.beeyes.service.MachineStatusService;
 import cv.beriholic.beeyes.service.MetricService;
 import cv.beriholic.beeyes.utils.JsonUtil;
 import cv.beriholic.beeyes.utils.RedisUtils;
@@ -41,6 +43,7 @@ public class ClientServiceImpl implements ClientService {
     private final RedisUtils redisUtils;
     private final MetricService metricService;
     private final ServerNetworkInterfaceRepository serverNetworkInterfaceRepository;
+    private final MachineStatusService machineStatusService;
 
     @Override
     public Long getIdByTokenWithCache(String token) {
@@ -70,8 +73,19 @@ public class ClientServiceImpl implements ClientService {
     @Transactional(rollbackFor = Exception.class)
     public void reportMachineInfo(Long machineId, MachineInfo machineInfo) {
         log.info("[reportMachineInfo] biz start, machineId={}, machineInfo={}", machineId, JsonUtil.toJSONString(machineInfo));
-        ServersDO serversDO = serversRepository.findById(machineId, ServerAllSacleView.METADATA.getFetcher());
+        ServersDO serversDO = serversRepository.findById(machineId, ServerAllScaleView.METADATA.getFetcher());
         SaveServerInput saveServerInput = new SaveServerInput();
+
+        ServerStatusDTO serverStatus = machineStatusService.getServerStatus(machineId);
+        if (ServerStatus.UNREGISTER.getKey().equals(serverStatus.getCurrentStatus())
+                || ServerStatus.UNKNOW.getKey().equals(serverStatus.getCurrentStatus())
+        ) {
+            saveServerInput.setStatus(ServerStatus.REGISTER.getKey());
+            machineStatusService.setServerStatus(machineId, ServerStatus.REGISTER);
+        } else {
+            saveServerInput.setStatus(serverStatus.getCurrentStatus());
+        }
+
         saveServerInput.setId(machineId);
         saveServerInput.setHostname(machineInfo.getSystemInfo().getHostName());
         saveServerInput.setHardware(ServerMachineConverter.buildHardware(machineInfo, serversDO));
@@ -80,7 +94,6 @@ public class ClientServiceImpl implements ClientService {
 
         // 清理旧数据
         cleanOldMachineReportedData(machineId, serversDO, saveServerInput);
-
         // 更新
         serversRepository.save(saveServerInput, SaveMode.UPSERT);
     }
@@ -110,7 +123,6 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public void reportRuntimeInfo(Long machineId, RuntimeInfo runtimeInfo) {
-        log.info("[reportRuntimeInfo] biz start, machineId={}, runtimeInfo={}", machineId, JsonUtil.toJSONString(runtimeInfo));
         metricService.saveRuntimeInfo(machineId, runtimeInfo);
     }
 }

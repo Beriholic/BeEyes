@@ -2,6 +2,7 @@ package cv.beriholic.beeyes.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
 import cv.beriholic.beeyes.aspect.IgnoreContextFill;
+import cv.beriholic.beeyes.helper.ValidateHelper;
 import cv.beriholic.beeyes.models.dto.RestBean;
 import cv.beriholic.beeyes.models.entity.dto.AuthChangePasswordRequest;
 import cv.beriholic.beeyes.models.entity.dto.AuthLoginRequest;
@@ -20,6 +21,7 @@ public class AuthController {
     @IgnoreContextFill
     @PostMapping("/login")
     public RestBean<Void> login(@RequestBody AuthLoginRequest request) {
+        ValidateHelper.validateAuthLoginRequest(request);
         authService.login(request);
         return RestBean.success();
     }

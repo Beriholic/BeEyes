@@ -15,17 +15,20 @@ export class MachineControllerService {
     /**
      * @param pageIndex
      * @param pageSize
+     * @param hostname
      * @returns RestBean_PageDTO_List_MachineView OK
      * @throws ApiError
      */
     public static getMachineList(
         pageIndex: number,
         pageSize: number,
+        hostname?: string,
     ): CancelablePromise<RestBean_PageDTO_List_MachineView> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/machine/list',
             query: {
+                'hostname': hostname,
                 'pageIndex': pageIndex,
                 'pageSize': pageSize,
             },
@@ -64,17 +67,20 @@ export class MachineControllerService {
     /**
      * @param pageIndex
      * @param pageSize
+     * @param hostname
      * @returns RestBean_PageDTO_List_MachineManageView OK
      * @throws ApiError
      */
     public static getMachineManageList(
         pageIndex: number,
         pageSize: number,
+        hostname?: string,
     ): CancelablePromise<RestBean_PageDTO_List_MachineManageView> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/machine/manage/list',
             query: {
+                'hostname': hostname,
                 'pageIndex': pageIndex,
                 'pageSize': pageSize,
             },
