@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "api-gen": "bunx openapi-typescript-codegen --input http://localhost:8080/swagger/openapi.yml --output ./api"
+    "api-gen": "bunx openapi-typescript-codegen --input http://localhost:8080/swagger/openapi.yml --output ./api --exportCore false"
   },
   "dependencies": {
     "lucide-react": "^0.554.0",

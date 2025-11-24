@@ -288,6 +288,10 @@ export const catchErrorCodes = (
 
   const error = errors[result.status];
   if (error) {
+    // Redirect to login page on 401 Unauthorized
+    if (result.status === 401 && typeof window !== "undefined") {
+      window.location.href = "/login";
+    }
     throw new ApiError(options, result, error);
   }
 
