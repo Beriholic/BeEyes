@@ -1,25 +1,28 @@
 package cv.beriholic.beeyes.service.impl;
 
-import cv.beriholic.beeyes.consts.CacheKey;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import cv.beriholic.beeyes.consts.KafkaGroup;
 import cv.beriholic.beeyes.consts.KafkaTopic;
 import cv.beriholic.beeyes.consts.ServerStatus;
-import cv.beriholic.beeyes.models.dto.MachineRuntimeInfoDTO;
-import cv.beriholic.beeyes.models.dto.MessageEntity;
+import cv.beriholic.beeyes.models.dto.*;
 import cv.beriholic.beeyes.models.dto.system.RuntimeInfo;
-import cv.beriholic.beeyes.mq.MetricRecordProducerService;
+import cv.beriholic.beeyes.models.entity.dto.QueryMachineRuntimeInfoRequest;
+import cv.beriholic.beeyes.mq.MetricRecordBaseProducerService;
 import cv.beriholic.beeyes.repository.MetricDataRepository;
+import cv.beriholic.beeyes.service.MachineService;
 import cv.beriholic.beeyes.service.MachineStatusService;
 import cv.beriholic.beeyes.service.MetricService;
 import cv.beriholic.beeyes.utils.JsonUtil;
-import cv.beriholic.beeyes.utils.RedisUtils;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -27,11 +30,14 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class MetricServiceImpl implements MetricService {
     private final MetricDataRepository metricDataRepository;
-    private final MetricRecordProducerService metricRecordProducerService;
+    private final MetricRecordBaseProducerService metricRecordProducerService;
     private final MachineStatusService machineStatusService;
-    private final RedisUtils redisUtils;
+    private final MachineService machineService;
+    private final Cache<@NonNull Long, RuntimeInfo> runtimeInfoCache = Caffeine.newBuilder()
+            .maximumSize(1000)
+            .expireAfterWrite(10, TimeUnit.SECONDS)
+            .build();
 
-    @Override
     @KafkaListener(topics = KafkaTopic.MACHINE_RUNTIME_METRIC, groupId = KafkaGroup.MACHINE_RUNTIME_INFO_GROUP)
     public void recordMachineRuntimeInfo(MessageEntity message) {
         log.info("[recordMachineRuntimeInfo] message={}", JsonUtil.toJSONString(message));
@@ -46,21 +52,46 @@ public class MetricServiceImpl implements MetricService {
     @Override
     public RuntimeInfo getMachineRuntimeInfoById(Long id) {
         log.info("[getMachineRuntimeInfoById] biz start id={}", id);
-        String machineRuntimeInfoJson = redisUtils.get(CacheKey.machineRuntimeInfo(id));
-        if (StringUtils.isEmpty(machineRuntimeInfoJson)) {
+        if (Objects.isNull(id)) {
             return null;
         }
-        return JsonUtil.parseObject(machineRuntimeInfoJson, RuntimeInfo.class);
+        return runtimeInfoCache.get(id, key -> null);
     }
 
     @Override
     @Transactional
     public void saveRuntimeInfo(Long machineId, RuntimeInfo runtimeInfo) {
+        if (Objects.isNull(machineId)) {
+            return;
+        }
         log.info("[saveRuntimeInfo] biz start, machineId={}, runtimeInfo={}", machineId, JsonUtil.toJSONString(runtimeInfo));
-        redisUtils.set(CacheKey.machineRuntimeInfo(machineId), JsonUtil.toJSONString(runtimeInfo), 10, TimeUnit.MINUTES);
-        MachineRuntimeInfoDTO runtimeInfoDTO = MachineRuntimeInfoDTO.from(runtimeInfo);
-        machineStatusService.setServerStatus(machineId, ServerStatus.ONLINE);
+        runtimeInfoCache.put(machineId, runtimeInfo);
+        MachineRuntimeInfoDTO runtimeInfoDTO = MachineRuntimeInfoDTO.from(machineId, runtimeInfo);
+
+        ServerStatusDTO oldStatus = machineStatusService.getServerStatus(machineId);
+        machineStatusService.setServerStatus(machineId, oldStatus, ServerStatus.ONLINE);
+
         metricRecordProducerService.pushMachineMetricData(runtimeInfoDTO);
+    }
+
+    @Override
+    public List<RuntimeInfoDTO> queryMachineRuntimeInfo(Long userId, QueryMachineRuntimeInfoRequest request) {
+        List<Long> serverIds = machineService.getUserServerIdListByCache(
+                PageDTO.of(userId, request.getPageIndex(), request.getPageSize())
+        );
+
+        return serverIds.stream()
+                .map(id -> {
+                            RuntimeInfo runtimeInfo = runtimeInfoCache.get(id, key -> null);
+                            if (Objects.isNull(runtimeInfo)) {
+                                return null;
+                            }
+                            ServerStatusDTO serverStatus = machineStatusService.getServerStatus(id);
+                            return new RuntimeInfoDTO(String.valueOf(id), serverStatus.getCurrentStatus(), runtimeInfo);
+                        }
+                )
+                .filter(Objects::nonNull)
+                .toList();
     }
 }
 

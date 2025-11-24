@@ -8,3 +8,8 @@ UserBaseView {
     phone
 }
 
+ServerIdListUnderUserView {
+    servers {
+        id
+    }
+}

@@ -78,40 +78,6 @@ spring:
             trusted:
               packages: "*"
 
-# 自定义应用配置
-app:
-  kafka:
-    topics: "test,alert,audit,notification"
-    consumer:
-      group-id: "beeyes-group"
-    producer:
-      retries: 3
-      timeout: 5000
-    # 监听器配置
-    listener:
-      # 消息确认模式：manual-手动确认，auto-自动确认
-      ack-mode: manual_immediate
-      # 并发消费者数量
-      concurrency: 3
-      # 批量消费配置
-      batch-listener: false
-      # 每次拉取的记录数
-      consumer:
-        max-poll-records: 500
-      # 重试配置
-      retry:
-        # 是否启用重试
-        enabled: true
-        # 初始重试间隔时间
-        initial-interval: 1000
-        # 最大重试间隔时间
-        max-interval: 10000
-        # 重试乘数
-        multiplier: 2
-        # 最大重试次数
-        max-attempts: 3
-
-
 jimmer:
   dialect: org.babyfish.jimmer.sql.dialect.PostgresDialect
   show-sql: true

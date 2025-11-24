@@ -21,10 +21,10 @@ export type NetworkInterfaceInfo = {
     /**
      * 上传速度（字节）
      */
-    uploadSpeed?: number | null;
+    upload_speed?: number | null;
     /**
      * 下载速度（字节）
      */
-    downloadSpeed?: number | null;
+    download_speed?: number | null;
 };
 

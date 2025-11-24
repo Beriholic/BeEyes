@@ -17,6 +17,8 @@ public class MachineRuntimeInfoDTO {
     @Column(timestamp = true)
     private Instant timestamp;
     @Column
+    private Long serverId;
+    @Column
     private Double cpuUsage;
     @Column
     private Double memoryUsage;
@@ -25,16 +27,17 @@ public class MachineRuntimeInfoDTO {
     @Column
     private Double diskUsage;
 
-    public static MachineRuntimeInfoDTO from(RuntimeInfo from) {
-        CPUInfo cpuInfo = from.getCpuInfo();
-        MemoryInfo memoryInfo = from.getMemoryInfo();
-        List<DiskInfo> diskInfo = from.getDiskInfo();
+    public static MachineRuntimeInfoDTO from(Long serverId, RuntimeInfo from) {
+        CPUInfo cpuInfo = from.getCpu_info();
+        MemoryInfo memoryInfo = from.getMemory_info();
+        List<DiskInfo> diskInfo = from.getDisk_info();
 
         MachineRuntimeInfoDTO to = new MachineRuntimeInfoDTO();
+        to.setServerId(serverId);
         to.setTimestamp(Instant.now());
         to.setCpuUsage(cpuInfo.getUsage());
-        to.setMemoryUsage(memoryInfo.getPercentMemory());
-        to.setSwapUsage(memoryInfo.getPercentSwap());
+        to.setMemoryUsage(memoryInfo.getPercent_memory());
+        to.setSwapUsage(memoryInfo.getPercent_swap());
 
         double avgDiskUsage = diskInfo.stream()
                 .mapToDouble(DiskInfo::getPercent)

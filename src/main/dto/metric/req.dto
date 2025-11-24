@@ -1,0 +1,6 @@
+export cv.beriholic.beeyes.models.entity.ServersDO
+
+input QueryMachineRuntimeInfoRequest {
+    pageIndex: Int
+    pageSize: Int
+}

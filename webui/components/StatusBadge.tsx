@@ -10,29 +10,29 @@ const STATUS_MAP: Record<
   { label: string; color: string; dot: string }
 > = {
   0: {
-    label: "未知",
-    color: "bg-slate-500/10 text-slate-400 border-slate-500/30",
-    dot: "bg-slate-400",
-  },
-  1: {
-    label: "已注册",
-    color: "bg-blue-500/10 text-blue-500 border-blue-500/30",
-    dot: "bg-blue-400",
-  },
-  2: {
-    label: "未注册",
-    color: "bg-amber-500/10 text-amber-600 border-amber-500/40",
-    dot: "bg-amber-400",
-  },
-  3: {
     label: "在线",
     color: "bg-emerald-500/10 text-emerald-500 border-emerald-500/30",
     dot: "bg-emerald-400",
   },
-  4: {
+  1: {
     label: "离线",
     color: "bg-rose-500/10 text-rose-500 border-rose-500/30",
     dot: "bg-rose-400",
+  },
+  2: {
+    label: "已注册",
+    color: "bg-blue-500/10 text-blue-500 border-blue-500/30",
+    dot: "bg-blue-400",
+  },
+  3: {
+    label: "未注册",
+    color: "bg-amber-500/10 text-amber-600 border-amber-500/40",
+    dot: "bg-amber-400",
+  },
+  4: {
+    label: "未知",
+    color: "bg-slate-500/10 text-slate-400 border-slate-500/30",
+    dot: "bg-slate-400",
   },
 };
 

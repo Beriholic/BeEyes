@@ -1,7 +1,5 @@
 package cv.beriholic.beeyes.models.dto.system;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,47 +13,46 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class MemoryInfo implements Serializable {
     @Serial
     private static final long serialVersionUID = 4049866545799310455L;
     /**
      * 总内存（字节）
      */
-    private Long totalMemory;
+    private Long total_memory;
 
     /**
      * 已使用内存（字节）
      */
-    private Long usedMemory;
+    private Long used_memory;
 
     /**
      * 可用内存（字节）
      */
-    private Long freeMemory;
+    private Long free_memory;
 
     /**
      * 总交换分区（字节）
      */
-    private Long totalSwap;
+    private Long total_swap;
 
     /**
      * 已使用交换分区（字节）
      */
-    private Long usedSwap;
+    private Long used_swap;
 
     /**
      * 可用交换分区（字节）
      */
-    private Long freeSwap;
+    private Long free_swap;
 
     /**
      * 内存使用百分比
      */
-    private Double percentMemory;
+    private Double percent_memory;
 
     /**
      * 交换分区使用百分比
      */
-    private Double percentSwap;
+    private Double percent_swap;
 }

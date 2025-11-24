@@ -12,15 +12,15 @@ import java.util.Objects;
 
 @Service
 @Slf4j
-public class MetricRecordProducerService extends ProducerService {
-    public void pushMachineMetricData(MachineRuntimeInfoDTO machineRuntimeInfoDTO) {
-        log.info("[pushMachineMetricData] biz start, machineRuntimeInfoDTO={}", JsonUtil.toJSONString(machineRuntimeInfoDTO));
-        if (Objects.isNull(machineRuntimeInfoDTO)) {
+public class MetricRecordBaseProducerService extends BaseProducerService {
+    public void pushMachineMetricData(MachineRuntimeInfoDTO dto) {
+        log.info("[pushMachineMetricData] biz start, machineRuntimeInfoDTO={}", JsonUtil.toJSONString(dto));
+        if (Objects.isNull(dto)) {
             return;
         }
         MessageEntity message = new MessageEntity(
-                BusinessId.ReportMachineRuntimeInfo.getKey(),
-                JsonUtil.toJSONString(machineRuntimeInfoDTO)
+                BusinessId.ReportMachineRuntimeInfo.buildKey(dto.getServerId()),
+                JsonUtil.toJSONString(dto)
         );
         sendMessage(KafkaTopic.MACHINE_RUNTIME_METRIC, message);
     }

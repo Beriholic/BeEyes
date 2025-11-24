@@ -4,12 +4,14 @@ import cv.beriholic.beeyes.models.entity.dto.AuthLoginRequest;
 import org.apache.commons.lang3.StringUtils;
 
 public class ValidateHelper {
-    public static void validatePageParma(int pageIndex, int pageSize, int maxPage) {
+    private static final int QUERY_MACHINE_MAX_PAGE_SIZE = 20;
+
+    public static void validateQueryMachinePageParam(int pageIndex, int pageSize) {
         if (pageIndex < 0 || pageSize < 0) {
             throw new IllegalArgumentException("Page index or page size cannot be negative");
         }
-        if (pageSize > maxPage) {
-            throw new IllegalArgumentException("Page size cannot be greater than " + maxPage);
+        if (pageSize > QUERY_MACHINE_MAX_PAGE_SIZE) {
+            throw new IllegalArgumentException("Page size cannot be greater than " + QUERY_MACHINE_MAX_PAGE_SIZE);
         }
     }
 

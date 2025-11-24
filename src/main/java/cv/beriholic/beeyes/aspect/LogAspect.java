@@ -7,7 +7,6 @@ import cv.beriholic.beeyes.exception.ErrorCode;
 import cv.beriholic.beeyes.models.dto.Context;
 import cv.beriholic.beeyes.models.dto.RestBean;
 import cv.beriholic.beeyes.utils.JsonUtil;
-import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -19,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
+import java.security.InvalidParameterException;
 
 @Aspect
 @Component
@@ -43,10 +43,9 @@ public class LogAspect {
                 Object proceed = thisJoinPoint.proceed();
                 LOGGER.info("调用日志【方法】:{};【参数】:{},【结果】:{}", currentMethod.getName(), JsonUtil.toJSONString(args), JsonUtil.toJSONString(proceed));
                 return proceed;
-            } catch (ConstraintViolationException e) {
-                String violationMessage = e.getConstraintViolations().stream().map(ConstraintViolation::getMessageTemplate).toList().getFirst();
+            } catch (ConstraintViolationException | InvalidParameterException e) {
                 LOGGER.warn("参数异常【方法】:{};【参数】:{}", currentMethod.getName(), JsonUtil.toJSONString(args), e);
-                return RestBean.failed(ErrorCode.PARAM_INVALID.getCode(), violationMessage);
+                return RestBean.failed(ErrorCode.PARAM_INVALID);
             } catch (AbstractBeEyesException ex) {
                 LOGGER.warn("业务异常【方法】:{};【参数】:{}", currentMethod.getName(), JsonUtil.toJSONString(args), ex);
                 return RestBean.failed(ex.getCode(), ex.getMessage());

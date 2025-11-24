@@ -1,13 +1,16 @@
 "use client";
 
 import type { MachineView } from "@/api/models/MachineView";
+import type { RuntimeInfoDTO } from "@/api/models/RuntimeInfoDTO";
 import { MachineControllerService } from "@/api/services/MachineControllerService";
+import { MetricControllerService } from "@/api/services/MetricControllerService";
 import { Button } from "@/components/Button";
 import { Card } from "@/components/Card";
 import { Modal } from "@/components/Modal";
 import { PageBackground } from "@/components/PageBackground";
+import { RuntimeMetrics } from "@/components/RuntimeMetrics";
 import { StatusBadge } from "@/components/StatusBadge";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 
 const PAGE_SIZE_OPTIONS = [5, 10, 20];
 
@@ -90,9 +93,9 @@ const summarizeNetwork = (interfaces: MachineView["networkInterfaces"]) => {
 
 export default function HomePage() {
   const [machines, setMachines] = useState<MachineView[]>([]);
+  const [runtimeData, setRuntimeData] = useState<RuntimeInfoDTO[]>([]);
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(PAGE_SIZE_OPTIONS[0]);
-  const [hostname, setHostname] = useState("");
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -113,13 +116,12 @@ export default function HomePage() {
       setError(null);
     });
 
-    const request = MachineControllerService.getMachineList(
+    const machineRequest = MachineControllerService.getMachineList(
       pageIndex - 1,
-      pageSize,
-      hostname || undefined
+      pageSize
     );
 
-    request
+    machineRequest
       .then((response) => {
         if (disposed) return;
         const list = response?.data?.data ?? [];
@@ -140,11 +142,32 @@ export default function HomePage() {
     return () => {
       disposed = true;
       cancelAnimationFrame(frame);
-      request.cancel();
+      machineRequest.cancel();
     };
-  }, [pageIndex, pageSize, hostname]);
+  }, [pageIndex, pageSize]);
 
   useEffect(() => loadMachines(), [loadMachines]);
+
+  // Poll runtime data every 5 seconds
+  useEffect(() => {
+    const pollInterval = setInterval(() => {
+      // Only fetch runtime data, don't reload the entire machine list
+      MetricControllerService.queryMachineRuntimeInfo({
+        pageIndex: pageIndex - 1,
+        pageSize: pageSize,
+      })
+        .then((response) => {
+          setRuntimeData(response?.data ?? []);
+        })
+        .catch((err) => {
+          console.error("Failed to poll runtime data:", err);
+        });
+    }, 5000); // Poll every 5 seconds
+
+    return () => {
+      clearInterval(pollInterval);
+    };
+  }, [pageIndex, pageSize]);
 
   const totalPages = useMemo(() => {
     if (total <= 0) return 1;
@@ -204,31 +227,6 @@ export default function HomePage() {
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <div className="relative">
-                <input
-                  type="text"
-                  value={hostname}
-                  onChange={(e) => {
-                    setHostname(e.target.value);
-                    setPageIndex(1);
-                  }}
-                  placeholder="搜索主机名..."
-                  className="w-48 rounded-2xl border border-white/10 bg-slate-900 px-4 py-2 pl-10 text-sm text-white placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none"
-                />
-                <svg
-                  className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-              </div>
               <button
                 type="button"
                 onClick={() => loadMachines()}
@@ -334,101 +332,123 @@ export default function HomePage() {
                     );
                     const hostnameLabel =
                       machine.hostname ?? `ID-${machine.id ?? "未知"}`;
+
+                    // Find runtime data for this machine
+                    const machineRuntimeData = runtimeData.find(
+                      (item) => item.id === String(machine.id)
+                    );
+
+                    // Use runtime status if available, otherwise fallback to machine status
+                    const currentStatus =
+                      machineRuntimeData?.status ?? machine.status;
+
                     return (
-                      <tr
-                        key={machine.id ?? machine.hostname}
-                        className="hover:bg-white/5 whitespace-nowrap"
-                      >
-                        <td className="px-6 py-4">
-                          <div className="font-semibold text-white">
-                            {machine.hostname ?? "-"}
-                          </div>
-                          <div className="text-xs text-slate-400">
-                            ID: {machine.id ?? "未知"}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <p className="max-w-xs text-sm text-slate-300">
-                            {machine.description ?? "-"}
-                          </p>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="text-sm text-slate-200">
-                            {machine.hardware?.cpuName ?? "-"}
-                          </div>
-                          <div className="text-xs text-slate-400">
-                            {machine.hardware?.cpuArch ?? "未知架构"} ·{" "}
-                            {machine.hardware?.cpuCores ?? "-"} 核
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-sm">
-                          {machine.disks && machine.disks.length > 0 ? (
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setDiskModal({
-                                  hostname: hostnameLabel,
-                                  disks: machine.disks ?? [],
-                                })
-                              }
-                              className="group flex w-full flex-col items-start rounded-2xl border border-transparent px-3 py-2 text-left transition hover:border-indigo-400/60 hover:bg-indigo-500/5"
-                            >
-                              <span className="font-semibold text-white group-hover:text-indigo-200">
-                                {diskInfo.title}
+                      <Fragment key={machine.id ?? machine.hostname}>
+                        <tr className="hover:bg-white/5 whitespace-nowrap">
+                          <td className="px-6 py-4">
+                            <div className="font-semibold text-white">
+                              {machine.hostname ?? "-"}
+                            </div>
+                            <div className="text-xs text-slate-400">
+                              ID: {machine.id ?? "未知"}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <p className="max-w-xs text-sm text-slate-300">
+                              {machine.description ?? "-"}
+                            </p>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm text-slate-200">
+                              {machine.hardware?.cpuName ?? "-"}
+                            </div>
+                            <div className="text-xs text-slate-400">
+                              {machine.hardware?.cpuArch ?? "未知架构"} ·{" "}
+                              {machine.hardware?.cpuCores ?? "-"} 核
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-sm">
+                            {machine.disks && machine.disks.length > 0 ? (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setDiskModal({
+                                    hostname: hostnameLabel,
+                                    disks: machine.disks ?? [],
+                                  })
+                                }
+                                className="group flex w-full flex-col items-start rounded-2xl border border-transparent px-3 py-2 text-left transition hover:border-indigo-400/60 hover:bg-indigo-500/5"
+                              >
+                                <span className="font-semibold text-white group-hover:text-indigo-200">
+                                  {diskInfo.title}
+                                </span>
+                                {diskInfo.detail && (
+                                  <span className="mt-1 text-xs text-slate-300 group-hover:text-slate-100">
+                                    {diskInfo.detail}
+                                  </span>
+                                )}
+                                {diskInfo.hint && (
+                                  <span className="mt-1 text-[11px] text-slate-500 group-hover:text-slate-200">
+                                    {diskInfo.hint}
+                                  </span>
+                                )}
+                              </button>
+                            ) : (
+                              <span className="text-slate-500">
+                                暂无磁盘信息
                               </span>
-                              {diskInfo.detail && (
-                                <span className="mt-1 text-xs text-slate-300 group-hover:text-slate-100">
-                                  {diskInfo.detail}
+                            )}
+                          </td>
+                          <td className="px-6 py-4 text-sm">
+                            {machine.networkInterfaces &&
+                            machine.networkInterfaces.length > 0 ? (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setNetworkModal({
+                                    hostname: hostnameLabel,
+                                    interfaces: machine.networkInterfaces ?? [],
+                                  })
+                                }
+                                className="group flex w-full flex-col items-start rounded-2xl border border-transparent px-3 py-2 text-left transition hover:border-indigo-400/60 hover:bg-indigo-500/5"
+                              >
+                                <span className="font-semibold text-white group-hover:text-indigo-200">
+                                  {networkInfo.title}
                                 </span>
-                              )}
-                              {diskInfo.hint && (
-                                <span className="mt-1 text-[11px] text-slate-500 group-hover:text-slate-200">
-                                  {diskInfo.hint}
-                                </span>
-                              )}
-                            </button>
-                          ) : (
-                            <span className="text-slate-500">暂无磁盘信息</span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 text-sm">
-                          {machine.networkInterfaces &&
-                          machine.networkInterfaces.length > 0 ? (
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setNetworkModal({
-                                  hostname: hostnameLabel,
-                                  interfaces: machine.networkInterfaces ?? [],
-                                })
-                              }
-                              className="group flex w-full flex-col items-start rounded-2xl border border-transparent px-3 py-2 text-left transition hover:border-indigo-400/60 hover:bg-indigo-500/5"
-                            >
-                              <span className="font-semibold text-white group-hover:text-indigo-200">
-                                {networkInfo.title}
+                                {networkInfo.detail && (
+                                  <span className="mt-1 text-xs text-slate-300 group-hover:text-slate-100">
+                                    {networkInfo.detail}
+                                  </span>
+                                )}
+                                {networkInfo.hint && (
+                                  <span className="mt-1 text-[11px] text-slate-500 group-hover:text-slate-200">
+                                    {networkInfo.hint}
+                                  </span>
+                                )}
+                              </button>
+                            ) : (
+                              <span className="text-slate-500">
+                                暂无网络信息
                               </span>
-                              {networkInfo.detail && (
-                                <span className="mt-1 text-xs text-slate-300 group-hover:text-slate-100">
-                                  {networkInfo.detail}
-                                </span>
-                              )}
-                              {networkInfo.hint && (
-                                <span className="mt-1 text-[11px] text-slate-500 group-hover:text-slate-200">
-                                  {networkInfo.hint}
-                                </span>
-                              )}
-                            </button>
-                          ) : (
-                            <span className="text-slate-500">暂无网络信息</span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4">
-                          <StatusBadge
-                            status={machine.status}
-                            lastSeen={machine.lastSeen}
-                          />
-                        </td>
-                      </tr>
+                            )}
+                          </td>
+                          <td className="px-6 py-4">
+                            <StatusBadge
+                              status={currentStatus}
+                              lastSeen={machine.lastSeen}
+                            />
+                          </td>
+                        </tr>
+                        {machine.id && (
+                          <tr key={`runtime-${machine.id}`}>
+                            <td colSpan={6} className="p-0">
+                              <RuntimeMetrics
+                                runtimeInfo={machineRuntimeData?.info}
+                              />
+                            </td>
+                          </tr>
+                        )}
+                      </Fragment>
                     );
                   })
                 )}

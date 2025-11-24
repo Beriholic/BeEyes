@@ -2,10 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { RuntimeInfo } from './RuntimeInfo';
-export type RestBean_RuntimeInfo = {
+import type { RuntimeInfoDTO } from './RuntimeInfoDTO';
+export type RestBean_List_RuntimeInfoDTO = {
     code?: number;
     msg?: string;
-    data?: RuntimeInfo;
+    data?: Array<RuntimeInfoDTO>;
 };
 

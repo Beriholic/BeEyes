@@ -1,10 +1,15 @@
 package cv.beriholic.beeyes.repository;
 
 import cv.beriholic.beeyes.consts.ServerStatus;
+import cv.beriholic.beeyes.models.dto.PageDTO;
 import cv.beriholic.beeyes.models.dto.ServerStatusDTO;
 import cv.beriholic.beeyes.models.entity.ServersDO;
 import cv.beriholic.beeyes.models.entity.ServersDOTable;
+import cv.beriholic.beeyes.models.entity.dto.MachineView;
+import cv.beriholic.beeyes.models.entity.dto.QueryServerSpec;
+import org.babyfish.jimmer.Page;
 import org.babyfish.jimmer.sql.JSqlClient;
+import org.babyfish.jimmer.sql.ast.Predicate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -26,7 +31,8 @@ public class ServersRepository extends BaseRepository<ServersDO, ServersDOTable,
     }
 
     public void updateStatus(Long id, ServerStatus status) {
-        createUpdate().where(table.id().eq(id)).set(table.status(), status.getKey());
+        createUpdate().set(table.status(), status.getKey())
+                .where(table.id().eq(id)).execute();
     }
 
     public Long getIdByApiKey(String token) {
@@ -44,6 +50,30 @@ public class ServersRepository extends BaseRepository<ServersDO, ServersDOTable,
 
     public List<Long> getAllIds() {
         return createQuery().select(table.id()).execute();
+    }
+
+    public List<Long> getServerIdListOrderByStatus(PageDTO<Long> userIdPage) {
+        return createQuery()
+                .where(
+                        table.users(userDOTableEx ->
+                                Predicate.and(
+                                        userDOTableEx.id().eq(userIdPage.getData())
+                                )
+                        )
+                )
+                .orderBy(table.status().asc())
+                .select(table.id())
+                .fetchPage(userIdPage.getPageIndex(), userIdPage.getPageSize())
+                .getRows();
+    }
+
+
+    public Page<MachineView> queryMachineListOrderByStatus(QueryServerSpec queryServerSpec, int pageIndex, int pageSize) {
+        return createQuery()
+                .where(queryServerSpec)
+                .orderBy(table.status().asc())
+                .select(table.fetch(MachineView.class))
+                .fetchPage(pageIndex, pageSize);
     }
 }
 

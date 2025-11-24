@@ -17,18 +17,18 @@ export type RuntimeInfo = {
     /**
      * CPU信息
      */
-    cpuInfo?: CPUInfo;
+    cpu_info?: CPUInfo;
     /**
      * 内存信息
      */
-    memoryInfo?: MemoryInfo;
+    memory_info?: MemoryInfo;
     /**
      * 磁盘信息列表
      */
-    diskInfo?: Array<DiskInfo>;
+    disk_info?: Array<DiskInfo>;
     /**
      * 网络信息
      */
-    networkInfo?: NetworkInfo;
+    network_info?: NetworkInfo;
 };
 

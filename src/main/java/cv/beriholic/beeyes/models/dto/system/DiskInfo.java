@@ -1,7 +1,5 @@
 package cv.beriholic.beeyes.models.dto.system;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,7 +13,6 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class DiskInfo implements Serializable {
     @Serial
     private static final long serialVersionUID = 986779629743583069L;
@@ -27,7 +24,7 @@ public class DiskInfo implements Serializable {
     /**
      * 文件系统类型
      */
-    private String fileSystem;
+    private String file_system;
 
     /**
      * 总空间（字节）

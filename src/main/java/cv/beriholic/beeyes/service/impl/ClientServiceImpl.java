@@ -2,7 +2,8 @@ package cv.beriholic.beeyes.service.impl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import cv.beriholic.beeyes.consts.CacheKey;
+import cv.beriholic.beeyes.cache.CacheKey;
+import cv.beriholic.beeyes.cache.RedisUtils;
 import cv.beriholic.beeyes.consts.ServerStatus;
 import cv.beriholic.beeyes.converter.ServerMachineConverter;
 import cv.beriholic.beeyes.models.dto.ServerStatusDTO;
@@ -17,10 +18,10 @@ import cv.beriholic.beeyes.repository.ServerDiskRepository;
 import cv.beriholic.beeyes.repository.ServerNetworkInterfaceRepository;
 import cv.beriholic.beeyes.repository.ServersRepository;
 import cv.beriholic.beeyes.service.ClientService;
+import cv.beriholic.beeyes.service.MachineService;
 import cv.beriholic.beeyes.service.MachineStatusService;
 import cv.beriholic.beeyes.service.MetricService;
 import cv.beriholic.beeyes.utils.JsonUtil;
-import cv.beriholic.beeyes.utils.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -44,6 +45,7 @@ public class ClientServiceImpl implements ClientService {
     private final MetricService metricService;
     private final ServerNetworkInterfaceRepository serverNetworkInterfaceRepository;
     private final MachineStatusService machineStatusService;
+    private final MachineService machineService;
 
     @Override
     public Long getIdByTokenWithCache(String token) {
@@ -87,7 +89,7 @@ public class ClientServiceImpl implements ClientService {
         }
 
         saveServerInput.setId(machineId);
-        saveServerInput.setHostname(machineInfo.getSystemInfo().getHostName());
+        saveServerInput.setHostname(machineInfo.getSystem_info().getHostname());
         saveServerInput.setHardware(ServerMachineConverter.buildHardware(machineInfo, serversDO));
         saveServerInput.setDisks(ServerMachineConverter.buildDisk(machineInfo, serversDO));
         saveServerInput.setNetworkInterfaces(ServerMachineConverter.buildNetworkInterface(machineInfo, serversDO));
@@ -118,7 +120,7 @@ public class ClientServiceImpl implements ClientService {
         serverNetworkInterfaceRepository.deleteByIds(diffIds);
 
         // cache
-        redisUtils.delete(CacheKey.userServerList(machineId));
+        machineService.deleteUserServerCacheByServerId(machineId);
     }
 
     @Override

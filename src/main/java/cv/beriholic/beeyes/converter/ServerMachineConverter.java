@@ -9,8 +9,8 @@ import cv.beriholic.beeyes.models.dto.system.SystemInfo;
 import cv.beriholic.beeyes.models.entity.ServersDO;
 import cv.beriholic.beeyes.models.entity.dto.SaveServerInput;
 import cv.beriholic.beeyes.utils.DiffUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.lang.NonNull;
-import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,18 +19,18 @@ import java.util.Objects;
 public class ServerMachineConverter {
     public static @NonNull SaveServerInput.TargetOf_hardware buildHardware(MachineInfo machineInfo, ServersDO serversDO) {
         SaveServerInput.TargetOf_hardware hardware = new SaveServerInput.TargetOf_hardware();
-        SystemInfo systemInfo = machineInfo.getSystemInfo();
-        CPUInfo cpuInfo = machineInfo.getCpuInfo();
-        MemoryInfo memoryInfo = machineInfo.getMemoryInfo();
+        SystemInfo systemInfo = machineInfo.getSystem_info();
+        CPUInfo cpuInfo = machineInfo.getCpu_info();
+        MemoryInfo memoryInfo = machineInfo.getMemory_info();
 
-        hardware.setOsName(systemInfo.getOsName());
-        hardware.setOsVersion(String.valueOf(systemInfo.getOsVersion()));
-        hardware.setKernelVersion(String.valueOf(systemInfo.getKernelVersion()));
-        hardware.setCpuArch(systemInfo.getCpuArch());
-        hardware.setCpuCores(cpuInfo.getCoreCount());
+        hardware.setOsName(systemInfo.getOs_name());
+        hardware.setOsVersion(String.valueOf(systemInfo.getOs_version()));
+        hardware.setKernelVersion(String.valueOf(systemInfo.getKernel_version()));
+        hardware.setCpuArch(systemInfo.getCpu_arch());
+        hardware.setCpuCores(cpuInfo.getCore_count());
         hardware.setCpuName(cpuInfo.getName());
-        hardware.setTotalMemory(memoryInfo.getTotalMemory());
-        hardware.setTotalSwap(memoryInfo.getTotalSwap());
+        hardware.setTotalMemory(memoryInfo.getTotal_memory());
+        hardware.setTotalSwap(memoryInfo.getTotal_swap());
 
         if (Objects.nonNull(serversDO) && Objects.nonNull(serversDO.hardware())) {
             hardware.setId(Objects.requireNonNull(serversDO.hardware()).id());
@@ -44,11 +44,11 @@ public class ServerMachineConverter {
     }
 
     public static @NonNull List<SaveServerInput.TargetOf_disks> buildDisk(MachineInfo machineInfo, ServersDO serversDO) {
-        return machineInfo.getDiskInfo().stream().map(diskInfo -> {
+        return machineInfo.getDisk_info().stream().map(diskInfo -> {
             SaveServerInput.TargetOf_disks disk = new SaveServerInput.TargetOf_disks();
 
             disk.setDiskName(diskInfo.getName());
-            disk.setFileSystem(diskInfo.getFileSystem());
+            disk.setFileSystem(diskInfo.getFile_system());
             disk.setDiskKind(diskInfo.getKind());
             disk.setTotalBytes(diskInfo.getTotal());
 
@@ -68,7 +68,7 @@ public class ServerMachineConverter {
                     disk.setCreatedAt(existingDisk.getCreatedAt());
                     disk.setCreatedBy(existingDisk.getCreatedBy());
 
-                    String newFileSystem = DiffUtils.replaceOrNotNull(existingDisk.getFileSystem(), diskInfo.getFileSystem());
+                    String newFileSystem = DiffUtils.replaceOrNotNull(existingDisk.getFileSystem(), diskInfo.getFile_system());
                     String newDiskKind = DiffUtils.replaceOrNotNull(existingDisk.getDiskKind(), diskInfo.getKind());
                     Long newTotalBytes = DiffUtils.replaceOrNotNull(existingDisk.getTotalBytes(), diskInfo.getTotal());
 
@@ -95,7 +95,7 @@ public class ServerMachineConverter {
     }
 
     public static @NonNull List<SaveServerInput.TargetOf_networkInterfaces> buildNetworkInterface(MachineInfo machineInfo, ServersDO serversDO) {
-        return machineInfo.getNetworkInfo().getInterfaces().stream().map(networkInterface -> {
+        return machineInfo.getNetwork_info().getInterfaces().stream().map(networkInterface -> {
                     SaveServerInput.TargetOf_networkInterfaces network = new SaveServerInput.TargetOf_networkInterfaces();
 
                     network.setInterfaceName(networkInterface.getName());
@@ -124,10 +124,10 @@ public class ServerMachineConverter {
                                     Lists.newArrayList(existingInterface.getIpv6Address()),
                                     networkInterface.getIpv6()
                             );
-                            if (!CollectionUtils.isEmpty(ipv4Address)) {
+                            if (CollectionUtils.isNotEmpty(ipv4Address)) {
                                 network.setIpv4Address(ipv4Address.toArray(new String[0]));
                             }
-                            if (!CollectionUtils.isEmpty(ipv6Address)) {
+                            if (CollectionUtils.isNotEmpty(ipv6Address)) {
                                 network.setIpv6Address(ipv6Address.toArray(new String[0]));
                             }
                         } else {

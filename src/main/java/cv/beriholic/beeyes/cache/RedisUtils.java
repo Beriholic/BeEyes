@@ -1,6 +1,8 @@
-package cv.beriholic.beeyes.utils;
+package cv.beriholic.beeyes.cache;
 
+import cv.beriholic.beeyes.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.ScanOptions;
@@ -17,6 +19,46 @@ import java.util.concurrent.TimeUnit;
 public class RedisUtils {
     private final StringRedisTemplate redisTemplate;
     // -------------------key相关操作---------------------
+
+    /**
+     * 获取存储在哈希表中指定字段的值
+     *
+     * @param key   键
+     * @param field 字段
+     * @return 值
+     */
+    public <T> T hGet(String key, String field, Class<T> elementType) {
+        Object value = redisTemplate.opsForHash().get(key, field);
+        if (Objects.isNull(value)) {
+            return null;
+        }
+        if (elementType.isInstance(value)) {
+            return elementType.cast(value);
+        } else {
+            throw new ClassCastException("Expected type: " + elementType + ", but got: " + value.getClass());
+        }
+    }
+
+
+    public <T> void hSetList(String key, String filed, List<T> list) {
+        String json = JsonUtil.toJSONString(list);
+        if (StringUtils.isEmpty(json)) {
+            return;
+        }
+        redisTemplate.opsForHash().put(key, filed, json);
+    }
+
+    public <T> List<T> hGetList(String key, String filed, Class<T> elementType) {
+        Object value = redisTemplate.opsForHash().get(key, filed);
+        if (Objects.isNull(value)) {
+            return null;
+        }
+        if (value instanceof String) {
+            return JsonUtil.parseList((String) value, elementType);
+        } else {
+            throw new ClassCastException("Expected type: " + elementType + ", but got: " + value.getClass());
+        }
+    }
 
     /**
      * 删除key
@@ -161,6 +203,8 @@ public class RedisUtils {
         return redisTemplate.renameIfAbsent(oldKey, newKey);
     }
 
+    // -------------------string相关操作---------------------
+
     /**
      * 返回 key 所储存的值的类型
      *
@@ -170,8 +214,6 @@ public class RedisUtils {
     public DataType type(String key) {
         return redisTemplate.type(key);
     }
-
-    // -------------------string相关操作---------------------
 
     /**
      * 设置指定 key 的值
@@ -347,6 +389,8 @@ public class RedisUtils {
         return redisTemplate.opsForValue().increment(key, increment);
     }
 
+    // -------------------hash相关操作-------------------------
+
     /**
      * 追加到末尾
      *
@@ -356,19 +400,6 @@ public class RedisUtils {
      */
     public Integer append(String key, String value) {
         return redisTemplate.opsForValue().append(key, value);
-    }
-
-    // -------------------hash相关操作-------------------------
-
-    /**
-     * 获取存储在哈希表中指定字段的值
-     *
-     * @param key   键
-     * @param field 字段
-     * @return 值
-     */
-    public Object hGet(String key, String field) {
-        return redisTemplate.opsForHash().get(key, field);
     }
 
     /**

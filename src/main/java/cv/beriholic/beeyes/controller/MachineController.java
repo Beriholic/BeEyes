@@ -21,10 +21,10 @@ public class MachineController {
 
     @GetMapping("/list")
     public RestBean<PageDTO<List<MachineView>>> getMachineList(QueryMachineListRequest request) {
-        ValidateHelper.validatePageParma(request.getPageIndex(), request.getPageSize(), 20);
+        ValidateHelper.validateQueryMachinePageParam(request.getPageIndex(), request.getPageSize());
         long userId = StpUtil.getLoginIdAsLong();
 
-        PageDTO<List<MachineView>> machineList = machineService.queryMachineList(userId, request, MachineView.class);
+        PageDTO<List<MachineView>> machineList = machineService.queryMachineListOrderByStatus(userId, request);
         return RestBean.success(machineList);
     }
 
@@ -46,11 +46,11 @@ public class MachineController {
     }
 
     @GetMapping("/manage/list")
-    public RestBean<PageDTO<List<MachineManageView>>> getMachineManageList(QueryMachineListRequest request) {
-        ValidateHelper.validatePageParma(request.getPageIndex(), request.getPageSize(), 20);
+    public RestBean<PageDTO<List<MachineManageView>>> getMachineManageList(QueryMachineManageListRequest request) {
+        ValidateHelper.validateQueryMachinePageParam(request.getPageIndex(), request.getPageSize());
         long userId = StpUtil.getLoginIdAsLong();
 
-        PageDTO<List<MachineManageView>> machineList = machineService.queryMachineList(userId, request, MachineManageView.class);
+        PageDTO<List<MachineManageView>> machineList = machineService.queryMachineManageList(userId, request);
         return RestBean.success(machineList);
     }
 

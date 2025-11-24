@@ -1,7 +1,5 @@
 package cv.beriholic.beeyes.models.dto.system;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,7 +14,6 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class RuntimeInfo implements Serializable {
     @Serial
     private static final long serialVersionUID = -850417733986509022L;
@@ -28,20 +25,20 @@ public class RuntimeInfo implements Serializable {
     /**
      * CPU信息
      */
-    private CPUInfo cpuInfo;
+    private CPUInfo cpu_info;
 
     /**
      * 内存信息
      */
-    private MemoryInfo memoryInfo;
+    private MemoryInfo memory_info;
 
     /**
      * 磁盘信息列表
      */
-    private List<DiskInfo> diskInfo;
+    private List<DiskInfo> disk_info;
 
     /**
      * 网络信息
      */
-    private NetworkInfo networkInfo;
+    private NetworkInfo network_info;
 }

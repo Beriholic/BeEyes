@@ -1,7 +1,5 @@
 package cv.beriholic.beeyes.models.dto.system;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,7 +14,6 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class NetworkInterfaceInfo implements Serializable {
     @Serial
     private static final long serialVersionUID = -6787311378747478706L;
@@ -38,10 +35,10 @@ public class NetworkInterfaceInfo implements Serializable {
     /**
      * 上传速度（字节）
      */
-    private Long uploadSpeed;
+    private Long upload_speed;
 
     /**
      * 下载速度（字节）
      */
-    private Long downloadSpeed;
+    private Long download_speed;
 }

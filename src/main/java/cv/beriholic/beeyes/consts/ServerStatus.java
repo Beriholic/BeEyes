@@ -8,11 +8,11 @@ import java.util.Objects;
 @Getter
 @AllArgsConstructor
 public enum ServerStatus {
-    UNKNOW(0, "未知"),
-    REGISTER(1, "已注册"),
-    UNREGISTER(2, "未注册"),
-    ONLINE(3, "在线"),
-    OFFLINE(4, "离线");
+    ONLINE(0, "在线"),
+    OFFLINE(1, "离线"),
+    REGISTER(2, "已注册"),
+    UNREGISTER(3, "未注册"),
+    UNKNOW(4, "未知");
 
     private final Integer key;
     private final String desc;

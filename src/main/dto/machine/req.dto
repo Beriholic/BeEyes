@@ -15,8 +15,12 @@ input DeleteMachineRequest {
     serverId: Long
 }
 
-input QueryMachineListRequest {
+input QueryMachineManageListRequest {
     hostname: String?
+    pageIndex: Int
+    pageSize: Int
+}
+input QueryMachineListRequest {
     pageIndex: Int
     pageSize: Int
 }

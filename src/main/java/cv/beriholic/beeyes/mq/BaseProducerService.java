@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 @Slf4j
-public abstract class ProducerService {
+public abstract class BaseProducerService {
     @Resource
     private KafkaTemplate<String, MessageEntity> kafkaTemplate;
 

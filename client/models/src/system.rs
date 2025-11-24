@@ -2,6 +2,8 @@
 
 use serde::Serialize;
 use std::collections::HashSet;
+use std::thread;
+use std::time::Duration;
 use sysinfo::{Disks, Networks, System};
 
 /// System information including OS details
@@ -11,7 +13,7 @@ pub struct SystemInfo {
     pub kernel_version: String,
     pub os_version: String,
     pub cpu_arch: String,
-    pub host_name: String,
+    pub hostname: String,
 }
 
 impl SystemInfo {
@@ -21,7 +23,7 @@ impl SystemInfo {
             kernel_version: System::kernel_version().unwrap_or_else(|| "Unknown".to_owned()),
             os_version: System::os_version().unwrap_or_else(|| "Unknown".to_owned()),
             cpu_arch: System::cpu_arch(),
-            host_name: System::host_name().unwrap_or_else(|| "Unknown".to_owned()),
+            hostname: System::host_name().unwrap_or_else(|| "Unknown".to_owned()),
         }
     }
 }
@@ -130,7 +132,11 @@ impl DiskInfo {
                 }
 
                 let file_system = disk.file_system().to_str().unwrap_or("Unknown").to_owned();
-                let percent = if total > 0 { used as f64 / total as f64 } else { 0.0 };
+                let percent = if total > 0 {
+                    used as f64 / total as f64
+                } else {
+                    0.0
+                };
                 let kind = disk.kind().to_string();
 
                 Some(DiskInfo {
@@ -153,8 +159,8 @@ pub struct NetworkInterfaceInfo {
     pub name: String,
     pub ipv4: Vec<String>,
     pub ipv6: Vec<String>,
-    pub upload_speed: u64,
-    pub download_speed: u64,
+    pub upload_speed: f64,   // bytes per second
+    pub download_speed: f64, // bytes per second
 }
 
 /// Network information containing all interfaces
@@ -167,6 +173,23 @@ impl NetworkInfo {
     pub fn fetch() -> Self {
         let networks = Networks::new_with_refreshed_list();
         let mut interfaces = Vec::new();
+
+        // First measurement
+        let mut first_measurements: std::collections::HashMap<String, (u64, u64)> =
+            std::collections::HashMap::new();
+
+        for (interface_name, network) in &networks {
+            first_measurements.insert(
+                interface_name.clone(),
+                (network.total_transmitted(), network.total_received()),
+            );
+        }
+
+        // Sleep for 1 second to measure speed
+        thread::sleep(Duration::from_secs(1));
+
+        // Refresh and take second measurement
+        let networks = Networks::new_with_refreshed_list();
 
         for (interface_name, network) in &networks {
             let mut ipv4 = Vec::new();
@@ -184,10 +207,28 @@ impl NetworkInfo {
                 }
             });
 
+            let current_transmitted = network.total_transmitted();
+            let current_received = network.total_received();
+
+            // Calculate speeds based on 1-second difference
+            let (upload_speed, download_speed) = if let Some((prev_transmitted, prev_received)) =
+                first_measurements.get(interface_name)
+            {
+                let upload_diff = current_transmitted.saturating_sub(*prev_transmitted) as f64;
+                let download_diff = current_received.saturating_sub(*prev_received) as f64;
+
+                (
+                    upload_diff,   // bytes per second (over 1 second)
+                    download_diff, // bytes per second (over 1 second)
+                )
+            } else {
+                (0.0, 0.0)
+            };
+
             interfaces.push(NetworkInterfaceInfo {
                 name: interface_name.to_owned(),
-                upload_speed: network.total_transmitted(),
-                download_speed: network.total_received(),
+                upload_speed,
+                download_speed,
                 ipv4,
                 ipv6,
             });

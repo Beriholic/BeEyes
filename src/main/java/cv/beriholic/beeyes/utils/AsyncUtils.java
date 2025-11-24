@@ -24,5 +24,6 @@ public class AsyncUtils {
                 }
             }
         }
+        throw new RuntimeException("Operation timed out after " + maxRetries + " attempts");
     }
 }

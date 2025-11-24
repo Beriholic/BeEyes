@@ -2,25 +2,25 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { RestBean_RuntimeInfo } from '../models/RestBean_RuntimeInfo';
+import type { QueryMachineRuntimeInfoRequest } from '../models/QueryMachineRuntimeInfoRequest';
+import type { RestBean_List_RuntimeInfoDTO } from '../models/RestBean_List_RuntimeInfoDTO';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 export class MetricControllerService {
     /**
-     * @param id
-     * @returns RestBean_RuntimeInfo OK
+     * @param requestBody
+     * @returns RestBean_List_RuntimeInfoDTO OK
      * @throws ApiError
      */
-    public static getMachineCurrentRuntimeInfo(
-        id: string,
-    ): CancelablePromise<RestBean_RuntimeInfo> {
+    public static queryMachineRuntimeInfo(
+        requestBody: QueryMachineRuntimeInfoRequest,
+    ): CancelablePromise<RestBean_List_RuntimeInfoDTO> {
         return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/v1/metric/runtime/current/{id}',
-            path: {
-                'id': id,
-            },
+            method: 'POST',
+            url: '/api/v1/metric/runtime/current',
+            body: requestBody,
+            mediaType: 'application/json',
         });
     }
 }

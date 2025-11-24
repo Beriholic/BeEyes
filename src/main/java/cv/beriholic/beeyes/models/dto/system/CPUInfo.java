@@ -1,7 +1,5 @@
 package cv.beriholic.beeyes.models.dto.system;
 
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,7 +13,6 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CPUInfo implements Serializable {
     @Serial
     private static final long serialVersionUID = -6246748910140336685L;
@@ -27,7 +24,7 @@ public class CPUInfo implements Serializable {
     /**
      * 核心数
      */
-    private Integer coreCount;
+    private Integer core_count;
 
     /**
      * CPU使用率

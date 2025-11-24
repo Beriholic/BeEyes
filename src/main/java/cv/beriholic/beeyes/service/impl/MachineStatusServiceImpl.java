@@ -1,13 +1,14 @@
 package cv.beriholic.beeyes.service.impl;
 
-import cv.beriholic.beeyes.consts.CacheKey;
+import cv.beriholic.beeyes.cache.CacheKey;
+import cv.beriholic.beeyes.cache.RedisUtils;
 import cv.beriholic.beeyes.consts.ServerStatus;
 import cv.beriholic.beeyes.models.dto.ServerStatusDTO;
+import cv.beriholic.beeyes.models.dto.ServerStatusUpdatedDTO;
+import cv.beriholic.beeyes.mq.ServerStatusProducerService;
 import cv.beriholic.beeyes.repository.ServersRepository;
 import cv.beriholic.beeyes.service.MachineStatusService;
-import cv.beriholic.beeyes.utils.AsyncUtils;
 import cv.beriholic.beeyes.utils.JsonUtil;
-import cv.beriholic.beeyes.utils.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -16,28 +17,32 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class MachineStatusServiceImpl implements MachineStatusService {
+    private final ServerStatusProducerService serverStatusProducerService;
     private final ServersRepository serversRepository;
     private final RedisUtils redisUtils;
-    private final Executor virtualThreadExecutor = Executors.newVirtualThreadPerTaskExecutor();
 
 
     @Override
-    public void setServerStatus(Long id, ServerStatus status) {
-        ServerStatusDTO statusDTO = getServerStatus(id);
-        if (statusDTO.isStatusUpdated(status)) {
-            return;
+    public void setServerStatus(Long id, ServerStatusDTO oldStatus, ServerStatus newStatus) {
+        if (!Objects.equals(oldStatus.getCurrentStatus(), newStatus.getKey())) {
+            ServerStatusDTO statusDTO = ServerStatusDTO.of(newStatus);
+            redisUtils.set(CacheKey.machineStatus(id), JsonUtil.toJSONString(statusDTO), 1, TimeUnit.HOURS);
+            ServerStatusUpdatedDTO updatedStatus = new ServerStatusUpdatedDTO(id, newStatus.getKey());
+            serverStatusProducerService.pushUpdateServerStatus(updatedStatus);
         }
-        statusDTO.updateStatus(status);
-        redisUtils.set(CacheKey.machineStatus(id), JsonUtil.toJSONString(statusDTO));
-        asyncStatusSyncToDB(id, status);
+    }
+
+    @Override
+    public void setServerStatus(Long id, ServerStatus status) {
+        ServerStatusDTO statusDTO = ServerStatusDTO.of(status);
+        redisUtils.set(CacheKey.machineStatus(id), JsonUtil.toJSONString(statusDTO), 1, TimeUnit.HOURS);
+        serversRepository.updateStatus(id, status);
     }
 
     @Override
@@ -53,28 +58,15 @@ public class MachineStatusServiceImpl implements MachineStatusService {
         return serverStatusDTO;
     }
 
-    private void asyncStatusSyncToDB(Long id, ServerStatus status) {
-        CompletableFuture.runAsync(() -> {
-                    AsyncUtils.withRetry(
-                            () -> serversRepository.updateStatus(id, status),
-                            3,
-                            1000L
-                    );
-                },
-                virtualThreadExecutor
-        );
-    }
-
-
     @Scheduled(fixedDelay = 30000)
     public void syncServerStatus() {
         List<Long> allIds = serversRepository.getAllIds();
         allIds.forEach(id -> {
-            ServerStatusDTO serverStatus = getServerStatus(id);
-            if (Objects.equals(serverStatus.getCurrentStatus(), ServerStatus.ONLINE.getKey())
-                    && serverStatus.isNotUpdatedForHalfMinute()
+            ServerStatusDTO oldStatus = getServerStatus(id);
+            if (Objects.equals(oldStatus.getCurrentStatus(), ServerStatus.ONLINE.getKey())
+                    && oldStatus.isNotUpdatedForHalfMinute()
             ) {
-                setServerStatus(id, ServerStatus.OFFLINE);
+                setServerStatus(id, oldStatus, ServerStatus.OFFLINE);
             }
         });
     }

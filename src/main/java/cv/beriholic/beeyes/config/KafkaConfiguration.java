@@ -19,5 +19,10 @@ public class KafkaConfiguration {
     public NewTopic machineRuntimeMetricTopic() {
         return new NewTopic(KafkaTopic.MACHINE_RUNTIME_METRIC, 3, (short) 1);
     }
+
+    @Bean
+    public NewTopic serverStatusUpdatedTopic() {
+        return new NewTopic(KafkaTopic.SERVER_STATUS_UPDATED, 3, (short) 1);
+    }
 }
 

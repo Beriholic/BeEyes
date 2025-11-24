@@ -13,7 +13,7 @@ export type CPUInfo = {
     /**
      * 核心数
      */
-    coreCount?: number | null;
+    core_count?: number | null;
     /**
      * CPU使用率
      */

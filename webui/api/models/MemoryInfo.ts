@@ -9,34 +9,34 @@ export type MemoryInfo = {
     /**
      * 总内存（字节）
      */
-    totalMemory?: number | null;
+    total_memory?: number | null;
     /**
      * 已使用内存（字节）
      */
-    usedMemory?: number | null;
+    used_memory?: number | null;
     /**
      * 可用内存（字节）
      */
-    freeMemory?: number | null;
+    free_memory?: number | null;
     /**
      * 总交换分区（字节）
      */
-    totalSwap?: number | null;
+    total_swap?: number | null;
     /**
      * 已使用交换分区（字节）
      */
-    usedSwap?: number | null;
+    used_swap?: number | null;
     /**
      * 可用交换分区（字节）
      */
-    freeSwap?: number | null;
+    free_swap?: number | null;
     /**
      * 内存使用百分比
      */
-    percentMemory?: number | null;
+    percent_memory?: number | null;
     /**
      * 交换分区使用百分比
      */
-    percentSwap?: number | null;
+    percent_swap?: number | null;
 };
 

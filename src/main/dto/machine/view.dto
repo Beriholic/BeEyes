@@ -63,3 +63,9 @@ MachineManageView {
     region
     apiKey
 }
+
+UserIdListUnderServerView {
+    users {
+        id
+    }
+}

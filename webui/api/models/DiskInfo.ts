@@ -13,7 +13,7 @@ export type DiskInfo = {
     /**
      * 文件系统类型
      */
-    fileSystem?: string;
+    file_system?: string;
     /**
      * 总空间（字节）
      */

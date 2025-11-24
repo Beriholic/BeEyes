@@ -9,18 +9,9 @@
  *
  */
 export type AuthLoginRequest = {
-    /**
-     * 用户名（唯一）
-     */
-    username?: string;
-    /**
-     * 邮箱地址（唯一）
-     */
-    email?: string;
-    /**
-     * 手机号
-     */
-    phone?: string | null;
+    username?: string | null;
     password?: string;
+    email?: string | null;
+    phone?: string | null;
 };
 
