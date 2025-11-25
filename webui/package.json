@@ -10,19 +10,24 @@
     "api-gen": "bunx openapi-typescript-codegen --input http://localhost:8080/swagger/openapi.yml --output ./api --exportCore false"
   },
   "dependencies": {
+    "@xterm/addon-fit": "^0.10.0",
+    "@xterm/xterm": "^5.5.0",
     "lucide-react": "^0.554.0",
     "next": "16.0.3",
     "react": "19.2.0",
     "react-country-flag": "^3.1.0",
     "react-dom": "19.2.0",
     "react-jdenticon": "^1.5.0",
-    "react-select-country-list": "^2.2.3"
+    "react-select-country-list": "^2.2.3",
+    "xterm": "^5.3.0",
+    "xterm-addon-fit": "^0.8.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/xterm": "^3.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.3",
     "openapi-typescript-codegen": "^0.29.0",

@@ -98,14 +98,21 @@ public abstract class BaseRepository<E, T extends TableProxy<E>, D> extends Abst
                 .fetchPage(pageIndex, pageSize);
     }
 
-    public <V extends View<E>> List<V> findBySpec(Class<V> viewType, JSpecification<E, T> spec) {
+    public <V extends View<E>> List<V> findBySpec(JSpecification<E, T> spec, Class<V> viewType) {
         return createQuery()
                 .where(spec)
                 .select(table.fetch(viewType))
                 .execute();
     }
 
-    public <V extends View<E>> List<V> findBySpec(Class<V> viewType, PageDTO<? extends JSpecification<E, T>> pageDTO) {
+    public <V extends View<E>> V findBySpecOne(JSpecification<E, T> spec, Class<V> viewType) {
+        return createQuery()
+                .where(spec)
+                .select(table.fetch(viewType))
+                .fetchOneOrNull();
+    }
+
+    public <V extends View<E>> List<V> findBySpec(PageDTO<? extends JSpecification<E, T>> pageDTO, Class<V> viewType) {
         return createQuery()
                 .where(pageDTO.getData())
                 .select(table.fetch(viewType))

@@ -56,6 +56,8 @@ dependencies {
     implementation("com.influxdb:influxdb-client-java:6.6.0")
     implementation("org.apache.commons:commons-collections4:4.5.0")
     implementation("com.github.ben-manes.caffeine:caffeine:3.2.3")
+    implementation("com.github.mwiede:jsch:2.27.5")
+    implementation("org.springframework.boot:spring-boot-starter-websocket")
 }
 
 tasks.withType<Test> {

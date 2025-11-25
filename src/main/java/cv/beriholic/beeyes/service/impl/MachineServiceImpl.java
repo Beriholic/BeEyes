@@ -7,19 +7,26 @@ import cv.beriholic.beeyes.cache.RedisUtils;
 import cv.beriholic.beeyes.consts.KafkaGroup;
 import cv.beriholic.beeyes.consts.KafkaTopic;
 import cv.beriholic.beeyes.consts.ServerStatus;
+import cv.beriholic.beeyes.exception.BizRuntimeException;
+import cv.beriholic.beeyes.exception.ErrorCode;
+import cv.beriholic.beeyes.models.dto.MachineIPAddressDTO;
 import cv.beriholic.beeyes.models.dto.MessageEntity;
 import cv.beriholic.beeyes.models.dto.PageDTO;
 import cv.beriholic.beeyes.models.dto.ServerStatusUpdatedDTO;
 import cv.beriholic.beeyes.models.entity.dto.*;
+import cv.beriholic.beeyes.repository.ServerNetworkInterfaceRepository;
 import cv.beriholic.beeyes.repository.ServersRepository;
+import cv.beriholic.beeyes.repository.SshConnectionsRepository;
 import cv.beriholic.beeyes.repository.UserRepository;
 import cv.beriholic.beeyes.service.MachineService;
+import cv.beriholic.beeyes.utils.EncryptUtils;
 import cv.beriholic.beeyes.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.babyfish.jimmer.Page;
 import org.babyfish.jimmer.sql.ast.mutation.SaveMode;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +42,12 @@ public class MachineServiceImpl implements MachineService {
     private final ServersRepository serversRepository;
     private final RedisUtils redisUtils;
     private final UserRepository userRepository;
+    private final SshConnectionsRepository sshConnectionsRepository;
+    private final ServerNetworkInterfaceRepository serverNetworkInterfaceRepository;
+
+    @Value("${encrypt.key}")
+    private String encryptKey;
+
 
     @Override
     public void createMachine(Long userId, CreateMachineRequest request) {
@@ -124,6 +137,91 @@ public class MachineServiceImpl implements MachineService {
                 page.getTotalRowCount(),
                 page.getTotalPageCount()
         );
+    }
+
+    @Override
+    public MachineSSHInfoView getMachineSSHInfoView(Long userId, Long serverId) {
+        try {
+            QueryUserServerSSHConfigSpec spec = new QueryUserServerSSHConfigSpec();
+            spec.setServerId(serverId);
+            spec.setUserId(userId);
+            MachineSSHInfoView view = sshConnectionsRepository.findBySpecOne(spec, MachineSSHInfoView.class);
+            if (Objects.isNull(view)) {
+                return null;
+            }
+            view.setPassword(
+                    EncryptUtils.aesDecrypt(view.getPassword(), encryptKey)
+            );
+
+            MachineIPAddressDTO machineIPAddressDTO = serverNetworkInterfaceRepository.queryMachineIPAddress(serverId);
+            view.setIpv4(machineIPAddressDTO.getIpv4());
+            view.setIpv6(machineIPAddressDTO.getIpv6());
+            return view;
+        } catch (Exception e) {
+            throw new BizRuntimeException(ErrorCode.SYSTEM_ERROR.getCode(), e.getMessage());
+        }
+    }
+
+    @Override
+    public void updateLastConnectTime(long clientId, Long userId) {
+        sshConnectionsRepository.updateLastConnectTime(clientId, userId);
+    }
+
+    @Override
+    public PageDTO<List<MachineTerminalListView>> queryMachineTerminalList(Long userId, QueryMachineTerminalListRequest request) {
+        QueryServerSpec spec = new QueryServerSpec();
+        spec.setHostname(request.getHostname());
+        spec.setUserId(userId);
+        Page<MachineTerminalListView> page = serversRepository.findBySpecFetchPage(
+                spec,
+                request.getPageIndex(),
+                request.getPageSize(),
+                MachineTerminalListView.class
+        );
+
+        return PageDTO.of(
+                page.getRows(),
+                request.getPageIndex(),
+                request.getPageSize(),
+                page.getTotalRowCount(),
+                page.getTotalPageCount()
+        );
+    }
+
+    @Override
+    public void updateMachineSSHConfig(Long userId, UpdateSSHConfigRequest request) {
+        UpdateMachineSSHConfigInput input = buildUpdateMachineSSHConfigInput(userId, request);
+        sshConnectionsRepository.save(input, SaveMode.UPSERT);
+    }
+
+    private UpdateMachineSSHConfigInput buildUpdateMachineSSHConfigInput(Long userId, UpdateSSHConfigRequest request) {
+        try {
+            UpdateMachineSSHConfigInput input = new UpdateMachineSSHConfigInput();
+            input.setServerId(request.getServerId());
+            input.setUserId(userId);
+            input.setName(request.getName());
+            input.setPort(request.getPort());
+            input.setPassword(
+                    EncryptUtils.aesDecrypt(request.getPassword(), encryptKey)
+            );
+            return input;
+        } catch (Exception e) {
+            throw new BizRuntimeException(ErrorCode.SYSTEM_ERROR.getCode(), e.getMessage());
+        }
+    }
+
+    private SaveMachineSSHConfigInput buildSaveMachineSSHConfigInput(Long userId, CreateSSHConfigRequest request) {
+        try {
+            SaveMachineSSHConfigInput input = new SaveMachineSSHConfigInput();
+            input.setServerId(request.getServerId());
+            input.setUserId(userId);
+            input.setName(request.getName());
+            input.setPort(request.getPort());
+            input.setPassword(EncryptUtils.aesEncrypt(request.getPassword(), encryptKey));
+            return input;
+        } catch (Exception e) {
+            throw new BizRuntimeException(ErrorCode.SYSTEM_ERROR.getCode(), e.getMessage());
+        }
     }
 
     private UpdateServerInfoInput buildUpdateServerInfoInput(UpdateMachineRequest request) {

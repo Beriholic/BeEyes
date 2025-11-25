@@ -1,0 +1,12 @@
+export cv.beriholic.beeyes.models.entity.SshConnectionsDO
+
+MachineSSHInfoView {
+    serverId
+    userId
+    name
+    password
+    port
+    ipv4: Array<String>
+    ipv6: Array<String>
+}
+

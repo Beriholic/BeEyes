@@ -22,7 +22,10 @@ public enum ErrorCode {
     KAFKA_TOPIC_NOT_FOUND(70004, "Kafka主题不存在"),
     KAFKA_SERIALIZATION_ERROR(70005, "Kafka消息序列化失败"),
     KAFKA_BATCH_SEND_FAILED(70006, "Kafka批量发送失败"),
-    RECORD_NOT_FOUND(80001, "记录未找到");
+    RECORD_NOT_FOUND(80001, "记录未找到"),
+    RECORD_DUPLICATION(80002, "记录已存在"),
+    SSH_CONNECT_FAILED(90001, "SSH 连接失败"),
+    ;
 
     private final Integer code;
     private final String msg;

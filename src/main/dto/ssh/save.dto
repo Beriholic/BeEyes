@@ -1,0 +1,9 @@
+export cv.beriholic.beeyes.models.entity.SshConnectionsDO
+
+input SaveMachineSSHConfigInput {
+    serverId
+    userId
+    name
+    port
+    password
+}

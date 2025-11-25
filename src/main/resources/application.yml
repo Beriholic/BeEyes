@@ -107,3 +107,6 @@ influx-db:
   token: ${INFLUXDB_TOKEN}
   bucket: ${INFLUXDB_BUCKET}
   org: ${INFLUXDB_ORG}
+
+encrypt:
+  key: edw56sw57wgh8ui9 # length 16

@@ -69,3 +69,10 @@ UserIdListUnderServerView {
         id
     }
 }
+
+MachineTerminalListView {
+    id
+    hostname
+    region
+    description
+}

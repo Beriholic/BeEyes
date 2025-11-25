@@ -19,4 +19,12 @@ public interface MachineService {
     PageDTO<List<MachineManageView>> queryMachineManageList(long userId, QueryMachineManageListRequest request);
 
     PageDTO<List<MachineView>> queryMachineListOrderByStatus(long userId, QueryMachineListRequest request);
+
+    MachineSSHInfoView getMachineSSHInfoView(Long userId, Long serverId);
+
+    void updateLastConnectTime(long clientId, Long userId);
+
+    PageDTO<List<MachineTerminalListView>> queryMachineTerminalList(Long userId, QueryMachineTerminalListRequest request);
+
+    void updateMachineSSHConfig(Long userId, UpdateSSHConfigRequest request);
 }

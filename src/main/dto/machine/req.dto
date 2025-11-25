@@ -24,3 +24,9 @@ input QueryMachineListRequest {
     pageIndex: Int
     pageSize: Int
 }
+
+input QueryMachineTerminalListRequest {
+    hostname: String?
+    pageIndex: Int
+    pageSize: Int
+}
