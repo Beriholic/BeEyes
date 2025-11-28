@@ -48,7 +48,8 @@ export function TerminalWindow({
 
     // Determine WebSocket protocol based on current page protocol
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const wsUrl = `${protocol}//${window.location.host}/terminal/${serverId}/${token}`;
+    const host = window.location.host;
+    const wsUrl = `${protocol}//${host}/terminal/${serverId}/${token}`;
 
     try {
       const ws = new WebSocket(wsUrl);
@@ -72,10 +73,14 @@ export function TerminalWindow({
         setErrorMessage("WebSocket 连接错误");
       };
 
-      ws.onclose = () => {
+      ws.onclose = (event) => {
         setConnectionStatus("disconnected");
         if (xtermRef.current) {
-          xtermRef.current.write("\r\n\x1b[33m连接已断开\x1b[0m\r\n");
+          let reason = "连接已断开";
+          if (event.reason) {
+            reason += `: ${event.reason}`;
+          }
+          xtermRef.current.write(`\r\n\x1b[33m${reason}\x1b[0m\r\n`);
         }
       };
     } catch (err) {

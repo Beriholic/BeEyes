@@ -60,6 +60,6 @@ public class SaTokenConfiguration implements WebMvcConfigurer {
                     .check(staff -> StpUtil.checkLogin());
 
 
-        })).addPathPatterns("/**");
+        })).addPathPatterns("/**").excludePathPatterns("/terminal/**");
     }
 }

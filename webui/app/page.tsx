@@ -344,13 +344,19 @@ export default function HomePage() {
 
                     return (
                       <Fragment key={machine.id ?? machine.hostname}>
-                        <tr className="hover:bg-white/5 whitespace-nowrap">
+                        <tr className="hover:bg-white/5">
                           <td className="px-6 py-4">
                             <div className="font-semibold text-white">
                               {machine.hostname ?? "-"}
                             </div>
-                            <div className="text-xs text-slate-400">
-                              ID: {machine.id ?? "未知"}
+                            <div className="mt-0.5 text-xs text-slate-400">
+                              {machine.osName} {machine.osVersion}
+                            </div>
+                            <div className="text-xs text-slate-500">
+                              {machine.kernelVersion}
+                            </div>
+                            <div className="text-xs text-slate-500">
+                              {machine.id ?? "未知"}
                             </div>
                           </td>
                           <td className="px-6 py-4">

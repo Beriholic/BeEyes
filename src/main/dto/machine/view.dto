@@ -27,6 +27,12 @@ MachineView {
 
     lastSeen
 
+    osName
+
+    osVersion
+
+    kernelVersion
+
     hardware {
         cpuName
 

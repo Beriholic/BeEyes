@@ -1,6 +1,7 @@
 package cv.beriholic.beeyes.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
+import cv.beriholic.beeyes.helper.ValidateHelper;
 import cv.beriholic.beeyes.models.dto.PageDTO;
 import cv.beriholic.beeyes.models.dto.RestBean;
 import cv.beriholic.beeyes.models.entity.dto.MachineTerminalListView;
@@ -20,6 +21,7 @@ public class TerminalController {
 
     @PutMapping("/ssh-config/update")
     public RestBean<Void> updateSSHConfig(@RequestBody UpdateSSHConfigRequest request) {
+        ValidateHelper.validateUpdateSSHConfigRequest(request);
         Long userId = StpUtil.getLoginIdAsLong();
         machineService.updateMachineSSHConfig(userId, request);
         return RestBean.success();

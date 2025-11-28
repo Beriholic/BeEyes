@@ -32,6 +32,18 @@ export type MachineView = {
      * 最后在线时间
      */
     lastSeen?: string | null;
+    /**
+     * 系统名称
+     */
+    osName?: string | null;
+    /**
+     * 系统版本
+     */
+    osVersion?: string | null;
+    /**
+     * 内核版本
+     */
+    kernelVersion?: string | null;
     hardware?: MachineView_TargetOf_hardware | null;
     disks?: Array<MachineView_TargetOf_disks>;
     networkInterfaces?: Array<MachineView_TargetOf_networkInterfaces>;

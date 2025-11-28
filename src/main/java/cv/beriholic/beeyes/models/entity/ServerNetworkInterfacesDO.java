@@ -47,5 +47,6 @@ public interface ServerNetworkInterfacesDO extends BaseDO {
 
     @ManyToOne
     @JoinColumn(name = "server_id")
+    @OnDissociate(DissociateAction.DELETE)
     ServersDO server();
 }

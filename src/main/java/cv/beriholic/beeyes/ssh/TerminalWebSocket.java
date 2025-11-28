@@ -12,6 +12,9 @@ import jakarta.websocket.*;
 import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -21,8 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Properties;
 
 @Slf4j
 @Component
@@ -30,7 +32,13 @@ import java.util.concurrent.Executors;
 public class TerminalWebSocket {
     private final static Map<Session, Shell> sessionMap = Maps.newConcurrentMap();
     private static MachineService machineService;
-    private final ExecutorService service = Executors.newSingleThreadExecutor();
+    private static ThreadPoolTaskExecutor executor;
+
+    @Autowired
+    @Qualifier("ioIntensiveExecutor")
+    public void setExecutor(ThreadPoolTaskExecutor executor) {
+        TerminalWebSocket.executor = executor;
+    }
 
     @Resource
     public void setMachineService(MachineService machineService) {
@@ -38,11 +46,7 @@ public class TerminalWebSocket {
     }
 
     @OnOpen
-    public void onOpen(
-            Session session,
-            @PathParam("machineId") long machineId,
-            @PathParam("token") String token
-    ) throws IOException {
+    public void onOpen(Session session, @PathParam("machineId") long machineId, @PathParam("token") String token) throws IOException {
         Object id = StpUtil.getLoginIdByToken(token);
         if (token.isBlank() || Objects.isNull(id)) {
             session.close(new CloseReason(CloseReason.CloseCodes.CANNOT_ACCEPT, "未登陆或登陆已过期"));
@@ -50,82 +54,94 @@ public class TerminalWebSocket {
         }
         Long userId = Long.valueOf((String) id);
         MachineSSHInfoView machineSSHInfoView = machineService.getMachineSSHInfoView(userId, machineId);
+
         if (Objects.isNull(machineSSHInfoView)) {
             session.close(new CloseReason(CloseReason.CloseCodes.CANNOT_ACCEPT, "服务器异常或未配置连接信息"));
             return;
         }
 
+        boolean connected = false;
+
         for (String ipv4 : machineSSHInfoView.getIpv4()) {
-            if (this.createSSHConnection(session, machineSSHInfoView, ipv4)) {
-                service.submit(() -> machineService.updateLastConnectTime(machineId, userId));
-                log.info("主机 {} SSH连接创建成功[ipv4={}]", machineId, ipv4);
-            }
-        }
-        for (String ipv6 : machineSSHInfoView.getIpv6()) {
-            if (this.createSSHConnection(session, machineSSHInfoView, ipv6)) {
-                service.submit(() -> machineService.updateLastConnectTime(machineId, userId));
-                log.info("主机 {} SSH连接创建成功[ipv6={}]", machineId, ipv6);
-                return;
+            String ip = ipv4.contains("/") ? ipv4.split("/")[0] : ipv4;
+            if (this.createSSHConnection(session, machineSSHInfoView, ip)) {
+                connected = true;
+                log.info("主机 {} SSH连接创建成功[ipv4={}]", machineId, ip);
+                break;
             }
         }
 
+        if (!connected) {
+            for (String ipv6 : machineSSHInfoView.getIpv6()) {
+                String ip = ipv6.contains("/") ? ipv6.split("/")[0] : ipv6;
+                if (this.createSSHConnection(session, machineSSHInfoView, ip)) {
+                    connected = true;
+                    log.info("主机 {} SSH连接创建成功[ipv6={}]", machineId, ip);
+                    break;
+                }
+            }
+        }
+
+        if (connected) {
+            executor.submit(() -> machineService.updateLastConnectTime(machineId, userId));
+        } else {
+            session.close(new CloseReason(CloseReason.CloseCodes.CANNOT_ACCEPT, "无法连接到主机，请检查网络或配置"));
+        }
     }
 
     @OnMessage
     public void onMessage(Session session, String message) throws IOException {
         Shell shell = sessionMap.get(session);
-        OutputStream outputStream = shell.outputStream;
-        outputStream.write(message.getBytes(StandardCharsets.UTF_8));
-        outputStream.flush();
+        if (shell != null && shell.channel.isConnected()) {
+            OutputStream outputStream = shell.outputStream;
+            outputStream.write(message.getBytes(StandardCharsets.UTF_8));
+            outputStream.flush();
+        }
     }
 
     @OnClose
-    public void onClose(Session session) throws IOException {
-        Shell shell = sessionMap.get(session);
-        if (Objects.nonNull(shell)) {
+    public void onClose(Session session) {
+        Shell shell = sessionMap.remove(session);
+        if (shell != null) {
             shell.close();
-            sessionMap.remove(session);
-            log.info("主机 {} SSH 连接已断开", shell.jsession.getHost());
+            log.info("主机 SSH 连接已断开");
         }
     }
 
     @OnError
-    public void onError(Session session, Throwable error) throws IOException {
+    public void onError(Session session, Throwable error) {
         log.error("WebSocket 连接出错: ", error);
-        session.close();
+        onClose(session);
     }
-
 
     private boolean createSSHConnection(Session session, MachineSSHInfoView view, String ip) throws IOException {
         JSch jSch = new JSch();
         try {
             com.jcraft.jsch.Session jsession = jSch.getSession(view.getName(), ip, view.getPort());
+            Properties config = new Properties();
+
+            config.put("StrictHostKeyChecking", "no");
+
             jsession.setPassword(view.getPassword());
-            jsession.setConfig("StrictHostKeyChecking", "no");
-            jsession.setTimeout(3000);
+            jsession.setConfig(config);
+
+            jsession.setTimeout(10000);
+
             jsession.connect();
+
             ChannelShell channel = (ChannelShell) jsession.openChannel("shell");
             channel.setPtyType("xterm");
-            channel.connect(1000);
+            channel.connect(5000);
+
             sessionMap.put(session, new Shell(session, jsession, channel));
             return true;
         } catch (JSchException e) {
-            String message = e.getMessage();
-            if (message.equals("Auth fail")) {
-                session.close(new CloseReason(CloseReason.CloseCodes.CANNOT_ACCEPT, "SSH 连接失败，用户名或密码错误"));
-                log.error("SSH 连接失败，用户名或密码错误");
-            } else if (message.equals("Connection refused")) {
-                session.close(new CloseReason(CloseReason.CloseCodes.CANNOT_ACCEPT, "拒绝连接，请检查 SSH 端口是否开放"));
-                log.error("拒绝连接，请检查 SSH 端口是否开放");
-            } else {
-                session.close(new CloseReason(CloseReason.CloseCodes.CANNOT_ACCEPT, message));
-                log.error("SSH 连接出错: ", e);
-            }
+            log.warn("尝试连接 {} 失败: {}", ip, e.getMessage());
         }
         return false;
     }
 
-    private class Shell {
+    private static class Shell {
         public final Session session;
         public final com.jcraft.jsch.Session jsession;
         public final ChannelShell channel;
@@ -138,28 +154,37 @@ public class TerminalWebSocket {
             this.channel = channel;
             this.inputStream = channel.getInputStream();
             this.outputStream = channel.getOutputStream();
-            service.submit(this::read);
+
+            executor.submit(this::read);
         }
 
         public void read() {
+            byte[] buffer = new byte[1024];
+            int i;
             try {
-                byte[] buffer = new byte[1024 * 1024];
-                int i;
                 while ((i = inputStream.read(buffer)) != -1) {
-                    String text = new String(Arrays.copyOfRange(buffer, 0, i), StandardCharsets.UTF_8);
-                    session.getBasicRemote().sendText(text);
+                    synchronized (session) {
+                        session.getBasicRemote().sendText(new String(Arrays.copyOfRange(buffer, 0, i), StandardCharsets.UTF_8));
+                    }
                 }
             } catch (Exception e) {
-                log.error("读取 SSH InputStream 时出现问题: ", e);
+                if (!"Socket closed".equals(e.getMessage())) {
+                    log.error("读取 SSH InputStream 时出现问题: ", e);
+                }
+            } finally {
+                this.close();
             }
         }
 
-        public void close() throws IOException {
-            inputStream.close();
-            outputStream.close();
-            channel.disconnect();
-            jsession.disconnect();
-            service.shutdown();
+        public void close() {
+            try {
+                if (inputStream != null) inputStream.close();
+                if (outputStream != null) outputStream.close();
+                if (channel != null) channel.disconnect();
+                if (jsession != null) jsession.disconnect();
+            } catch (IOException e) {
+                log.error("关闭资源出错", e);
+            }
         }
     }
 }

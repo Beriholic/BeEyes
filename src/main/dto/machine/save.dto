@@ -7,6 +7,12 @@ input SaveServerInput {
 
     status
 
+    osName
+
+    osVersion
+
+    kernelVersion
+
     disks {
         #allScalars
     }

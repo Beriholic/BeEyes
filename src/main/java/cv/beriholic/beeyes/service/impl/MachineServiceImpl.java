@@ -63,6 +63,7 @@ public class MachineServiceImpl implements MachineService {
     public void deleteMachine(Long userId, DeleteMachineRequest request) {
         //TODO check 权限
         serversRepository.deleteById(request.getServerId());
+        sshConnectionsRepository.deleteById(request.getServerId());
         redisUtils.delete(CacheKey.machineStatus(request.getServerId()));
     }
 
@@ -202,22 +203,8 @@ public class MachineServiceImpl implements MachineService {
             input.setName(request.getName());
             input.setPort(request.getPort());
             input.setPassword(
-                    EncryptUtils.aesDecrypt(request.getPassword(), encryptKey)
+                    EncryptUtils.aesEncrypt(request.getPassword(), encryptKey)
             );
-            return input;
-        } catch (Exception e) {
-            throw new BizRuntimeException(ErrorCode.SYSTEM_ERROR.getCode(), e.getMessage());
-        }
-    }
-
-    private SaveMachineSSHConfigInput buildSaveMachineSSHConfigInput(Long userId, CreateSSHConfigRequest request) {
-        try {
-            SaveMachineSSHConfigInput input = new SaveMachineSSHConfigInput();
-            input.setServerId(request.getServerId());
-            input.setUserId(userId);
-            input.setName(request.getName());
-            input.setPort(request.getPort());
-            input.setPassword(EncryptUtils.aesEncrypt(request.getPassword(), encryptKey));
             return input;
         } catch (Exception e) {
             throw new BizRuntimeException(ErrorCode.SYSTEM_ERROR.getCode(), e.getMessage());

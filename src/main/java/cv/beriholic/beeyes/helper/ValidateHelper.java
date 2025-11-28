@@ -1,6 +1,7 @@
 package cv.beriholic.beeyes.helper;
 
 import cv.beriholic.beeyes.models.entity.dto.AuthLoginRequest;
+import cv.beriholic.beeyes.models.entity.dto.UpdateSSHConfigRequest;
 import org.apache.commons.lang3.StringUtils;
 
 public class ValidateHelper {
@@ -23,6 +24,14 @@ public class ValidateHelper {
                 && StringUtils.isEmpty(request.getEmail())
         ) {
             throw new IllegalArgumentException("Login condition cannot be empty");
+        }
+    }
+
+    public static void validateUpdateSSHConfigRequest(UpdateSSHConfigRequest request) {
+        if (StringUtils.isEmpty(request.getName())
+                || StringUtils.isEmpty(request.getPassword())
+        ) {
+            throw new IllegalArgumentException("Name or Password cannot be empty");
         }
     }
 }

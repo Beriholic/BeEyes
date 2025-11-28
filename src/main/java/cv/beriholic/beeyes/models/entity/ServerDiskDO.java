@@ -51,6 +51,7 @@ public interface ServerDiskDO extends BaseDO {
     long totalBytes();
 
     @ManyToOne
+    @OnDissociate(DissociateAction.DELETE)
     @JoinColumn(name = "server_id")
     ServersDO server();
 }

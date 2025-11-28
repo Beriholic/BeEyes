@@ -89,7 +89,7 @@ public class ClientServiceImpl implements ClientService {
         }
 
         saveServerInput.setId(machineId);
-        saveServerInput.setHostname(machineInfo.getSystem_info().getHostname());
+        ServerMachineConverter.buildSystemInfo(saveServerInput, machineInfo);
         saveServerInput.setHardware(ServerMachineConverter.buildHardware(machineInfo, serversDO));
         saveServerInput.setDisks(ServerMachineConverter.buildDisk(machineInfo, serversDO));
         saveServerInput.setNetworkInterfaces(ServerMachineConverter.buildNetworkInterface(machineInfo, serversDO));

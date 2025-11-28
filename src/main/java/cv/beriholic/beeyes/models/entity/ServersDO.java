@@ -76,6 +76,27 @@ public interface ServersDO extends BaseDO {
     @Nullable
     String region();
 
+    /**
+     * 系统名称
+     */
+    @Nullable
+    @Column(name = "os_name")
+    String osName();
+
+    /**
+     * 系统版本
+     */
+    @Nullable
+    @Column(name = "os_version")
+    String osVersion();
+
+    /**
+     * 内核版本
+     */
+    @Nullable
+    @Column(name = "kernel_version")
+    String kernelVersion();
+
 
     @OneToOne
     @JoinColumn(name = "hardware_id")

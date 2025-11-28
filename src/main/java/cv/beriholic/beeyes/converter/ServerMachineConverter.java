@@ -140,4 +140,12 @@ public class ServerMachineConverter {
                 }
         ).toList();
     }
+
+    public static void buildSystemInfo(SaveServerInput saveServerInput, MachineInfo machineInfo) {
+        SystemInfo systemInfo = machineInfo.getSystem_info();
+        saveServerInput.setHostname(systemInfo.getHostname());
+        saveServerInput.setOsName(systemInfo.getOs_name());
+        saveServerInput.setOsVersion(systemInfo.getOs_version());
+        saveServerInput.setKernelVersion(systemInfo.getKernel_version());
+    }
 }

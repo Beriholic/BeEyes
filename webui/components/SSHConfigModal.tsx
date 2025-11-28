@@ -145,7 +145,6 @@ export function SSHConfigModal({
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, name: e.target.value }))
                   }
-                  placeholder="root"
                   className="mt-2 w-full rounded-xl border border-white/10 bg-slate-800 px-4 py-3 text-white placeholder-slate-500 transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                 />
               </div>
@@ -168,7 +167,6 @@ export function SSHConfigModal({
                       password: e.target.value,
                     }))
                   }
-                  placeholder="••••••••"
                   className="mt-2 w-full rounded-xl border border-white/10 bg-slate-800 px-4 py-3 text-white placeholder-slate-500 transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                 />
               </div>

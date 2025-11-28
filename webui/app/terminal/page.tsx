@@ -25,7 +25,7 @@ export default function TerminalPage() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-64px)] bg-slate-950">
+    <div className="flex h-[calc(100vh-64px)] w-full overflow-hidden bg-slate-950">
       {/* Left Sidebar - Server List */}
       <div className="w-80 flex-shrink-0">
         <ServerListSidebar
