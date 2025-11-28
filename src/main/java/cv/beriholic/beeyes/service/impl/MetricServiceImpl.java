@@ -2,11 +2,15 @@ package cv.beriholic.beeyes.service.impl;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import cv.beriholic.beeyes.consts.HistoryTimeUnit;
 import cv.beriholic.beeyes.consts.KafkaGroup;
 import cv.beriholic.beeyes.consts.KafkaTopic;
 import cv.beriholic.beeyes.consts.ServerStatus;
+import cv.beriholic.beeyes.exception.BizRuntimeException;
+import cv.beriholic.beeyes.exception.ErrorCode;
 import cv.beriholic.beeyes.models.dto.*;
 import cv.beriholic.beeyes.models.dto.system.RuntimeInfo;
+import cv.beriholic.beeyes.models.entity.dto.QueryMachineRuntimeHistoryRequest;
 import cv.beriholic.beeyes.models.entity.dto.QueryMachineRuntimeInfoRequest;
 import cv.beriholic.beeyes.mq.MetricRecordBaseProducerService;
 import cv.beriholic.beeyes.repository.MetricDataRepository;
@@ -33,6 +37,7 @@ public class MetricServiceImpl implements MetricService {
     private final MetricRecordBaseProducerService metricRecordProducerService;
     private final MachineStatusService machineStatusService;
     private final MachineService machineService;
+
     private final Cache<@NonNull Long, RuntimeInfo> runtimeInfoCache = Caffeine.newBuilder()
             .maximumSize(1000)
             .expireAfterWrite(10, TimeUnit.SECONDS)
@@ -92,6 +97,20 @@ public class MetricServiceImpl implements MetricService {
                 )
                 .filter(Objects::nonNull)
                 .toList();
+    }
+
+    @Override
+    public List<MachineRuntimeInfoDTO> queryMachineRuntimeHistory(Long userId, QueryMachineRuntimeHistoryRequest request) {
+        Long serverId = Long.valueOf(request.getMachineId());
+        boolean isValid = machineService.userHasServer(userId, serverId);
+        if (!isValid) {
+            throw new BizRuntimeException(ErrorCode.UNAUTHORIZED);
+        }
+        return metricDataRepository.queryHistoricalRuntimeInfo(
+                serverId,
+                request.getTime(),
+                HistoryTimeUnit.of(request.getTimeUnit())
+        );
     }
 }
 

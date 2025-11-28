@@ -16,7 +16,7 @@ import java.util.List;
 public class MachineRuntimeInfoDTO {
     @Column(timestamp = true)
     private Instant timestamp;
-    @Column
+    @Column(tag = true)
     private Long serverId;
     @Column
     private Double cpuUsage;
@@ -39,11 +39,9 @@ public class MachineRuntimeInfoDTO {
         to.setMemoryUsage(memoryInfo.getPercent_memory());
         to.setSwapUsage(memoryInfo.getPercent_swap());
 
-        double avgDiskUsage = diskInfo.stream()
-                .mapToDouble(DiskInfo::getPercent)
-                .average()
-                .orElse(0.0);
-        to.setDiskUsage(avgDiskUsage);
+        double totalUsed = diskInfo.stream().mapToDouble(DiskInfo::getUsed).sum();
+        double totalFree = diskInfo.stream().mapToDouble(DiskInfo::getTotal).sum();
+        to.setDiskUsage(totalUsed * 100 / totalFree);
         return to;
     }
 }

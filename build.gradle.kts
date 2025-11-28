@@ -58,6 +58,7 @@ dependencies {
     implementation("com.github.ben-manes.caffeine:caffeine:3.2.3")
     implementation("com.github.mwiede:jsch:2.27.5")
     implementation("org.springframework.boot:spring-boot-starter-websocket")
+    implementation("com.alibaba.fastjson2:fastjson2:2.0.60")
 }
 
 tasks.withType<Test> {

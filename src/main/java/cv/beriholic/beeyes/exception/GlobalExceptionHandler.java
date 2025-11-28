@@ -14,4 +14,10 @@ public class GlobalExceptionHandler {
     public RestBean<Void> notLogin() {
         return RestBean.failed(ErrorCode.UNAUTHORIZED);
     }
+
+    @ExceptionHandler(BizRuntimeException.class)
+    @ResponseStatus(HttpStatus.OK)
+    public RestBean<Void> bizRuntimeException(BizRuntimeException e) {
+        return RestBean.failed(e);
+    }
 }

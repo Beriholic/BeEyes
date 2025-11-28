@@ -4,3 +4,9 @@ input QueryMachineRuntimeInfoRequest {
     pageIndex: Int
     pageSize: Int
 }
+
+input QueryMachineRuntimeHistoryRequest {
+    machineId: String
+    time: Int
+    timeUnit: Int
+}

@@ -11,20 +11,9 @@ import { PageBackground } from "@/components/PageBackground";
 import { RuntimeMetrics } from "@/components/RuntimeMetrics";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 
 const PAGE_SIZE_OPTIONS = [5, 10, 20];
-
-const formatDate = (value?: string | null) => {
-  if (!value) return "-";
-  try {
-    return new Intl.DateTimeFormat("zh-CN", {
-      dateStyle: "medium",
-      timeStyle: "short",
-    }).format(new Date(value));
-  } catch {
-    return value;
-  }
-};
 
 const formatBytes = (bytes?: number) => {
   if (!bytes || bytes <= 0) return "-";
@@ -347,7 +336,16 @@ export default function HomePage() {
                         <tr className="hover:bg-white/5">
                           <td className="px-6 py-4">
                             <div className="font-semibold text-white">
-                              {machine.hostname ?? "-"}
+                              {machine.id ? (
+                                <Link
+                                  href={`/machine/${machine.id}`}
+                                  className="text-indigo-300 hover:text-indigo-200"
+                                >
+                                  {machine.hostname ?? "-"}
+                                </Link>
+                              ) : (
+                                machine.hostname ?? "-"
+                              )}
                             </div>
                             <div className="mt-0.5 text-xs text-slate-400">
                               {machine.osName} {machine.osVersion}

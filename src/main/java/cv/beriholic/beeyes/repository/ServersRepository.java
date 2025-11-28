@@ -75,5 +75,17 @@ public class ServersRepository extends BaseRepository<ServersDO, ServersDOTable,
                 .select(table.fetch(MachineView.class))
                 .fetchPage(pageIndex, pageSize);
     }
+
+    public boolean userHasServer(Long userId, Long serverId) {
+        return createQuery()
+                .where(table.id().eq(serverId))
+                .where(table.users(userDOTableEx ->
+                                Predicate.and(
+                                        userDOTableEx.id().eq(userId))
+                        )
+                )
+                .exists();
+
+    }
 }
 

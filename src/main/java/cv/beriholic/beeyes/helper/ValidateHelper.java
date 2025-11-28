@@ -1,6 +1,8 @@
 package cv.beriholic.beeyes.helper;
 
+import cv.beriholic.beeyes.consts.HistoryTimeUnit;
 import cv.beriholic.beeyes.models.entity.dto.AuthLoginRequest;
+import cv.beriholic.beeyes.models.entity.dto.QueryMachineRuntimeHistoryRequest;
 import cv.beriholic.beeyes.models.entity.dto.UpdateSSHConfigRequest;
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,6 +34,33 @@ public class ValidateHelper {
                 || StringUtils.isEmpty(request.getPassword())
         ) {
             throw new IllegalArgumentException("Name or Password cannot be empty");
+        }
+    }
+
+    public static void validateQueryMachineHistoryRuntimeInfoRequest(QueryMachineRuntimeHistoryRequest request) {
+        if (StringUtils.isEmpty(request.getMachineId())) {
+            throw new IllegalArgumentException("Machine Id cannot be empty");
+        }
+        if (request.getTime() < 1) {
+            throw new IllegalArgumentException("Time cannot be less than 1");
+        }
+
+        HistoryTimeUnit historyTimeUnit = HistoryTimeUnit.of(request.getTimeUnit());
+        boolean validTimeUnit = false;
+
+        switch (historyTimeUnit) {
+            case MINUTE ->
+                    validTimeUnit = (request.getTime() == 5 || request.getTime() == 15 || request.getTime() == 30);
+            case HOUR ->
+                    validTimeUnit = (request.getTime() == 1 || request.getTime() == 2 || request.getTime() == 3 || request.getTime() == 6 || request.getTime() == 12);
+            case DAY -> validTimeUnit = (request.getTime() == 1 || request.getTime() == 3);
+            case WEEK -> validTimeUnit = (request.getTime() == 1 || request.getTime() == 2 || request.getTime() == 3);
+            case MONTH ->
+                    validTimeUnit = (request.getTime() == 1 || request.getTime() == 3 || request.getTime() == 6 || request.getTime() == 12);
+        }
+
+        if (!validTimeUnit) {
+            throw new IllegalArgumentException("Invalid time unit or time value");
         }
     }
 }

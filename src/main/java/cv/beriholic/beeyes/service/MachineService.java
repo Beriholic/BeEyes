@@ -27,4 +27,8 @@ public interface MachineService {
     PageDTO<List<MachineTerminalListView>> queryMachineTerminalList(Long userId, QueryMachineTerminalListRequest request);
 
     void updateMachineSSHConfig(Long userId, UpdateSSHConfigRequest request);
+
+    boolean userHasServer(Long userId, Long serverId);
+
+    MachineView getMachineDetail(long userId, Long serverId);
 }

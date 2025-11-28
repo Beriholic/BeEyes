@@ -10,6 +10,7 @@ export type { CreateMachineRequest } from './models/CreateMachineRequest';
 export type { DeleteMachineRequest } from './models/DeleteMachineRequest';
 export type { DiskInfo } from './models/DiskInfo';
 export type { MachineManageView } from './models/MachineManageView';
+export type { MachineRuntimeInfoDTO } from './models/MachineRuntimeInfoDTO';
 export type { MachineTerminalListView } from './models/MachineTerminalListView';
 export type { MachineView } from './models/MachineView';
 export type { MachineView_TargetOf_disks } from './models/MachineView_TargetOf_disks';
@@ -22,7 +23,9 @@ export type { PageDTO_List_MachineManageView } from './models/PageDTO_List_Machi
 export type { PageDTO_List_MachineTerminalListView } from './models/PageDTO_List_MachineTerminalListView';
 export type { PageDTO_List_MachineView } from './models/PageDTO_List_MachineView';
 export type { QueryMachineRuntimeInfoRequest } from './models/QueryMachineRuntimeInfoRequest';
+export type { RestBean_List_MachineRuntimeInfoDTO } from './models/RestBean_List_MachineRuntimeInfoDTO';
 export type { RestBean_List_RuntimeInfoDTO } from './models/RestBean_List_RuntimeInfoDTO';
+export type { RestBean_MachineView } from './models/RestBean_MachineView';
 export type { RestBean_PageDTO_List_MachineManageView } from './models/RestBean_PageDTO_List_MachineManageView';
 export type { RestBean_PageDTO_List_MachineTerminalListView } from './models/RestBean_PageDTO_List_MachineTerminalListView';
 export type { RestBean_PageDTO_List_MachineView } from './models/RestBean_PageDTO_List_MachineView';

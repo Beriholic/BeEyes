@@ -195,6 +195,21 @@ public class MachineServiceImpl implements MachineService {
         sshConnectionsRepository.save(input, SaveMode.UPSERT);
     }
 
+    @Override
+    public boolean userHasServer(Long userId, Long serverId) {
+        return serversRepository.userHasServer(userId, serverId);
+    }
+
+    @Override
+    public MachineView getMachineDetail(long userId, Long serverId) {
+        boolean userHasServer = userHasServer(userId, serverId);
+        if (!userHasServer) {
+            throw new BizRuntimeException(ErrorCode.UNAUTHORIZED);
+        }
+
+        return serversRepository.findById(serverId, MachineView.class);
+    }
+
     private UpdateMachineSSHConfigInput buildUpdateMachineSSHConfigInput(Long userId, UpdateSSHConfigRequest request) {
         try {
             UpdateMachineSSHConfigInput input = new UpdateMachineSSHConfigInput();

@@ -28,6 +28,20 @@ public class MachineController {
         return RestBean.success(machineList);
     }
 
+    @GetMapping("/detail")
+    public RestBean<MachineView> getMachineDetail(
+            @RequestParam String serverId
+    ) {
+        if (StringUtils.isEmpty(serverId)) {
+            return RestBean.failed(ErrorCode.PARAM_INVALID);
+        }
+
+        long userId = StpUtil.getLoginIdAsLong();
+        MachineView machineDetail = machineService.getMachineDetail(userId, Long.valueOf(serverId));
+        return RestBean.success(machineDetail);
+    }
+
+
     @PostMapping("/manage/create")
     public RestBean<Void> createMachine(@RequestBody CreateMachineRequest request) {
         if (StringUtils.isEmpty(request.getDescription()) || StringUtils.isEmpty(request.getRegion())) {
