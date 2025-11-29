@@ -21,5 +21,13 @@ export type MachineView_TargetOf_hardware = {
      * CPU核心数
      */
     cpuCores?: number | null;
+    /**
+     * 总交换分区(字节)
+     */
+    totalSwap?: number | null;
+    /**
+     * 总内存(字节)
+     */
+    totalMemory?: number | null;
 };
 

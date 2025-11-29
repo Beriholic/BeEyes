@@ -1,5 +1,5 @@
-use models::{BeEyesConfig, BeEyesConfigValidationError};
 use anyhow::{Context, Result};
+use models::{BeEyesConfig, BeEyesConfigValidationError};
 use std::fs::{self, File};
 use std::io::{Read, Write};
 use std::path::Path;
@@ -9,14 +9,14 @@ const CONFIG_FILE_PATH: &str = "$HOME/.config/beeyes/config.toml";
 pub fn save_config(config: &BeEyesConfig) -> Result<()> {
     let config_path = get_config_path()?;
 
-    // 确保配置目录存在
     if let Some(parent) = Path::new(&config_path).parent() {
         fs::create_dir_all(parent).context("无法创建配置目录")?;
     }
 
     let config_str = toml::to_string(&config).context("无法序列化配置")?;
     let mut file = File::create(&config_path).context("无法创建配置文件")?;
-    file.write_all(config_str.as_bytes()).context("无法写入配置文件")?;
+    file.write_all(config_str.as_bytes())
+        .context("无法写入配置文件")?;
 
     Ok(())
 }
@@ -25,10 +25,19 @@ pub fn load_config() -> Result<BeEyesConfig> {
     let config_path = get_config_path()?;
     let mut contents = String::new();
 
-    let mut file = File::open(&config_path).context("无法打开配置文件")?;
-    file.read_to_string(&mut contents).context("无法读取配置文件")?;
+    match File::open(&config_path) {
+        Ok(mut file) => {
+            file.read_to_string(&mut contents)
+                .context("无法读取配置文件")?;
+        }
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+            return Ok(BeEyesConfig::default());
+        }
+        Err(e) => {
+            return Err(e.into());
+        }
+    }
 
-    // 处理空文件或无效TOML的情况
     if contents.trim().is_empty() {
         return Ok(BeEyesConfig::default());
     }

@@ -15,8 +15,8 @@ import Link from "next/link";
 
 const PAGE_SIZE_OPTIONS = [5, 10, 20];
 
-const formatBytes = (bytes?: number) => {
-  if (!bytes || bytes <= 0) return "-";
+const formatBytes = (bytes?: number | null) => {
+  if (!bytes || bytes <= 0 || bytes === null) return "-";
   const units = ["B", "KB", "MB", "GB", "TB", "PB"];
   let value = bytes;
   let index = 0;
@@ -358,7 +358,10 @@ export default function HomePage() {
                             </div>
                           </td>
                           <td className="px-6 py-4">
-                            <p className="max-w-xs text-sm text-slate-300">
+                            <p
+                              className="text-sm text-slate-300 whitespace-nowrap truncate"
+                              title={machine.description ?? "-"}
+                            >
                               {machine.description ?? "-"}
                             </p>
                           </td>
@@ -370,6 +373,14 @@ export default function HomePage() {
                               {machine.hardware?.cpuArch ?? "未知架构"} ·{" "}
                               {machine.hardware?.cpuCores ?? "-"} 核
                             </div>
+                            <div className="mt-1 text-xs text-slate-400">
+                              内存：{formatBytes(machine.hardware?.totalMemory)}
+                            </div>
+                            {Number(machine.hardware?.totalSwap ?? 0) > 0 && (
+                              <div className="text-xs text-slate-400">
+                                Swap：{formatBytes(machine.hardware?.totalSwap)}
+                              </div>
+                            )}
                           </td>
                           <td className="px-6 py-4 text-sm">
                             {machine.disks && machine.disks.length > 0 ? (

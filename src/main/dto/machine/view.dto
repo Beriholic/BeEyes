@@ -39,6 +39,10 @@ MachineView {
         cpuArch
 
         cpuCores
+
+        totalSwap
+
+        totalMemory
     }
 
     disks {

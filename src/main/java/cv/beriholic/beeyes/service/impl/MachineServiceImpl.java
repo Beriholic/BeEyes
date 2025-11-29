@@ -65,6 +65,7 @@ public class MachineServiceImpl implements MachineService {
         serversRepository.deleteById(request.getServerId());
         sshConnectionsRepository.deleteById(request.getServerId());
         redisUtils.delete(CacheKey.machineStatus(request.getServerId()));
+        redisUtils.delete(CacheKey.userServerList(userId));
     }
 
     @Override
@@ -72,6 +73,7 @@ public class MachineServiceImpl implements MachineService {
         // TODO check权限
         UpdateServerInfoInput input = buildUpdateServerInfoInput(request);
         serversRepository.save(input, SaveMode.UPDATE_ONLY);
+        redisUtils.delete(CacheKey.machineStatus(request.getId()));
     }
 
     @Override
