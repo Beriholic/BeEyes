@@ -14,6 +14,7 @@ export type QueryManageUserListRequest = {
     email?: string | null;
     phone?: string | null;
     ruleCode?: number | null;
+    parentId?: string | null;
     pageIndex?: number;
     pageSize?: number;
 };

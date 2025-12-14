@@ -1,0 +1,6 @@
+export cv.beriholic.beeyes.models.entity.UserRoleDO
+
+input SaveUserRoleInput {
+    userId
+    role
+}

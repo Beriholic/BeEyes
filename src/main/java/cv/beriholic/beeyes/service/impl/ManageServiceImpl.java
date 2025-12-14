@@ -1,21 +1,22 @@
 package cv.beriholic.beeyes.service.impl;
 
 import cn.hutool.core.lang.Pair;
-import cv.beriholic.beeyes.consts.PermissionCode;
-import cv.beriholic.beeyes.consts.UserRoleCode;
+import cn.hutool.core.util.IdUtil;
 import cv.beriholic.beeyes.exception.BizRuntimeException;
 import cv.beriholic.beeyes.exception.ErrorCode;
 import cv.beriholic.beeyes.models.dto.PageDTO;
 import cv.beriholic.beeyes.models.entity.dto.*;
 import cv.beriholic.beeyes.repository.UserRepository;
+import cv.beriholic.beeyes.repository.UserRoleRepository;
 import cv.beriholic.beeyes.service.ManageService;
 import cv.beriholic.beeyes.utils.BcryptUtil;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.babyfish.jimmer.Page;
 import org.babyfish.jimmer.sql.ast.mutation.SaveMode;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,6 +25,7 @@ import java.util.Objects;
 public class ManageServiceImpl implements ManageService {
 
     private final UserRepository userRepository;
+    private final UserRoleRepository userRoleRepository;
 
     @Override
     public PageDTO<List<ManageUserView>> getManageUserList(QueryManageUserListRequest request) {
@@ -33,6 +35,9 @@ public class ManageServiceImpl implements ManageService {
         spec.setFullName(request.getFullName());
         spec.setUsername(request.getUsername());
         spec.setRoleCode(request.getRuleCode());
+        if (StringUtils.isNotEmpty(request.getParentId())) {
+            spec.setParentId(Long.valueOf(request.getParentId()));
+        }
 
         Page<ManageUserView> page = userRepository.findBySpecFetchPage(spec, request.getPageIndex(), request.getPageSize(), ManageUserView.class);
 
@@ -46,28 +51,25 @@ public class ManageServiceImpl implements ManageService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public CreateUserView createUser(CreateUserRequest request) {
-        SaveUserInput input = new SaveUserInput();
-        input.setEmail(request.getEmail());
-        input.setPhone(request.getPhone());
-        input.setFullName(request.getFullName());
-        input.setRoleCode(request.getRoleCode());
-        input.setUsername(request.getUsername());
-
+        long id = IdUtil.getSnowflakeNextId();
+        SaveUserInput saveUserInput = new SaveUserInput();
+        saveUserInput.setId(id);
+        saveUserInput.setEmail(request.getEmail());
+        saveUserInput.setPhone(request.getPhone());
+        saveUserInput.setFullName(request.getFullName());
+        saveUserInput.setUsername(request.getUsername());
+        saveUserInput.setParentId(Long.valueOf(request.getParentId()));
         Pair<String, String> randomHash = BcryptUtil.getRandomHash(8);
-        input.setPasswordHash(randomHash.getValue());
+        saveUserInput.setPasswordHash(randomHash.getValue());
 
+        SaveUserRoleInput saveUserRoleInput = new SaveUserRoleInput();
+        saveUserRoleInput.setUserId(id);
+        saveUserRoleInput.setRole(request.getRoleCode());
 
-        if (UserRoleCode.SUPER_ADMIN.getCode() == request.getRoleCode() || UserRoleCode.ADMIN.getCode() == request.getRoleCode()) {
-            List<SaveUserInput.TargetOf_permissions> permissions = Arrays.stream(PermissionCode.values()).map(it -> {
-                SaveUserInput.TargetOf_permissions targetOfPermissions = new SaveUserInput.TargetOf_permissions();
-                targetOfPermissions.setPermissionCode(it.getCode());
-                return targetOfPermissions;
-            }).toList();
-            input.setPermissions(permissions);
-        }
-
-        userRepository.save(input, SaveMode.INSERT_ONLY);
+        userRepository.save(saveUserInput, SaveMode.INSERT_ONLY);
+        userRoleRepository.save(saveUserRoleInput, SaveMode.INSERT_ONLY);
 
         CreateUserView createUserView = new CreateUserView();
         createUserView.setEmail(request.getEmail());
@@ -82,16 +84,22 @@ public class ManageServiceImpl implements ManageService {
 
     @Override
     public void updateUser(UpdateUserRequest request) {
+        long userId = Long.parseLong(request.getUserId());
         UpdateUserInput input = new UpdateUserInput();
-        input.setId(Long.valueOf(request.getUserId()));
+        input.setId(userId);
         input.setEmail(request.getEmail());
         input.setPhone(request.getPhone());
         input.setFullName(request.getFullName());
-        input.setRoleCode(request.getRoleCode());
         input.setUsername(request.getUsername());
+        input.setParentId(Long.valueOf(request.getParentId()));
+
+
+        UpdateUserRoleInput updateUserRoleInput = new UpdateUserRoleInput();
+        updateUserRoleInput.setUserId(userId);
+        updateUserRoleInput.setRole(request.getRoleCode());
 
         userRepository.save(input, SaveMode.UPDATE_ONLY);
-
+        userRoleRepository.updateRole(updateUserRoleInput);
     }
 
     @Override

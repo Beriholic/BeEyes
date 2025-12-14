@@ -29,9 +29,10 @@ export type ManageUserView = {
      * 手机号
      */
     phone?: string | null;
+    parent?: ManageUserView | null;
     /**
      * 角色类型（应用层维护枚举映射）
      */
-    code?: number | null;
+    roleCode?: number | null;
 };
 

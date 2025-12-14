@@ -4,7 +4,7 @@ import type { UserBaseView } from "@/api/models/UserBaseView";
 import { AuthControllerService } from "@/api/services/AuthControllerService";
 import { PermissionControllerService } from "@/api/services/PermissionControllerService";
 import { ProfileControllerService } from "@/api/services/ProfileControllerService";
-import { UserRole } from "@/constants/enums";
+import { UserRole } from "@/api/enums/enums";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Jdenticon from "react-jdenticon";
@@ -45,25 +45,6 @@ export function Navbar() {
     if (!pathname) return false;
     return ["/login"].some((prefix) => pathname.startsWith(prefix));
   }, [pathname]);
-
-  const displayedNavItems = useMemo(() => {
-    const items = [...NAV_ITEMS];
-    if (role === UserRole.SUPER_ADMIN.key) {
-      items.push({ label: "用户管理", key: "users", href: "/users" });
-      items.push({
-        label: "权限管理",
-        key: "permissions",
-        href: "/permissions",
-      });
-    } else if (role === UserRole.ADMIN.key) {
-      items.push({
-        label: "权限管理",
-        key: "permissions",
-        href: "/permissions",
-      });
-    }
-    return items;
-  }, [role]);
 
   useEffect(() => {
     if (isHidden) return;
@@ -147,7 +128,7 @@ export function Navbar() {
             BeEyes
           </Link>
           <div className="flex items-center gap-4 text-sm text-slate-400">
-            {displayedNavItems.map((item) => {
+            {NAV_ITEMS.map((item) => {
               const isActive = activeKey === item.key;
               return (
                 <Link
@@ -190,14 +171,35 @@ export function Navbar() {
             </button>
             {menuOpen && (
               <div className="absolute right-0 mt-3 w-44 overflow-hidden rounded-2xl border border-white/10 bg-slate-900/95 p-2 text-sm text-slate-200 shadow-2xl backdrop-blur">
-                <button
-                  type="button"
-                  className="flex w-full items-center justify-between rounded-xl px-3 py-2 transition hover:bg-white/10"
-                  onClick={handleSettings}
-                >
-                  设置
-                  <span className="text-xs text-slate-500">⌘ ,</span>
-                </button>
+                {role === UserRole.SUPER_ADMIN.key && (
+                  <button
+                    type="button"
+                    className="flex w-full items-center justify-between rounded-xl px-3 py-2 transition hover:bg-white/10"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      router.push("/users");
+                    }}
+                  >
+                    用户管理
+                  </button>
+                )}
+                {(role === UserRole.SUPER_ADMIN.key ||
+                  role === UserRole.ADMIN.key) && (
+                  <button
+                    type="button"
+                    className="flex w-full items-center justify-between rounded-xl px-3 py-2 transition hover:bg-white/10"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      router.push("/permissions");
+                    }}
+                  >
+                    权限管理
+                  </button>
+                )}
+                {(role === UserRole.SUPER_ADMIN.key ||
+                  role === UserRole.ADMIN.key) && (
+                  <div className="my-1 h-px bg-white/10" />
+                )}
                 <button
                   type="button"
                   className="mt-1 flex w-full items-center justify-between rounded-xl px-3 py-2 text-rose-300 transition hover:bg-rose-500/20"
@@ -205,9 +207,6 @@ export function Navbar() {
                   disabled={logoutPending}
                 >
                   退出登录
-                  <span className="text-xs text-rose-200">
-                    {logoutPending ? "..." : "⌘ Q"}
-                  </span>
                 </button>
               </div>
             )}

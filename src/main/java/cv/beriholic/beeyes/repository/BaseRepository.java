@@ -49,6 +49,7 @@ public abstract class BaseRepository<E, T extends TableProxy<E>, D> extends Abst
     public List<E> findBySpec(JSpecification<E, T> spec, Fetcher<E> fetcher) {
         return createQuery()
                 .where(spec)
+                .orderBy(table.getId().asc())
                 .select(table.fetch(fetcher))
                 .execute();
 
@@ -57,6 +58,7 @@ public abstract class BaseRepository<E, T extends TableProxy<E>, D> extends Abst
     public List<E> findBySpec(PageDTO<? extends JSpecification<E, T>> pageDTO, Fetcher<E> fetcher) {
         return createQuery()
                 .where(pageDTO.getData())
+                .orderBy(table.getId().asc())
                 .select(table.fetch(fetcher))
                 .fetchPage(pageDTO.getPageIndex(), pageDTO.getPageSize())
                 .getRows();
@@ -66,6 +68,7 @@ public abstract class BaseRepository<E, T extends TableProxy<E>, D> extends Abst
     public E findBySpecOne(JSpecification<E, T> spec, Fetcher<E> fetcher) {
         return createQuery()
                 .where(spec)
+                .orderBy(table.getId().asc())
                 .select(table.fetch(fetcher))
                 .fetchFirst();
     }
@@ -73,6 +76,7 @@ public abstract class BaseRepository<E, T extends TableProxy<E>, D> extends Abst
     public List<E> findBySpec(JSpecification<E, T> spec) {
         return createQuery()
                 .where(spec)
+                .orderBy(table.getId().asc())
                 .select(table)
                 .execute();
     }
@@ -80,6 +84,7 @@ public abstract class BaseRepository<E, T extends TableProxy<E>, D> extends Abst
     public Page<E> findBySpecFetchPage(JSpecification<E, T> spec, Integer pageIndex, Integer pageSize) {
         return createQuery()
                 .where(spec)
+                .orderBy(table.getId().asc())
                 .select(table)
                 .fetchPage(pageIndex, pageSize);
     }
@@ -87,6 +92,7 @@ public abstract class BaseRepository<E, T extends TableProxy<E>, D> extends Abst
     public Page<E> findBySpecFetchPage(JSpecification<E, T> spec, Integer pageIndex, Integer pageSize, Fetcher<E> fetcher) {
         return createQuery()
                 .where(spec)
+                .orderBy(table.getId().asc())
                 .select(table.fetch(fetcher))
                 .fetchPage(pageIndex, pageSize);
     }
@@ -94,13 +100,16 @@ public abstract class BaseRepository<E, T extends TableProxy<E>, D> extends Abst
     public <V extends View<E>> Page<V> findBySpecFetchPage(JSpecification<E, T> spec, Integer pageIndex, Integer pageSize, Class<V> viewType) {
         return createQuery()
                 .where(spec)
+                .orderBy(table.getId().asc())
                 .select(table.fetch(viewType))
-                .fetchPage(pageIndex, pageSize);
+                .fetchPage(pageIndex, pageSize)
+                ;
     }
 
     public <V extends View<E>> List<V> findBySpec(JSpecification<E, T> spec, Class<V> viewType) {
         return createQuery()
                 .where(spec)
+                .orderBy(table.getId().asc())
                 .select(table.fetch(viewType))
                 .execute();
     }
@@ -108,6 +117,7 @@ public abstract class BaseRepository<E, T extends TableProxy<E>, D> extends Abst
     public <V extends View<E>> V findBySpecOne(JSpecification<E, T> spec, Class<V> viewType) {
         return createQuery()
                 .where(spec)
+                .orderBy(table.getId().asc())
                 .select(table.fetch(viewType))
                 .fetchOneOrNull();
     }
@@ -115,6 +125,7 @@ public abstract class BaseRepository<E, T extends TableProxy<E>, D> extends Abst
     public <V extends View<E>> List<V> findBySpec(PageDTO<? extends JSpecification<E, T>> pageDTO, Class<V> viewType) {
         return createQuery()
                 .where(pageDTO.getData())
+                .orderBy(table.getId().asc())
                 .select(table.fetch(viewType))
                 .fetchPage(pageDTO.getPageIndex(), pageDTO.getPageSize())
                 .getRows();
@@ -123,6 +134,7 @@ public abstract class BaseRepository<E, T extends TableProxy<E>, D> extends Abst
     public List<E> findBySpec(PageDTO<? extends JSpecification<E, T>> pageDTO) {
         return createQuery()
                 .where(pageDTO.getData())
+                .orderBy(table.getId().asc())
                 .select(table)
                 .fetchPage(pageDTO.getPageIndex(), pageDTO.getPageSize())
                 .getRows();
@@ -131,6 +143,7 @@ public abstract class BaseRepository<E, T extends TableProxy<E>, D> extends Abst
     public E findBySpecOne(JSpecification<E, T> spec) {
         return createQuery()
                 .where(spec)
+                .orderBy(table.getId().asc())
                 .select(table)
                 .fetchFirst();
     }
@@ -138,12 +151,14 @@ public abstract class BaseRepository<E, T extends TableProxy<E>, D> extends Abst
     public <V extends View<E>> V findBySpecOne(Class<V> viewType, JSpecification<E, T> spec) {
         return createQuery()
                 .where(spec)
+                .orderBy(table.getId().asc())
                 .select(table.fetch(viewType))
                 .fetchFirst();
     }
 
     public <V extends View<E>> Page<V> findByFetchPage(Integer pageIndex, Integer pageSize, Class<V> viewType) {
         return createQuery()
+                .orderBy(table.getId().asc())
                 .select(table.fetch(viewType))
                 .fetchPage(pageIndex, pageSize);
     }

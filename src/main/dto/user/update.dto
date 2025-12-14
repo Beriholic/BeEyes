@@ -6,11 +6,7 @@ input UpdateUserInput {
     email
     fullName
     phone
-    flat(role) {
-        role as roleCode
-    }
-    permissions {
-        permission as permissionCode
-    }
+    parentId
 }
+
 

@@ -2,6 +2,7 @@ package cv.beriholic.beeyes.repository;
 
 import cv.beriholic.beeyes.models.entity.UserRoleDO;
 import cv.beriholic.beeyes.models.entity.UserRoleDOTable;
+import cv.beriholic.beeyes.models.entity.dto.UpdateUserRoleInput;
 import org.babyfish.jimmer.sql.JSqlClient;
 import org.springframework.stereotype.Repository;
 
@@ -27,5 +28,12 @@ public class UserRoleRepository extends BaseRepository<UserRoleDO, UserRoleDOTab
                 .exists();
     }
 
+    public void updateRole(UpdateUserRoleInput input) {
+        createUpdate()
+                .where(table.userId().eq(input.getUserId()))
+                .set(table.role(), input.getRole())
+                .execute();
+
+    }
 }
 

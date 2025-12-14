@@ -21,8 +21,10 @@ ManageUserView {
     email
     phone
     flat(role) {
-        role as code
+        role as roleCode
     }
+    !depth(1)
+    parent*
 }
 
 CreateUserView {

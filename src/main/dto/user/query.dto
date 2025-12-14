@@ -1,6 +1,7 @@
 export cv.beriholic.beeyes.models.entity.UserDO
 
 specification QueryManageUserSpec {
+    parentId
     like(username)
     like(fullName)
     like(email)

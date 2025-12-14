@@ -6,6 +6,7 @@ input QueryManageUserListRequest {
     email: String?
     phone: String?
     ruleCode: Short?
+    parentId: String?
 
     pageIndex: Int
     pageSize: Int
@@ -17,6 +18,7 @@ input CreateUserRequest {
     email
     phone
     roleCode: Short
+    parentId: String
 }
 
 input UpdateUserRequest {
@@ -26,6 +28,7 @@ input UpdateUserRequest {
     email
     phone
     roleCode: Short
+    parentId: String
 }
 
 input ResetUserPasswordRequest {

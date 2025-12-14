@@ -1,16 +1,12 @@
 export cv.beriholic.beeyes.models.entity.UserDO
 
 input SaveUserInput {
+    id
     username
     email
     fullName
     phone
     passwordHash
-    flat(role) {
-        role as roleCode
-    }
-    permissions {
-        permission as permissionCode
-    }
+    parentId
 }
 

@@ -8,8 +8,6 @@ INSERT INTO users (id,
                    email,
                    password_hash,
                    full_name,
-                   is_active,
-                   is_main_account,
                    created_at,
                    updated_at,
                    created_by)
@@ -18,8 +16,6 @@ VALUES (1, -- 用户ID
         'admin@beeyes.com', -- 邮箱
         '$2a$10$FUn4uhnCcQomvwuCtWUiAOGIqH2UCdIoUY24yRtMfzZYo/L.j3c6m', -- 密码: admin123 (BCrypt加密)
         '系统管理员', -- 全名
-        true, -- 账户激活
-        true, -- 主账户
         CURRENT_TIMESTAMP, -- 创建时间
         CURRENT_TIMESTAMP, -- 更新时间
         1 -- 自己创建

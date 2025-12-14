@@ -20,4 +20,13 @@ public enum UserRoleCode {
         }
         throw new IllegalArgumentException("UserRoleCode not found");
     }
+
+    public static boolean isValid(short roleCode) {
+        for (UserRoleCode userRoleCode : UserRoleCode.values()) {
+            if (userRoleCode.getCode() == roleCode) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

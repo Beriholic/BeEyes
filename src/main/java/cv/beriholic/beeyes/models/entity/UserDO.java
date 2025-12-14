@@ -31,7 +31,7 @@ public interface UserDO extends BaseDO {
     /**
      * 父账户ID（用于账户关联）
      */
-    @Column(name = "parent_id")
+    @IdView
     @Nullable
     Long parentId();
 
@@ -83,4 +83,12 @@ public interface UserDO extends BaseDO {
 
     @OneToMany(mappedBy = "user")
     List<PermissionsDO> permissions();
+
+    @ManyToOne
+    @JoinColumn(name = "parent_id")
+    @Nullable
+    UserDO parent();
+
+    @OneToMany(mappedBy = "parent")
+    List<UserDO> subUsers();
 }

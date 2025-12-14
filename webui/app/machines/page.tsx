@@ -6,7 +6,7 @@ import type { DeleteMachineRequest } from "@/api/models/DeleteMachineRequest";
 import type { UpdateMachineRequest } from "@/api/models/UpdateMachineRequest";
 import { MachineControllerService } from "@/api/services/MachineControllerService";
 import { PermissionControllerService } from "@/api/services/PermissionControllerService";
-import { Permission } from "@/constants/enums";
+import { Permission } from "@/api/enums/enums";
 import { useCallback, useEffect, useMemo, useState, FormEvent } from "react";
 import CountrySelect from "react-select-country-list";
 import ReactCountryFlag from "react-country-flag";

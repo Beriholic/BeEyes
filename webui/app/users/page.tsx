@@ -7,7 +7,8 @@ import type { ResetUserView } from "@/api/models/ResetUserView";
 import type { UpdateUserRequest } from "@/api/models/UpdateUserRequest";
 import { ManageControllerService } from "@/api/services/ManageControllerService";
 import { Modal } from "@/components/Modal";
-import { UserRole } from "@/constants/enums";
+import { ParentUserSelector } from "@/components/ParentUserSelector";
+import { UserRole } from "@/api/enums/enums";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   FiCheck,
@@ -32,25 +33,32 @@ export default function UsersPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
-  const [createFormData, setCreateFormData] = useState<CreateUserRequest>({
+  const [createFormData, setCreateFormData] = useState<
+    CreateUserRequest & { parentId?: string }
+  >({
     username: "",
     fullName: "",
     email: "",
     phone: "",
     roleCode: undefined,
+    parentId: undefined,
   });
 
   // Edit User Modal State
   const [showEditModal, setShowEditModal] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
-  const [editFormData, setEditFormData] = useState<UpdateUserRequest>({
+  const [editParentLabel, setEditParentLabel] = useState("");
+  const [editFormData, setEditFormData] = useState<
+    UpdateUserRequest & { parentId?: string }
+  >({
     userId: "",
     username: "",
     fullName: "",
     email: "",
     phone: "",
     roleCode: undefined,
+    parentId: undefined,
   });
 
   // Delete User Modal State
@@ -81,6 +89,7 @@ export default function UsersPage() {
   const [searchEmail, setSearchEmail] = useState("");
   const [searchPhone, setSearchPhone] = useState("");
   const [searchRole, setSearchRole] = useState<number | null>(null);
+  const [searchParentId, setSearchParentId] = useState<string | null>(null);
 
   // Search Inputs (UI)
   const [inputUsername, setInputUsername] = useState("");
@@ -88,6 +97,7 @@ export default function UsersPage() {
   const [inputEmail, setInputEmail] = useState("");
   const [inputPhone, setInputPhone] = useState("");
   const [inputRole, setInputRole] = useState<number | null>(null);
+  const [inputParentId, setInputParentId] = useState<string | null>(null);
 
   const handleSearch = () => {
     setSearchUsername(inputUsername);
@@ -95,6 +105,7 @@ export default function UsersPage() {
     setSearchEmail(inputEmail);
     setSearchPhone(inputPhone);
     setSearchRole(inputRole);
+    setSearchParentId(inputParentId);
     setPageIndex(1);
   };
 
@@ -104,11 +115,13 @@ export default function UsersPage() {
     setInputEmail("");
     setInputPhone("");
     setInputRole(null);
+    setInputParentId(null);
     setSearchUsername("");
     setSearchFullName("");
     setSearchEmail("");
     setSearchPhone("");
     setSearchRole(null);
+    setSearchParentId(null);
     setPageIndex(1);
   };
 
@@ -128,6 +141,7 @@ export default function UsersPage() {
       email: searchEmail || undefined,
       phone: searchPhone || undefined,
       ruleCode: searchRole,
+      parentId: searchParentId || undefined,
     });
 
     request
@@ -161,6 +175,7 @@ export default function UsersPage() {
     searchEmail,
     searchPhone,
     searchRole,
+    searchParentId,
   ]);
 
   useEffect(() => loadUsers(), [loadUsers]);
@@ -195,7 +210,9 @@ export default function UsersPage() {
     setCreateError(null);
 
     try {
-      const response = await ManageControllerService.createUser(createFormData);
+      const response = await ManageControllerService.createUser(
+        createFormData as unknown as CreateUserRequest
+      );
       if (response.data) {
         setCreatedUser(response.data);
         setShowCreateModal(false);
@@ -207,6 +224,7 @@ export default function UsersPage() {
           email: "",
           phone: "",
           roleCode: undefined,
+          parentId: undefined,
         });
         loadUsers();
       }
@@ -246,8 +264,14 @@ export default function UsersPage() {
       fullName: user.fullName,
       email: user.email,
       phone: user.phone,
-      roleCode: user.code || undefined,
+      roleCode: user.roleCode || undefined,
+      parentId: user.parent?.id?.toString() || undefined,
     });
+    setEditParentLabel(
+      user.parent
+        ? `${user.parent.username} (${user.parent.fullName || "No Name"})`
+        : ""
+    );
     setEditError(null);
     setShowEditModal(true);
   };
@@ -257,7 +281,9 @@ export default function UsersPage() {
     setEditLoading(true);
     setEditError(null);
     try {
-      await ManageControllerService.updateUser(editFormData);
+      await ManageControllerService.updateUser(
+        editFormData as unknown as UpdateUserRequest
+      );
       setShowEditModal(false);
       loadUsers();
     } catch (err) {
@@ -448,6 +474,15 @@ export default function UsersPage() {
                   ))}
                 </select>
               </div>
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-slate-400">
+                  上级用户
+                </label>
+                <ParentUserSelector
+                  value={inputParentId}
+                  onChange={(val) => setInputParentId(val)}
+                />
+              </div>
             </div>
             <div className="mt-4 flex justify-end gap-3 border-t border-white/5 pt-4">
               <button
@@ -596,7 +631,7 @@ export default function UsersPage() {
                         </td>
                         <td className="px-6 py-4">
                           <div className="inline-flex items-center rounded-lg border border-white/10 bg-slate-900/50 px-2 py-1 text-xs font-medium text-slate-300">
-                            {getRoleName(user.code)}
+                            {getRoleName(user.roleCode)}
                           </div>
                         </td>
                         <td className="px-6 py-4 text-right">
@@ -706,10 +741,11 @@ export default function UsersPage() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-1">
                 <label className="text-sm font-medium text-slate-300">
-                  姓名
+                  姓名 <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
+                  required
                   value={createFormData.fullName || ""}
                   onChange={(e) =>
                     setCreateFormData((prev) => ({
@@ -723,10 +759,11 @@ export default function UsersPage() {
               </div>
               <div className="space-y-1">
                 <label className="text-sm font-medium text-slate-300">
-                  手机号
+                  手机号 <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="tel"
+                  required
                   value={createFormData.phone || ""}
                   onChange={(e) =>
                     setCreateFormData((prev) => ({
@@ -763,6 +800,21 @@ export default function UsersPage() {
                   </option>
                 ))}
               </select>
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-slate-300">
+                上级用户 <span className="text-rose-500">*</span>
+              </label>
+              <ParentUserSelector
+                required
+                value={createFormData.parentId}
+                onChange={(val) =>
+                  setCreateFormData((prev) => ({
+                    ...prev,
+                    parentId: val || undefined,
+                  }))
+                }
+              />
             </div>
           </div>
 
@@ -858,10 +910,11 @@ export default function UsersPage() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-1">
                 <label className="text-sm font-medium text-slate-300">
-                  姓名
+                  姓名 <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
+                  required
                   value={editFormData.fullName || ""}
                   onChange={(e) =>
                     setEditFormData((prev) => ({
@@ -875,10 +928,11 @@ export default function UsersPage() {
               </div>
               <div className="space-y-1">
                 <label className="text-sm font-medium text-slate-300">
-                  手机号
+                  手机号 <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="tel"
+                  required
                   value={editFormData.phone || ""}
                   onChange={(e) =>
                     setEditFormData((prev) => ({
@@ -912,6 +966,22 @@ export default function UsersPage() {
                   </option>
                 ))}
               </select>
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-slate-300">
+                上级用户 <span className="text-rose-500">*</span>
+              </label>
+              <ParentUserSelector
+                required
+                value={editFormData.parentId}
+                fallbackLabel={editParentLabel}
+                onChange={(val) =>
+                  setEditFormData((prev) => ({
+                    ...prev,
+                    parentId: val || undefined,
+                  }))
+                }
+              />
             </div>
           </div>
 

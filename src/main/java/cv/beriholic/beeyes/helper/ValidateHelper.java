@@ -1,6 +1,7 @@
 package cv.beriholic.beeyes.helper;
 
 import cv.beriholic.beeyes.consts.HistoryTimeUnit;
+import cv.beriholic.beeyes.consts.UserRoleCode;
 import cv.beriholic.beeyes.models.entity.dto.*;
 import org.apache.commons.lang3.StringUtils;
 
@@ -75,6 +76,12 @@ public class ValidateHelper {
         if (StringUtils.isEmpty(request.getPhone())) {
             throw new IllegalArgumentException("Phone cannot be empty");
         }
+        if (StringUtils.isEmpty(request.getParentId())) {
+            throw new IllegalArgumentException("Parent Id cannot be empty");
+        }
+        if (!UserRoleCode.isValid(request.getRoleCode())) {
+            throw new IllegalArgumentException("Invalid role code");
+        }
     }
 
     public static void validateUpdateUserRequest(UpdateUserRequest request) {
@@ -92,6 +99,12 @@ public class ValidateHelper {
         }
         if (StringUtils.isEmpty(request.getPhone())) {
             throw new IllegalArgumentException("Phone cannot be empty");
+        }
+        if (StringUtils.isEmpty(request.getParentId())) {
+            throw new IllegalArgumentException("Parent Id cannot be empty");
+        }
+        if (!UserRoleCode.isValid(request.getRoleCode())) {
+            throw new IllegalArgumentException("Invalid role code");
         }
     }
 

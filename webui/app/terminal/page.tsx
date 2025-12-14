@@ -32,7 +32,7 @@ export default function TerminalPage() {
   return (
     <div className="flex h-[calc(100vh-64px)] w-full overflow-hidden bg-slate-950">
       {/* Left Sidebar - Server List */}
-      <div className="w-80 flex-shrink-0">
+      <div className="w-80 shrink-0">
         <ServerListSidebar
           selectedServerId={selectedServer?.id ?? null}
           onSelectServer={handleSelectServer}
@@ -140,7 +140,7 @@ export default function TerminalPage() {
                   <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-4">
                     <div className="flex gap-3">
                       <svg
-                        className="h-5 w-5 flex-shrink-0 text-blue-400"
+                        className="h-5 w-5 shrink-0 text-blue-400"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
