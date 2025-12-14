@@ -9,6 +9,7 @@ import cv.beriholic.beeyes.consts.KafkaTopic;
 import cv.beriholic.beeyes.consts.ServerStatus;
 import cv.beriholic.beeyes.exception.BizRuntimeException;
 import cv.beriholic.beeyes.exception.ErrorCode;
+import cv.beriholic.beeyes.helper.PermissionValidateHelper;
 import cv.beriholic.beeyes.models.dto.MachineIPAddressDTO;
 import cv.beriholic.beeyes.models.dto.MessageEntity;
 import cv.beriholic.beeyes.models.dto.PageDTO;
@@ -44,6 +45,7 @@ public class MachineServiceImpl implements MachineService {
     private final UserRepository userRepository;
     private final SshConnectionsRepository sshConnectionsRepository;
     private final ServerNetworkInterfaceRepository serverNetworkInterfaceRepository;
+    private final PermissionValidateHelper permissionValidateHelper;
 
     @Value("${encrypt.key}")
     private String encryptKey;
@@ -51,7 +53,6 @@ public class MachineServiceImpl implements MachineService {
 
     @Override
     public void createMachine(Long userId, CreateMachineRequest request) {
-        //TODO check 权限
         Long serverId = IdUtil.getSnowflakeNextId();
         SaveCreateMachineInput saveMachineInput = buildCreateMachineInput(serverId, userId, request);
         serversRepository.save(saveMachineInput, SaveMode.INSERT_ONLY);
@@ -61,7 +62,6 @@ public class MachineServiceImpl implements MachineService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteMachine(Long userId, DeleteMachineRequest request) {
-        //TODO check 权限
         serversRepository.deleteById(request.getServerId());
         sshConnectionsRepository.deleteById(request.getServerId());
         redisUtils.delete(CacheKey.machineStatus(request.getServerId()));
@@ -70,7 +70,6 @@ public class MachineServiceImpl implements MachineService {
 
     @Override
     public void updateMachine(Long userId, UpdateMachineRequest request) {
-        // TODO check权限
         UpdateServerInfoInput input = buildUpdateServerInfoInput(request);
         serversRepository.save(input, SaveMode.UPDATE_ONLY);
         redisUtils.delete(CacheKey.machineStatus(request.getId()));

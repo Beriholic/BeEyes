@@ -1,6 +1,7 @@
 package cv.beriholic.beeyes.models.entity;
 
 import cv.beriholic.beeyes.models.entity.common.BaseDO;
+import cv.beriholic.beeyes.utils.SnowflakeIdGenerator;
 import jakarta.annotation.Nullable;
 import org.babyfish.jimmer.sql.*;
 
@@ -25,6 +26,7 @@ public interface ServersDO extends BaseDO {
      * 服务器唯一标识
      */
     @Id
+    @GeneratedValue(generatorType = SnowflakeIdGenerator.class)
     long id();
 
     /**

@@ -1,0 +1,62 @@
+package cv.beriholic.beeyes.service.impl;
+
+import cn.hutool.core.collection.CollectionUtil;
+import cv.beriholic.beeyes.consts.PermissionCode;
+import cv.beriholic.beeyes.consts.UserRoleCode;
+import cv.beriholic.beeyes.exception.BizRuntimeException;
+import cv.beriholic.beeyes.exception.ErrorCode;
+import cv.beriholic.beeyes.models.entity.PermissionsDO;
+import cv.beriholic.beeyes.models.entity.UserRoleDO;
+import cv.beriholic.beeyes.repository.PermissionsRepository;
+import cv.beriholic.beeyes.repository.UserRoleRepository;
+import cv.beriholic.beeyes.service.PermissionService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+
+@Service
+@RequiredArgsConstructor
+public class PermissionServiceImpl implements PermissionService {
+    private final PermissionsRepository permissionsRepository;
+    private final UserRoleRepository userRoleRepository;
+
+
+    @Override
+    public List<PermissionCode> getUserPermission(Long userId) {
+        List<PermissionsDO> permissionsDOS = permissionsRepository.findByUserId(userId);
+        if (CollectionUtil.isEmpty(permissionsDOS)) {
+            return Collections.emptyList();
+        }
+        return permissionsDOS.stream()
+                .map(it ->
+                        PermissionCode.getByCode(it.permission())
+                ).toList();
+    }
+
+    @Override
+    public boolean checkUserPermission(Long userId, List<PermissionCode> permissionCodeList) {
+        List<Short> permissionCodes = permissionCodeList.stream().map(PermissionCode::getCode).toList();
+        return permissionsRepository.existUserPermissions(userId, permissionCodes);
+    }
+
+    @Override
+    public boolean checkUserPermission(Long userId, PermissionCode permissionCodes) {
+        return checkUserPermission(userId, Collections.singletonList(permissionCodes));
+    }
+
+    @Override
+    public UserRoleCode getUserRole(Long userId) {
+        UserRoleDO userRole = userRoleRepository.findById(userId);
+        if (Objects.isNull(userRole)) {
+            throw new BizRuntimeException(ErrorCode.RECORD_NOT_FOUND);
+        }
+        return UserRoleCode.getByCode(userRole.role());
+    }
+
+    public boolean checkUserRole(Long userId, UserRoleCode userRoleCode) {
+        return userRoleRepository.existUserRole(userId, userRoleCode.getCode());
+    }
+}

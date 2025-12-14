@@ -25,7 +25,7 @@ public class MetricController {
     public RestBean<List<RuntimeInfoDTO>> queryMachineRuntimeInfo(
             @RequestBody QueryMachineRuntimeInfoRequest request
     ) {
-        ValidateHelper.validateQueryMachinePageParam(request.getPageIndex(), request.getPageSize());
+        ValidateHelper.validateQueryPageParam(request.getPageIndex(), request.getPageSize());
         Long userId = StpUtil.getLoginIdAsLong();
         List<RuntimeInfoDTO> runtimeInfoList = metricService.queryMachineRuntimeInfo(userId, request);
         return RestBean.success(runtimeInfoList);

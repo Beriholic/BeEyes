@@ -1,0 +1,11 @@
+export cv.beriholic.beeyes.models.entity.UserDO
+
+specification QueryManageUserSpec {
+    like(username)
+    like(fullName)
+    like(email)
+    like(phone)
+    flat(role) {
+        role as roleCode
+    }
+}

@@ -30,6 +30,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/xterm": "^3.0.0",
+    "baseline-browser-mapping": "^2.9.7",
     "eslint": "^9",
     "eslint-config-next": "16.0.3",
     "openapi-typescript-codegen": "^0.29.0",

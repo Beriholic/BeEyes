@@ -12,7 +12,7 @@ export type UpdateMachineRequest = {
     /**
      * 服务器唯一标识
      */
-    id?: number;
+    id?: number | null;
     /**
      * 服务器描述
      */

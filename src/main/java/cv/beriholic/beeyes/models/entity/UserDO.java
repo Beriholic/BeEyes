@@ -1,6 +1,7 @@
 package cv.beriholic.beeyes.models.entity;
 
 import cv.beriholic.beeyes.models.entity.common.BaseDO;
+import cv.beriholic.beeyes.utils.SnowflakeIdGenerator;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import org.babyfish.jimmer.sql.*;
@@ -20,11 +21,11 @@ import java.util.List;
 @Entity
 @Table(name = "users")
 public interface UserDO extends BaseDO {
-
     /**
      * 用户唯一标识
      */
     @Id
+    @GeneratedValue(generatorType = SnowflakeIdGenerator.class)
     long id();
 
     /**
@@ -63,20 +64,6 @@ public interface UserDO extends BaseDO {
     String fullName();
 
     /**
-     * 账户是否激活
-     */
-    @Column(name = "is_active")
-    @Nullable
-    Boolean isActive();
-
-    /**
-     * 是否为主账户
-     */
-    @Column(name = "is_main_account")
-    @Nullable
-    Boolean isMainAccount();
-
-    /**
      * 手机号
      */
     @Nullable
@@ -89,4 +76,11 @@ public interface UserDO extends BaseDO {
             inverseJoinColumnName = "server_id"
     )
     List<ServersDO> servers();
+
+    @OneToOne(mappedBy = "user")
+    @Nullable
+    UserRoleDO role();
+
+    @OneToMany(mappedBy = "user")
+    List<PermissionsDO> permissions();
 }

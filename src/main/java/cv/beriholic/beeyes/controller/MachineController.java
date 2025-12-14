@@ -1,7 +1,9 @@
 package cv.beriholic.beeyes.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
+import cv.beriholic.beeyes.consts.PermissionCode;
 import cv.beriholic.beeyes.exception.ErrorCode;
+import cv.beriholic.beeyes.helper.PermissionValidateHelper;
 import cv.beriholic.beeyes.helper.ValidateHelper;
 import cv.beriholic.beeyes.models.dto.PageDTO;
 import cv.beriholic.beeyes.models.dto.RestBean;
@@ -18,10 +20,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MachineController {
     private final MachineService machineService;
+    private final PermissionValidateHelper permissionValidateHelper;
 
     @GetMapping("/list")
     public RestBean<PageDTO<List<MachineView>>> getMachineList(QueryMachineListRequest request) {
-        ValidateHelper.validateQueryMachinePageParam(request.getPageIndex(), request.getPageSize());
+        ValidateHelper.validateQueryPageParam(request.getPageIndex(), request.getPageSize());
         long userId = StpUtil.getLoginIdAsLong();
 
         PageDTO<List<MachineView>> machineList = machineService.queryMachineListOrderByStatus(userId, request);
@@ -48,6 +51,7 @@ public class MachineController {
             return RestBean.failed(ErrorCode.PARAM_INVALID);
         }
         Long userId = StpUtil.getLoginIdAsLong();
+        permissionValidateHelper.checkPermission(userId, PermissionCode.CRATE_SERVER);
         machineService.createMachine(userId, request);
         return RestBean.success();
     }
@@ -55,13 +59,14 @@ public class MachineController {
     @PostMapping("/manage/update")
     public RestBean<Void> updateMachine(@RequestBody UpdateMachineRequest request) {
         Long userId = StpUtil.getLoginIdAsLong();
+        permissionValidateHelper.checkPermission(userId, PermissionCode.UPDATE_SERVER);
         machineService.updateMachine(userId, request);
         return RestBean.success();
     }
 
     @GetMapping("/manage/list")
     public RestBean<PageDTO<List<MachineManageView>>> getMachineManageList(QueryMachineManageListRequest request) {
-        ValidateHelper.validateQueryMachinePageParam(request.getPageIndex(), request.getPageSize());
+        ValidateHelper.validateQueryPageParam(request.getPageIndex(), request.getPageSize());
         long userId = StpUtil.getLoginIdAsLong();
 
         PageDTO<List<MachineManageView>> machineList = machineService.queryMachineManageList(userId, request);
@@ -71,6 +76,7 @@ public class MachineController {
     @DeleteMapping("/machine/delete")
     public RestBean<Void> deleteMachine(@RequestBody DeleteMachineRequest request) {
         Long userId = StpUtil.getLoginIdAsLong();
+        permissionValidateHelper.checkPermission(userId, PermissionCode.DELETE_SERVER);
         machineService.deleteMachine(userId, request);
         return RestBean.success();
     }

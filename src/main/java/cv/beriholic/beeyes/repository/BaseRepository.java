@@ -141,4 +141,10 @@ public abstract class BaseRepository<E, T extends TableProxy<E>, D> extends Abst
                 .select(table.fetch(viewType))
                 .fetchFirst();
     }
+
+    public <V extends View<E>> Page<V> findByFetchPage(Integer pageIndex, Integer pageSize, Class<V> viewType) {
+        return createQuery()
+                .select(table.fetch(viewType))
+                .fetchPage(pageIndex, pageSize);
+    }
 }

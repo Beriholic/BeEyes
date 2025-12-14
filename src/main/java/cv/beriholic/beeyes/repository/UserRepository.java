@@ -42,5 +42,12 @@ public class UserRepository extends BaseRepository<UserDO, UserDOTable, Long> {
                 )).select(table.id())
                 .execute();
     }
+
+    public void updatePasswordHash(Long userId, String value) {
+        createUpdate()
+                .set(table.passwordHash(), value)
+                .where(table.id().eq(userId))
+                .execute();
+    }
 }
 

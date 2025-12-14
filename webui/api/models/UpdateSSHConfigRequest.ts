@@ -9,7 +9,7 @@
  *
  */
 export type UpdateSSHConfigRequest = {
-    serverId?: number;
+    serverId?: number | null;
     name?: string;
     password?: string;
     port?: number;

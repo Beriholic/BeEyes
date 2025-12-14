@@ -1,0 +1,16 @@
+export cv.beriholic.beeyes.models.entity.UserDO
+
+input UpdateUserInput {
+    id
+    username
+    email
+    fullName
+    phone
+    flat(role) {
+        role as roleCode
+    }
+    permissions {
+        permission as permissionCode
+    }
+}
+

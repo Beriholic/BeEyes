@@ -1,8 +1,9 @@
 package cv.beriholic.beeyes.models.entity;
 
 import cv.beriholic.beeyes.models.entity.common.BaseDO;
+import cv.beriholic.beeyes.utils.SnowflakeIdGenerator;
+import jakarta.annotation.Nullable;
 import org.babyfish.jimmer.sql.*;
-import org.jetbrains.annotations.Nullable;
 
 import java.time.LocalDateTime;
 
@@ -17,20 +18,16 @@ import java.time.LocalDateTime;
  * @date 2025-11-01
  */
 @Entity
-@Table(name = "user_roles")
-public interface UserRolesDO extends BaseDO {
-
-    /**
-     * 角色分配记录ID
-     */
-    @Id
-    long id();
-
+@Table(name = "user_role")
+public interface UserRoleDO extends BaseDO {
     /**
      * 用户ID
      */
-    @Key
-    @Column(name = "user_id")
+    @Id
+    @GeneratedValue(generatorType = SnowflakeIdGenerator.class)
+    long id();
+
+    @IdView
     long userId();
 
     /**
@@ -60,4 +57,8 @@ public interface UserRolesDO extends BaseDO {
     @Nullable
     LocalDateTime expiresAt();
 
+    @OneToOne
+    @OnDissociate(DissociateAction.DELETE)
+    @JoinColumn(name = "user_id")
+    UserDO user();
 }

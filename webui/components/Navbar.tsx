@@ -2,7 +2,9 @@
 
 import type { UserBaseView } from "@/api/models/UserBaseView";
 import { AuthControllerService } from "@/api/services/AuthControllerService";
+import { PermissionControllerService } from "@/api/services/PermissionControllerService";
 import { ProfileControllerService } from "@/api/services/ProfileControllerService";
+import { UserRole } from "@/constants/enums";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Jdenticon from "react-jdenticon";
@@ -18,10 +20,12 @@ const NAV_ITEMS = [
 const getActiveKey = (pathname: string | null): string => {
   if (!pathname) return "monitor";
   if (pathname.startsWith("/settings")) return "";
-  const matched = NAV_ITEMS.find((item) =>
-    item.href === "/"
-      ? pathname === "/"
-      : pathname.startsWith(item.href)
+  const matched = [
+    ...NAV_ITEMS,
+    { label: "用户管理", key: "users", href: "/users" },
+    { label: "权限管理", key: "permissions", href: "/permissions" },
+  ].find((item) =>
+    item.href === "/" ? pathname === "/" : pathname.startsWith(item.href)
   );
   return matched?.key ?? "monitor";
 };
@@ -31,6 +35,7 @@ export function Navbar() {
   const router = useRouter();
   const activeKey = useMemo(() => getActiveKey(pathname), [pathname]);
   const [user, setUser] = useState<UserBaseView | null>(null);
+  const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [logoutPending, setLogoutPending] = useState(false);
@@ -41,6 +46,25 @@ export function Navbar() {
     return ["/login"].some((prefix) => pathname.startsWith(prefix));
   }, [pathname]);
 
+  const displayedNavItems = useMemo(() => {
+    const items = [...NAV_ITEMS];
+    if (role === UserRole.SUPER_ADMIN.key) {
+      items.push({ label: "用户管理", key: "users", href: "/users" });
+      items.push({
+        label: "权限管理",
+        key: "permissions",
+        href: "/permissions",
+      });
+    } else if (role === UserRole.ADMIN.key) {
+      items.push({
+        label: "权限管理",
+        key: "permissions",
+        href: "/permissions",
+      });
+    }
+    return items;
+  }, [role]);
+
   useEffect(() => {
     if (isHidden) return;
 
@@ -49,12 +73,17 @@ export function Navbar() {
       if (disposed) return;
       setLoading(true);
     });
-    const request = ProfileControllerService.getSelfInfo();
 
-    request
-      .then((response) => {
+    // 获取用户信息
+    const userRequest = ProfileControllerService.getSelfInfo();
+    // 获取用户角色
+    const roleRequest = PermissionControllerService.getCurrentUserRole();
+
+    Promise.all([userRequest, roleRequest])
+      .then(([userRes, roleRes]) => {
         if (disposed) return;
-        setUser(response?.data ?? null);
+        setUser(userRes?.data ?? null);
+        setRole((roleRes?.data as unknown as string) ?? null);
       })
       .catch(() => {
         if (disposed) return;
@@ -67,7 +96,8 @@ export function Navbar() {
     return () => {
       disposed = true;
       cancelAnimationFrame(frame);
-      request.cancel();
+      userRequest.cancel();
+      roleRequest.cancel();
     };
   }, [isHidden]);
 
@@ -117,7 +147,7 @@ export function Navbar() {
             BeEyes
           </Link>
           <div className="flex items-center gap-4 text-sm text-slate-400">
-            {NAV_ITEMS.map((item) => {
+            {displayedNavItems.map((item) => {
               const isActive = activeKey === item.key;
               return (
                 <Link
@@ -187,4 +217,3 @@ export function Navbar() {
     </nav>
   );
 }
-

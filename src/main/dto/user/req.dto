@@ -1,0 +1,37 @@
+export cv.beriholic.beeyes.models.entity.UserDO
+
+input QueryManageUserListRequest {
+    username: String?
+    fullName: String?
+    email: String?
+    phone: String?
+    ruleCode: Short?
+
+    pageIndex: Int
+    pageSize: Int
+}
+
+input CreateUserRequest {
+    username
+    fullName
+    email
+    phone
+    roleCode: Short
+}
+
+input UpdateUserRequest {
+    userId: String
+    username
+    fullName
+    email
+    phone
+    roleCode: Short
+}
+
+input ResetUserPasswordRequest {
+    userId: String
+}
+
+input DeleteUserRequest {
+    userId: String
+}

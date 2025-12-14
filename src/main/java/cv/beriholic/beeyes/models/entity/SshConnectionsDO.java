@@ -1,6 +1,7 @@
 package cv.beriholic.beeyes.models.entity;
 
 import cv.beriholic.beeyes.models.entity.common.BaseDO;
+import cv.beriholic.beeyes.utils.SnowflakeIdGenerator;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import org.babyfish.jimmer.sql.*;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 @Table(name = "ssh_connections")
 public interface SshConnectionsDO extends BaseDO {
     @Id
+    @GeneratedValue(generatorType = SnowflakeIdGenerator.class)
     @Column(name = "server_id")
     long serverId();
 

@@ -1,15 +1,13 @@
 package cv.beriholic.beeyes.helper;
 
 import cv.beriholic.beeyes.consts.HistoryTimeUnit;
-import cv.beriholic.beeyes.models.entity.dto.AuthLoginRequest;
-import cv.beriholic.beeyes.models.entity.dto.QueryMachineRuntimeHistoryRequest;
-import cv.beriholic.beeyes.models.entity.dto.UpdateSSHConfigRequest;
+import cv.beriholic.beeyes.models.entity.dto.*;
 import org.apache.commons.lang3.StringUtils;
 
 public class ValidateHelper {
     private static final int QUERY_MACHINE_MAX_PAGE_SIZE = 20;
 
-    public static void validateQueryMachinePageParam(int pageIndex, int pageSize) {
+    public static void validateQueryPageParam(int pageIndex, int pageSize) {
         if (pageIndex < 0 || pageSize < 0) {
             throw new IllegalArgumentException("Page index or page size cannot be negative");
         }
@@ -61,6 +59,51 @@ public class ValidateHelper {
 
         if (!validTimeUnit) {
             throw new IllegalArgumentException("Invalid time unit or time value");
+        }
+    }
+
+    public static void validateCreateUserRequest(CreateUserRequest request) {
+        if (StringUtils.isEmpty(request.getUsername())) {
+            throw new IllegalArgumentException("Username cannot be empty");
+        }
+        if (StringUtils.isEmpty(request.getEmail())) {
+            throw new IllegalArgumentException("Email cannot be empty");
+        }
+        if (StringUtils.isEmpty(request.getFullName())) {
+            throw new IllegalArgumentException("Full name cannot be empty");
+        }
+        if (StringUtils.isEmpty(request.getPhone())) {
+            throw new IllegalArgumentException("Phone cannot be empty");
+        }
+    }
+
+    public static void validateUpdateUserRequest(UpdateUserRequest request) {
+        if (StringUtils.isEmpty(request.getUserId())) {
+            throw new IllegalArgumentException("User Id cannot be empty");
+        }
+        if (StringUtils.isEmpty(request.getUsername())) {
+            throw new IllegalArgumentException("Username cannot be empty");
+        }
+        if (StringUtils.isEmpty(request.getEmail())) {
+            throw new IllegalArgumentException("Email cannot be empty");
+        }
+        if (StringUtils.isEmpty(request.getFullName())) {
+            throw new IllegalArgumentException("Full name cannot be empty");
+        }
+        if (StringUtils.isEmpty(request.getPhone())) {
+            throw new IllegalArgumentException("Phone cannot be empty");
+        }
+    }
+
+    public static void validateDeleteUserRequest(DeleteUserRequest request) {
+        if (StringUtils.isEmpty(request.getUserId())) {
+            throw new IllegalArgumentException("User Id cannot be empty");
+        }
+    }
+
+    public static void validateResetUserPasswordRequest(ResetUserPasswordRequest request) {
+        if (StringUtils.isEmpty(request.getUserId())) {
+            throw new IllegalArgumentException("User Id cannot be empty");
         }
     }
 }

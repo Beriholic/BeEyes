@@ -1,9 +1,11 @@
 package cv.beriholic.beeyes.repository;
 
 import cv.beriholic.beeyes.models.entity.PermissionsDO;
-import org.babyfish.jimmer.spring.repo.support.AbstractJavaRepository;
+import cv.beriholic.beeyes.models.entity.PermissionsDOTable;
 import org.babyfish.jimmer.sql.JSqlClient;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * <p>
@@ -14,10 +16,24 @@ import org.springframework.stereotype.Repository;
  * @date 2025-11-01
  */
 @Repository
-public class PermissionsRepository extends AbstractJavaRepository<PermissionsDO, Long> {
+public class PermissionsRepository extends BaseRepository<PermissionsDO, PermissionsDOTable, Long> {
 
     public PermissionsRepository(JSqlClient sql) {
-        super(sql);
+        super(sql, PermissionsDOTable.$);
+    }
+
+    public List<PermissionsDO> findByUserId(Long userId) {
+        return createQuery()
+                .where(table.userId().eq(userId))
+                .select(table)
+                .execute();
+    }
+
+    public boolean existUserPermissions(Long userId, List<Short> permissionCodes) {
+        return createQuery()
+                .where(table.userId().eq(userId))
+                .where(table.permission().in(permissionCodes))
+                .exists();
     }
 }
 

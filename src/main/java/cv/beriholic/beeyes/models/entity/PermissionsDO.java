@@ -1,6 +1,7 @@
 package cv.beriholic.beeyes.models.entity;
 
 import cv.beriholic.beeyes.models.entity.common.BaseDO;
+import cv.beriholic.beeyes.utils.SnowflakeIdGenerator;
 import jakarta.annotation.Nullable;
 import org.babyfish.jimmer.sql.*;
 
@@ -24,20 +25,14 @@ public interface PermissionsDO extends BaseDO {
      * 权限分配记录ID
      */
     @Id
+    @GeneratedValue(generatorType = SnowflakeIdGenerator.class)
     long id();
-
-    /**
-     * 用户ID
-     */
-    @Key
-    @Column(name = "user_id")
-    long userId();
 
     /**
      * 权限类型（应用层维护枚举映射）
      */
     @Key
-    long permission();
+    short permission();
 
     /**
      * 授权者ID
@@ -60,4 +55,8 @@ public interface PermissionsDO extends BaseDO {
     @Nullable
     LocalDateTime expiresAt();
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @OnDissociate(DissociateAction.DELETE)
+    UserDO user();
 }

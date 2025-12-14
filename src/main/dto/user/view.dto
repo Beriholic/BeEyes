@@ -13,3 +13,36 @@ ServerIdListUnderUserView {
         id
     }
 }
+
+ManageUserView {
+    id
+    username
+    fullName
+    email
+    phone
+    flat(role) {
+        role as code
+    }
+}
+
+CreateUserView {
+    username
+    fullName
+    email
+    phone
+    password: String
+    flat(role) {
+        role as roleCode
+    }
+}
+
+ResetUserView {
+    username
+    fullName
+    email
+    phone
+    password: String
+    flat(role) {
+        role as roleCode
+    }
+}

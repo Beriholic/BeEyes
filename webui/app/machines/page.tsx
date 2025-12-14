@@ -5,6 +5,8 @@ import type { CreateMachineRequest } from "@/api/models/CreateMachineRequest";
 import type { DeleteMachineRequest } from "@/api/models/DeleteMachineRequest";
 import type { UpdateMachineRequest } from "@/api/models/UpdateMachineRequest";
 import { MachineControllerService } from "@/api/services/MachineControllerService";
+import { PermissionControllerService } from "@/api/services/PermissionControllerService";
+import { Permission } from "@/constants/enums";
 import { useCallback, useEffect, useMemo, useState, FormEvent } from "react";
 import CountrySelect from "react-select-country-list";
 import ReactCountryFlag from "react-country-flag";
@@ -57,7 +59,18 @@ export default function MachinesPage() {
     value: string;
     label: string;
   } | null>(null);
+  const [permissions, setPermissions] = useState<string[]>([]);
   const countryOptions = useMemo(() => CountrySelect().getData(), []);
+
+  useEffect(() => {
+    PermissionControllerService.getCurrentUserPermissions()
+      .then((res) => {
+        setPermissions(res.data ?? []);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch permissions:", err);
+      });
+  }, []);
 
   // 获取国家名称的函数
   const getCountryName = useCallback(
@@ -326,13 +339,15 @@ export default function MachinesPage() {
                   />
                 </svg>
               </div>
-              <button
-                type="button"
-                onClick={() => setShowCreateModal(true)}
-                className="rounded-2xl border border-indigo-500/50 bg-indigo-500/10 px-6 py-2 text-sm font-medium text-indigo-300 transition hover:border-indigo-400 hover:bg-indigo-500/20"
-              >
-                新增机器
-              </button>
+              {permissions.includes(Permission.CREATE_SERVER.key) && (
+                <button
+                  type="button"
+                  onClick={() => setShowCreateModal(true)}
+                  className="rounded-2xl border border-indigo-500/50 bg-indigo-500/10 px-6 py-2 text-sm font-medium text-indigo-300 transition hover:border-indigo-400 hover:bg-indigo-500/20"
+                >
+                  新增机器
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => loadMachines()}
@@ -492,28 +507,36 @@ export default function MachinesPage() {
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2">
-                            <button
-                              type="button"
-                              onClick={() => handleEditMachine(machine)}
-                              className="rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-3 py-1.5 text-xs text-indigo-400 transition hover:border-indigo-500/50 hover:bg-indigo-500/20"
-                              title="编辑机器"
-                            >
-                              编辑
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setDeleteConfirm({
-                                  show: true,
-                                  machine,
-                                  loading: false,
-                                })
-                              }
-                              className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-1.5 text-xs text-rose-400 transition hover:border-rose-500/50 hover:bg-rose-500/20"
-                              title="删除机器"
-                            >
-                              删除
-                            </button>
+                            {permissions.includes(
+                              Permission.UPDATE_SERVER.key
+                            ) && (
+                              <button
+                                type="button"
+                                onClick={() => handleEditMachine(machine)}
+                                className="rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-3 py-1.5 text-xs text-indigo-400 transition hover:border-indigo-500/50 hover:bg-indigo-500/20"
+                                title="编辑机器"
+                              >
+                                编辑
+                              </button>
+                            )}
+                            {permissions.includes(
+                              Permission.DELETE_SERVER.key
+                            ) && (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setDeleteConfirm({
+                                    show: true,
+                                    machine,
+                                    loading: false,
+                                  })
+                                }
+                                className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-1.5 text-xs text-rose-400 transition hover:border-rose-500/50 hover:bg-rose-500/20"
+                                title="删除机器"
+                              >
+                                删除
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>

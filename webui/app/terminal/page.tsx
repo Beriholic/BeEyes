@@ -3,9 +3,14 @@
 import type { MachineTerminalListView } from "@/api/models/MachineTerminalListView";
 import { ServerListSidebar } from "@/components/ServerListSidebar";
 import { SSHConfigModal } from "@/components/SSHConfigModal";
-import { TerminalWindow } from "@/components/TerminalWindow";
+import dynamic from "next/dynamic";
 import { useState } from "react";
 import ReactCountryFlag from "react-country-flag";
+
+const TerminalWindow = dynamic(
+  () => import("@/components/TerminalWindow").then((mod) => mod.TerminalWindow),
+  { ssr: false }
+);
 
 export default function TerminalPage() {
   const [selectedServer, setSelectedServer] =
@@ -150,7 +155,7 @@ export default function TerminalPage() {
                       <div className="text-sm text-blue-300">
                         <p className="font-medium">使用提示</p>
                         <p className="mt-1 text-blue-300/80">
-                          点击"SSH配置"按钮配置服务器连接信息，配置完成后点击"连接"按钮即可开始远程操作
+                          点击“SSH配置”按钮配置服务器连接信息，配置完成后点击“连接”按钮即可开始远程操作
                         </p>
                       </div>
                     </div>
