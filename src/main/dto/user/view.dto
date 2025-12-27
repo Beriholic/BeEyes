@@ -8,12 +8,6 @@ UserBaseView {
     phone
 }
 
-ServerIdListUnderUserView {
-    servers {
-        id
-    }
-}
-
 ManageUserView {
     id
     username

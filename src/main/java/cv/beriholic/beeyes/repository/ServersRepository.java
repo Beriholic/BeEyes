@@ -1,7 +1,6 @@
 package cv.beriholic.beeyes.repository;
 
 import cv.beriholic.beeyes.consts.ServerStatus;
-import cv.beriholic.beeyes.models.dto.PageDTO;
 import cv.beriholic.beeyes.models.dto.ServerStatusDTO;
 import cv.beriholic.beeyes.models.entity.ServersDO;
 import cv.beriholic.beeyes.models.entity.ServersDOTable;
@@ -9,7 +8,6 @@ import cv.beriholic.beeyes.models.entity.dto.MachineView;
 import cv.beriholic.beeyes.models.entity.dto.QueryServerSpec;
 import org.babyfish.jimmer.Page;
 import org.babyfish.jimmer.sql.JSqlClient;
-import org.babyfish.jimmer.sql.ast.Predicate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -52,18 +50,11 @@ public class ServersRepository extends BaseRepository<ServersDO, ServersDOTable,
         return createQuery().select(table.id()).execute();
     }
 
-    public List<Long> getServerIdListOrderByStatus(PageDTO<Long> userIdPage) {
+    public List<Long> getServerIdListOrderByStatus(int pageIndex, int pageSize) {
         return createQuery()
-                .where(
-                        table.users(userDOTableEx ->
-                                Predicate.and(
-                                        userDOTableEx.id().eq(userIdPage.getData())
-                                )
-                        )
-                )
                 .orderBy(table.status().asc())
                 .select(table.id())
-                .fetchPage(userIdPage.getPageIndex(), userIdPage.getPageSize())
+                .fetchPage(pageIndex, pageSize)
                 .getRows();
     }
 
@@ -76,14 +67,9 @@ public class ServersRepository extends BaseRepository<ServersDO, ServersDOTable,
                 .fetchPage(pageIndex, pageSize);
     }
 
-    public boolean userHasServer(Long userId, Long serverId) {
+    public boolean userHasServer(Long serverId) {
         return createQuery()
                 .where(table.id().eq(serverId))
-                .where(table.users(userDOTableEx ->
-                                Predicate.and(
-                                        userDOTableEx.id().eq(userId))
-                        )
-                )
                 .exists();
 
     }

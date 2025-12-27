@@ -74,12 +74,6 @@ MachineManageView {
     apiKey
 }
 
-UserIdListUnderServerView {
-    users {
-        id
-    }
-}
-
 MachineTerminalListView {
     id
     hostname

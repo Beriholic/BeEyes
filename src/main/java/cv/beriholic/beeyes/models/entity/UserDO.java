@@ -69,14 +69,6 @@ public interface UserDO extends BaseDO {
     @Nullable
     String phone();
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_servers",
-            joinColumnName = "user_id",
-            inverseJoinColumnName = "server_id"
-    )
-    List<ServersDO> servers();
-
     @OneToOne(mappedBy = "user")
     @Nullable
     UserRoleDO role();

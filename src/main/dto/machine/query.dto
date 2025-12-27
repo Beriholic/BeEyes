@@ -1,15 +1,9 @@
 export cv.beriholic.beeyes.models.entity.ServersDO
 
 specification QueryServerSpec {
-    flat(users) {
-        id as userId
-    }
     like(hostname)
 }
 
 specification DeleteServerSpec {
     id
-    flat(users) {
-        id as userId
-    }
 }

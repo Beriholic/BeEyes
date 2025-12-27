@@ -111,6 +111,4 @@ public interface ServersDO extends BaseDO {
     @OneToMany(mappedBy = "server")
     List<ServerNetworkInterfacesDO> networkInterfaces();
 
-    @ManyToMany(mappedBy = "servers")
-    List<UserDO> users();
 }

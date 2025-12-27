@@ -26,5 +26,6 @@ export type CreateUserRequest = {
      */
     phone?: string | null;
     roleCode?: number;
+    parentId?: string;
 };
 

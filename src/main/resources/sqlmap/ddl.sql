@@ -1,202 +1,3 @@
-create table if not exists users
-(
-    id              bigint                                 not null,
-    parent_id       bigint,
-    username        varchar(50)                            not null,
-    email           varchar(255)                           not null,
-    password_hash   varchar(255)                           not null,
-    full_name       varchar(100),
-    is_active       boolean                  default true,
-    is_main_account boolean                  default false,
-    created_at      timestamp with time zone default CURRENT_TIMESTAMP,
-    updated_at      timestamp with time zone default CURRENT_TIMESTAMP,
-    is_deleted      boolean                  default false not null,
-    created_by      bigint,
-    phone           varchar(20)
-);
-
-comment on table users is '用户表：存储系统用户基本信息和账户状态';
-
-comment on column users.id is '用户唯一标识';
-
-comment on column users.parent_id is '父账户ID（用于账户关联）';
-
-comment on column users.username is '用户名（唯一）';
-
-comment on column users.email is '邮箱地址（唯一）';
-
-comment on column users.password_hash is '密码哈希值';
-
-comment on column users.full_name is '用户全名';
-
-comment on column users.is_active is '账户是否激活';
-
-comment on column users.is_main_account is '是否为主账户';
-
-comment on column users.created_at is '创建时间';
-
-comment on column users.updated_at is '更新时间';
-
-comment on column users.is_deleted is '是否删除';
-
-comment on column users.created_by is '创建者ID';
-
-comment on column users.phone is '电话号码';
-
-create index if not exists idx_users_parent_id
-    on users (parent_id);
-
-create index if not exists idx_users_active_created
-    on users (is_active, created_at, created_by)
-    where (is_deleted = false);
-
-create index if not exists idx_users_login_active
-    on users (email, username, is_active)
-    where ((is_deleted = false) AND (is_active = true));
-
-alter table users
-    add primary key (id);
-
-alter table users
-    add unique (username);
-
-alter table users
-    add unique (email);
-
-create table if not exists permissions
-(
-    id         bigint                                 not null,
-    user_id    bigint                                 not null,
-    permission smallint                               not null,
-    granted_by bigint,
-    granted_at timestamp with time zone default CURRENT_TIMESTAMP,
-    expires_at timestamp with time zone,
-    created_at timestamp with time zone default CURRENT_TIMESTAMP,
-    updated_at timestamp with time zone default CURRENT_TIMESTAMP,
-    is_deleted boolean                  default false not null,
-    created_by bigint
-);
-
-comment on table permissions is '用户权限表：存储用户具体权限分配信息';
-
-comment on column permissions.id is '权限分配记录ID';
-
-comment on column permissions.user_id is '用户ID';
-
-comment on column permissions.permission is '权限类型（应用层维护枚举映射）';
-
-comment on column permissions.granted_by is '授权者ID';
-
-comment on column permissions.granted_at is '授权时间';
-
-comment on column permissions.expires_at is '权限过期时间（可为空表示永不过期）';
-
-comment on column permissions.created_at is '创建时间';
-
-comment on column permissions.updated_at is '更新时间';
-
-comment on column permissions.is_deleted is '是否删除';
-
-create index if not exists idx_permissions_user_active
-    on permissions (user_id, permission, is_deleted)
-    where (is_deleted = false);
-
-alter table permissions
-    add primary key (id);
-
-alter table permissions
-    add constraint unique_user_permission
-        unique (user_id, permission);
-
-create table if not exists ssh_connections
-(
-    server_id          bigint                                 not null,
-    name               varchar(100)                           not null,
-    port               integer                  default 22    not null,
-    created_at         timestamp with time zone default CURRENT_TIMESTAMP,
-    updated_at         timestamp with time zone default CURRENT_TIMESTAMP,
-    is_deleted         boolean                  default false not null,
-    created_by         bigint,
-    password           varchar(100)                           not null,
-    user_id            bigint                                 not null,
-    last_connection_at timestamp
-);
-
-comment on table ssh_connections is 'SSH连接表：存储服务器SSH连接配置信息和认证方式';
-
-comment on column ssh_connections.server_id is '关联服务器ID';
-
-comment on column ssh_connections.name is 'SSH用户名';
-
-comment on column ssh_connections.port is 'SSH端口号';
-
-comment on column ssh_connections.created_at is '创建时间';
-
-comment on column ssh_connections.updated_at is '更新时间';
-
-comment on column ssh_connections.is_deleted is '是否删除';
-
-comment on column ssh_connections.created_by is '创建者ID';
-
-alter table ssh_connections
-    add constraint ssh_connections_pk
-        primary key (server_id, user_id);
-
-create table if not exists alert_rules
-(
-    id               bigint                                 not null,
-    name             varchar(200)                           not null,
-    description      text,
-    severity         smallint                               not null,
-    condition_type   smallint                               not null,
-    condition_config jsonb                                  not null,
-    target_servers   jsonb,
-    target_groups    jsonb,
-    is_enabled       boolean                  default true,
-    cooldown_minutes integer                  default 5,
-    created_at       timestamp with time zone default CURRENT_TIMESTAMP,
-    updated_at       timestamp with time zone default CURRENT_TIMESTAMP,
-    is_deleted       boolean                  default false not null,
-    created_by       bigint
-);
-
-comment on table alert_rules is '告警规则表：存储系统告警规则配置和触发条件';
-
-comment on column alert_rules.id is '告警规则ID';
-
-comment on column alert_rules.name is '规则名称';
-
-comment on column alert_rules.description is '规则描述';
-
-comment on column alert_rules.severity is '告警严重级别（应用层维护枚举映射）';
-
-comment on column alert_rules.condition_type is '条件类型（应用层维护枚举映射）';
-
-comment on column alert_rules.condition_config is '触发条件配置';
-
-comment on column alert_rules.target_servers is '目标服务器列表';
-
-comment on column alert_rules.target_groups is '目标服务器组列表';
-
-comment on column alert_rules.is_enabled is '规则是否启用';
-
-comment on column alert_rules.cooldown_minutes is '冷却时间（分钟）';
-
-comment on column alert_rules.created_at is '创建时间';
-
-comment on column alert_rules.updated_at is '更新时间';
-
-comment on column alert_rules.is_deleted is '是否删除';
-
-comment on column alert_rules.created_by is '创建者ID';
-
-create index if not exists idx_alert_rules_enabled_severity
-    on alert_rules (is_enabled, severity, is_deleted)
-    where (is_deleted = false);
-
-alter table alert_rules
-    add primary key (id);
-
 create table if not exists alert_channels
 (
     id         bigint                                 not null,
@@ -239,45 +40,6 @@ create index if not exists idx_alert_channels_enabled_type
 
 alter table alert_channels
     add primary key (id);
-
-create table if not exists alert_rule_channels
-(
-    id         bigint                                 not null,
-    rule_id    bigint                                 not null,
-    channel_id bigint                                 not null,
-    is_enabled boolean                  default true,
-    created_at timestamp with time zone default CURRENT_TIMESTAMP,
-    updated_at timestamp with time zone default CURRENT_TIMESTAMP,
-    is_deleted boolean                  default false not null,
-    created_by bigint
-);
-
-comment on table alert_rule_channels is '告警规则通道关联表：存储告警规则与通知通道的多对多关系';
-
-comment on column alert_rule_channels.id is '关联记录ID';
-
-comment on column alert_rule_channels.rule_id is '告警规则ID';
-
-comment on column alert_rule_channels.channel_id is '告警通道ID';
-
-comment on column alert_rule_channels.is_enabled is '关联是否启用';
-
-comment on column alert_rule_channels.created_at is '创建时间';
-
-comment on column alert_rule_channels.updated_at is '更新时间';
-
-comment on column alert_rule_channels.is_deleted is '是否删除';
-
-create index if not exists idx_alert_rule_channels_active
-    on alert_rule_channels (rule_id, channel_id, is_enabled, is_deleted)
-    where (is_deleted = false);
-
-alter table alert_rule_channels
-    add primary key (id);
-
-alter table alert_rule_channels
-    add constraint unique_rule_channel
-        unique (rule_id, channel_id);
 
 create table if not exists alert_incidents
 (
@@ -337,20 +99,20 @@ comment on column alert_incidents.updated_at is '更新时间';
 
 comment on column alert_incidents.is_deleted is '是否删除';
 
-create index if not exists idx_alert_incidents_status_created
-    on alert_incidents (status, severity, created_at)
+create index if not exists idx_alert_incidents_resolution
+    on alert_incidents (acknowledged_at, resolved_at, status)
     where (is_deleted = false);
 
 create index if not exists idx_alert_incidents_server_created
     on alert_incidents (server_id, created_at, status)
     where (is_deleted = false);
 
-create index if not exists idx_alert_incidents_time_series
-    on alert_incidents (created_at, severity, rule_id)
+create index if not exists idx_alert_incidents_status_created
+    on alert_incidents (status, severity, created_at)
     where (is_deleted = false);
 
-create index if not exists idx_alert_incidents_resolution
-    on alert_incidents (acknowledged_at, resolved_at, status)
+create index if not exists idx_alert_incidents_time_series
+    on alert_incidents (created_at, severity, rule_id)
     where (is_deleted = false);
 
 alter table alert_incidents
@@ -393,15 +155,109 @@ comment on column alert_notifications.updated_at is '更新时间';
 
 comment on column alert_notifications.is_deleted is '是否删除';
 
-create index if not exists idx_alert_notifications_status_created
-    on alert_notifications (status, created_at, channel_id)
-    where (is_deleted = false);
-
 create index if not exists idx_alert_notifications_retry
     on alert_notifications (status, retry_count, created_at)
     where ((is_deleted = false) AND (status <> 1));
 
+create index if not exists idx_alert_notifications_status_created
+    on alert_notifications (status, created_at, channel_id)
+    where (is_deleted = false);
+
 alter table alert_notifications
+    add primary key (id);
+
+create table if not exists alert_rule_channels
+(
+    id         bigint                                 not null,
+    rule_id    bigint                                 not null,
+    channel_id bigint                                 not null,
+    is_enabled boolean                  default true,
+    created_at timestamp with time zone default CURRENT_TIMESTAMP,
+    updated_at timestamp with time zone default CURRENT_TIMESTAMP,
+    is_deleted boolean                  default false not null,
+    created_by bigint
+);
+
+comment on table alert_rule_channels is '告警规则通道关联表：存储告警规则与通知通道的多对多关系';
+
+comment on column alert_rule_channels.id is '关联记录ID';
+
+comment on column alert_rule_channels.rule_id is '告警规则ID';
+
+comment on column alert_rule_channels.channel_id is '告警通道ID';
+
+comment on column alert_rule_channels.is_enabled is '关联是否启用';
+
+comment on column alert_rule_channels.created_at is '创建时间';
+
+comment on column alert_rule_channels.updated_at is '更新时间';
+
+comment on column alert_rule_channels.is_deleted is '是否删除';
+
+create index if not exists idx_alert_rule_channels_active
+    on alert_rule_channels (rule_id, channel_id, is_enabled, is_deleted)
+    where (is_deleted = false);
+
+alter table alert_rule_channels
+    add primary key (id);
+
+alter table alert_rule_channels
+    add constraint unique_rule_channel
+        unique (rule_id, channel_id);
+
+create table if not exists alert_rules
+(
+    id               bigint                                 not null,
+    name             varchar(200)                           not null,
+    description      text,
+    severity         smallint                               not null,
+    condition_type   smallint                               not null,
+    condition_config jsonb                                  not null,
+    target_servers   jsonb,
+    target_groups    jsonb,
+    is_enabled       boolean                  default true,
+    cooldown_minutes integer                  default 5,
+    created_at       timestamp with time zone default CURRENT_TIMESTAMP,
+    updated_at       timestamp with time zone default CURRENT_TIMESTAMP,
+    is_deleted       boolean                  default false not null,
+    created_by       bigint
+);
+
+comment on table alert_rules is '告警规则表：存储系统告警规则配置和触发条件';
+
+comment on column alert_rules.id is '告警规则ID';
+
+comment on column alert_rules.name is '规则名称';
+
+comment on column alert_rules.description is '规则描述';
+
+comment on column alert_rules.severity is '告警严重级别（应用层维护枚举映射）';
+
+comment on column alert_rules.condition_type is '条件类型（应用层维护枚举映射）';
+
+comment on column alert_rules.condition_config is '触发条件配置';
+
+comment on column alert_rules.target_servers is '目标服务器列表';
+
+comment on column alert_rules.target_groups is '目标服务器组列表';
+
+comment on column alert_rules.is_enabled is '规则是否启用';
+
+comment on column alert_rules.cooldown_minutes is '冷却时间（分钟）';
+
+comment on column alert_rules.created_at is '创建时间';
+
+comment on column alert_rules.updated_at is '更新时间';
+
+comment on column alert_rules.is_deleted is '是否删除';
+
+comment on column alert_rules.created_by is '创建者ID';
+
+create index if not exists idx_alert_rules_enabled_severity
+    on alert_rules (is_enabled, severity, is_deleted)
+    where (is_deleted = false);
+
+alter table alert_rules
     add primary key (id);
 
 create table if not exists audit_logs
@@ -447,24 +303,69 @@ comment on column audit_logs.updated_at is '更新时间';
 
 comment on column audit_logs.is_deleted is '是否删除';
 
-create index if not exists idx_audit_logs_user_created
-    on audit_logs (user_id, created_at, action)
-    where (is_deleted = false);
-
 create index if not exists idx_audit_logs_resource_created
     on audit_logs (resource_type, resource_id, created_at)
-    where (is_deleted = false);
-
-create index if not exists idx_audit_logs_security
-    on audit_logs (ip_address, action, created_at)
     where (is_deleted = false);
 
 create index if not exists idx_audit_logs_retention
     on audit_logs (created_at)
     where (is_deleted = false);
 
+create index if not exists idx_audit_logs_security
+    on audit_logs (ip_address, action, created_at)
+    where (is_deleted = false);
+
+create index if not exists idx_audit_logs_user_created
+    on audit_logs (user_id, created_at, action)
+    where (is_deleted = false);
+
 alter table audit_logs
     add primary key (id);
+
+create table if not exists permissions
+(
+    id         bigint                                 not null,
+    user_id    bigint                                 not null,
+    permission smallint                               not null,
+    granted_by bigint,
+    granted_at timestamp with time zone default CURRENT_TIMESTAMP,
+    expires_at timestamp with time zone,
+    created_at timestamp with time zone default CURRENT_TIMESTAMP,
+    updated_at timestamp with time zone default CURRENT_TIMESTAMP,
+    is_deleted boolean                  default false not null,
+    created_by bigint
+);
+
+comment on table permissions is '用户权限表：存储用户具体权限分配信息';
+
+comment on column permissions.id is '权限分配记录ID';
+
+comment on column permissions.user_id is '用户ID';
+
+comment on column permissions.permission is '权限类型（应用层维护枚举映射）';
+
+comment on column permissions.granted_by is '授权者ID';
+
+comment on column permissions.granted_at is '授权时间';
+
+comment on column permissions.expires_at is '权限过期时间（可为空表示永不过期）';
+
+comment on column permissions.created_at is '创建时间';
+
+comment on column permissions.updated_at is '更新时间';
+
+comment on column permissions.is_deleted is '是否删除';
+
+create index if not exists idx_permissions_user_active
+    on permissions (user_id, permission, is_deleted)
+    where (is_deleted = false);
+
+alter table permissions
+    add primary key (id);
+
+alter table permissions
+    add constraint unique_user_permission
+        unique (user_id, permission);
 
 create table if not exists scheduled_tasks
 (
@@ -547,74 +448,50 @@ alter table scheduled_tasks
     add constraint unique_task_name
         unique (name);
 
-create table if not exists servers
+create table if not exists server_disk
 (
-    id             bigint                                 not null,
-    group_id       bigint,
-    hostname       varchar(255),
-    description    text,
-    status         smallint                 default 0,
-    last_seen      timestamp with time zone,
-    created_at     timestamp with time zone default CURRENT_TIMESTAMP,
-    updated_at     timestamp with time zone default CURRENT_TIMESTAMP,
-    is_deleted     boolean                  default false not null,
-    created_by     bigint,
-    api_key        varchar(255),
-    hardware_id    bigint,
-    region         varchar(20),
-    os_name        varchar(100),
-    os_version     varchar(100),
-    kernel_version varchar(100)
+    id          bigint                                 not null,
+    server_id   bigint                                 not null,
+    disk_name   varchar(200)                           not null,
+    file_system varchar(50),
+    disk_kind   varchar(50),
+    total_bytes bigint                                 not null,
+    created_at  timestamp with time zone default CURRENT_TIMESTAMP,
+    updated_at  timestamp with time zone default CURRENT_TIMESTAMP,
+    is_deleted  boolean                  default false not null,
+    created_by  bigint
 );
 
-comment on table servers is '服务器表：存储被监控服务器的基本信息';
+comment on table server_disk is '服务器磁盘信息表：存储服务器磁盘分区信息';
 
-comment on column servers.id is '服务器唯一标识';
+comment on column server_disk.id is '磁盘信息ID';
 
-comment on column servers.group_id is '所属服务器组ID';
+comment on column server_disk.server_id is '关联服务器ID';
 
-comment on column servers.hostname is '主机名';
+comment on column server_disk.disk_name is '磁盘名称';
 
-comment on column servers.description is '服务器描述';
+comment on column server_disk.file_system is '文件系统类型';
 
-comment on column servers.status is '服务器状态（应用层维护枚举映射）';
+comment on column server_disk.disk_kind is '磁盘类型（SSD/HDD等）';
 
-comment on column servers.last_seen is '最后在线时间';
+comment on column server_disk.total_bytes is '总容量(字节)';
 
-comment on column servers.created_at is '创建时间';
+comment on column server_disk.created_at is '创建时间';
 
-comment on column servers.updated_at is '更新时间';
+comment on column server_disk.updated_at is '更新时间';
 
-comment on column servers.is_deleted is '是否删除';
+comment on column server_disk.is_deleted is '是否删除';
 
-comment on column servers.created_by is '创建者ID';
+create index if not exists idx_server_disk_info_server
+    on server_disk (server_id, is_deleted);
 
-comment on column servers.api_key is '客户端API密钥';
-
-create index if not exists idx_servers_api_key
-    on servers (api_key);
-
-create index if not exists idx_servers_status_active
-    on servers (status, is_deleted, last_seen)
+create unique index if not exists idx_server_disk_unique
+    on server_disk (server_id, disk_name)
     where (is_deleted = false);
 
-create index if not exists idx_servers_group_active
-    on servers (group_id, is_deleted, status)
-    where (is_deleted = false);
-
-create index if not exists servers_region_index
-    on servers (region);
-
-alter table servers
-    add primary key (id);
-
-alter table servers
-    add constraint unique_server_hostname
-        unique (hostname);
-
-alter table servers
-    add constraint unique_server_api_key
-        unique (api_key);
+alter table server_disk
+    add constraint server_disk_info_pkey
+        primary key (id);
 
 create table if not exists server_hardware
 (
@@ -701,70 +578,178 @@ create unique index if not exists idx_server_network_interface_unique
 alter table server_network_interfaces
     add primary key (id);
 
-create table if not exists server_disk
+create table if not exists servers
 (
-    id          bigint                                 not null,
-    server_id   bigint                                 not null,
-    disk_name   varchar(200)                           not null,
-    file_system varchar(50),
-    disk_kind   varchar(50),
-    total_bytes bigint                                 not null,
-    created_at  timestamp with time zone default CURRENT_TIMESTAMP,
-    updated_at  timestamp with time zone default CURRENT_TIMESTAMP,
-    is_deleted  boolean                  default false not null,
-    created_by  bigint
+    id             bigint                                 not null,
+    group_id       bigint,
+    hostname       varchar(255),
+    description    text,
+    status         smallint                 default 0,
+    last_seen      timestamp with time zone,
+    created_at     timestamp with time zone default CURRENT_TIMESTAMP,
+    updated_at     timestamp with time zone default CURRENT_TIMESTAMP,
+    is_deleted     boolean                  default false not null,
+    created_by     bigint,
+    api_key        varchar(255),
+    hardware_id    bigint,
+    region         varchar(20),
+    os_name        varchar(100),
+    os_version     varchar(100),
+    kernel_version varchar(100)
 );
 
-comment on table server_disk is '服务器磁盘信息表：存储服务器磁盘分区信息';
+comment on table servers is '服务器表：存储被监控服务器的基本信息';
 
-comment on column server_disk.id is '磁盘信息ID';
+comment on column servers.id is '服务器唯一标识';
 
-comment on column server_disk.server_id is '关联服务器ID';
+comment on column servers.group_id is '所属服务器组ID';
 
-comment on column server_disk.disk_name is '磁盘名称';
+comment on column servers.hostname is '主机名';
 
-comment on column server_disk.file_system is '文件系统类型';
+comment on column servers.description is '服务器描述';
 
-comment on column server_disk.disk_kind is '磁盘类型（SSD/HDD等）';
+comment on column servers.status is '服务器状态（应用层维护枚举映射）';
 
-comment on column server_disk.total_bytes is '总容量(字节)';
+comment on column servers.last_seen is '最后在线时间';
 
-comment on column server_disk.created_at is '创建时间';
+comment on column servers.created_at is '创建时间';
 
-comment on column server_disk.updated_at is '更新时间';
+comment on column servers.updated_at is '更新时间';
 
-comment on column server_disk.is_deleted is '是否删除';
+comment on column servers.is_deleted is '是否删除';
 
-create unique index if not exists idx_server_disk_unique
-    on server_disk (server_id, disk_name)
+comment on column servers.created_by is '创建者ID';
+
+comment on column servers.api_key is '客户端API密钥';
+
+create index if not exists idx_servers_api_key
+    on servers (api_key);
+
+create index if not exists idx_servers_group_active
+    on servers (group_id, is_deleted, status)
     where (is_deleted = false);
 
-create index if not exists idx_server_disk_info_server
-    on server_disk (server_id, is_deleted);
+create index if not exists idx_servers_status_active
+    on servers (status, is_deleted, last_seen)
+    where (is_deleted = false);
 
-alter table server_disk
-    add constraint server_disk_info_pkey
-        primary key (id);
+create index if not exists servers_region_index
+    on servers (region);
 
-create table if not exists user_roles
+alter table servers
+    add primary key (id);
+
+alter table servers
+    add constraint unique_server_api_key
+        unique (api_key);
+
+alter table servers
+    add constraint unique_server_hostname
+        unique (hostname);
+
+create table if not exists ssh_connections
+(
+    server_id          bigint                                 not null,
+    name               varchar(100)                           not null,
+    port               integer                  default 22    not null,
+    created_at         timestamp with time zone default CURRENT_TIMESTAMP,
+    updated_at         timestamp with time zone default CURRENT_TIMESTAMP,
+    is_deleted         boolean                  default false not null,
+    created_by         bigint,
+    password           varchar(100)                           not null,
+    user_id            bigint                                 not null,
+    last_connection_at timestamp
+);
+
+comment on table ssh_connections is 'SSH连接表：存储服务器SSH连接配置信息和认证方式';
+
+comment on column ssh_connections.server_id is '关联服务器ID';
+
+comment on column ssh_connections.name is 'SSH用户名';
+
+comment on column ssh_connections.port is 'SSH端口号';
+
+comment on column ssh_connections.created_at is '创建时间';
+
+comment on column ssh_connections.updated_at is '更新时间';
+
+comment on column ssh_connections.is_deleted is '是否删除';
+
+comment on column ssh_connections.created_by is '创建者ID';
+
+alter table ssh_connections
+    add constraint ssh_connections_pk
+        primary key (server_id, user_id);
+
+create table if not exists user_role
 (
     id         bigint                                 not null,
-    user_id    bigint                                 not null,
     role       smallint                               not null,
     granted_by bigint,
     granted_at timestamp with time zone default CURRENT_TIMESTAMP,
-    expires_at timestamp with time zone,
     created_at timestamp with time zone default CURRENT_TIMESTAMP,
     updated_at timestamp with time zone default CURRENT_TIMESTAMP,
     is_deleted boolean                  default false not null,
-    created_by bigint
+    created_by bigint,
+    user_id    bigint                                 not null
 );
 
-create table if not exists user_servers
+create index if not exists user_role_user_index
+    on user_role (user_id);
+
+alter table user_role
+    add constraint user_roles_pk
+        primary key (id);
+
+create table if not exists users
 (
-    user_id   bigint not null,
-    server_id bigint not null
+    id            bigint                                 not null,
+    parent_id     bigint,
+    username      varchar(50)                            not null,
+    email         varchar(255)                           not null,
+    password_hash varchar(255)                           not null,
+    full_name     varchar(100),
+    created_at    timestamp with time zone default CURRENT_TIMESTAMP,
+    updated_at    timestamp with time zone default CURRENT_TIMESTAMP,
+    is_deleted    boolean                  default false not null,
+    created_by    bigint,
+    phone         varchar(20)
 );
 
-alter table user_servers
-    add primary key (user_id, server_id);
+comment on table users is '用户表：存储系统用户基本信息和账户状态';
+
+comment on column users.id is '用户唯一标识';
+
+comment on column users.parent_id is '父账户ID（用于账户关联）';
+
+comment on column users.username is '用户名（唯一）';
+
+comment on column users.email is '邮箱地址（唯一）';
+
+comment on column users.password_hash is '密码哈希值';
+
+comment on column users.full_name is '用户全名';
+
+comment on column users.created_at is '创建时间';
+
+comment on column users.updated_at is '更新时间';
+
+comment on column users.is_deleted is '是否删除';
+
+comment on column users.created_by is '创建者ID';
+
+comment on column users.phone is '电话号码';
+
+create index if not exists idx_users_parent_id
+    on users (parent_id);
+
+alter table users
+    add primary key (id);
+
+alter table users
+    add unique (email);
+
+alter table users
+    add unique (username);
+
+

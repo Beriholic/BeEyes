@@ -5,10 +5,7 @@ import cv.beriholic.beeyes.models.entity.UserDOTable;
 import cv.beriholic.beeyes.models.entity.dto.AuthUserSpec;
 import cv.beriholic.beeyes.models.entity.dto.AuthUserView;
 import org.babyfish.jimmer.sql.JSqlClient;
-import org.babyfish.jimmer.sql.ast.Predicate;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 /**
  * <p>
@@ -31,16 +28,6 @@ public class UserRepository extends BaseRepository<UserDO, UserDOTable, Long> {
                 .where(table.phone().eqIf(spec.getPhone()))
                 .select(table.fetch(AuthUserView.class))
                 .fetchOne();
-    }
-
-    public List<Long> getUserIdList(Long serverId) {
-        return createQuery()
-                .where(table.servers(serversDOTableEx ->
-                        Predicate.and(
-                                serversDOTableEx.id().eq(serverId)
-                        )
-                )).select(table.id())
-                .execute();
     }
 
     public void updatePasswordHash(Long userId, String value) {

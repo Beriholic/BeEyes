@@ -8,7 +8,10 @@ import cv.beriholic.beeyes.consts.KafkaTopic;
 import cv.beriholic.beeyes.consts.ServerStatus;
 import cv.beriholic.beeyes.exception.BizRuntimeException;
 import cv.beriholic.beeyes.exception.ErrorCode;
-import cv.beriholic.beeyes.models.dto.*;
+import cv.beriholic.beeyes.models.dto.MachineRuntimeInfoDTO;
+import cv.beriholic.beeyes.models.dto.MessageEntity;
+import cv.beriholic.beeyes.models.dto.RuntimeInfoDTO;
+import cv.beriholic.beeyes.models.dto.ServerStatusDTO;
 import cv.beriholic.beeyes.models.dto.system.RuntimeInfo;
 import cv.beriholic.beeyes.models.entity.dto.QueryMachineRuntimeHistoryRequest;
 import cv.beriholic.beeyes.models.entity.dto.QueryMachineRuntimeInfoRequest;
@@ -82,7 +85,7 @@ public class MetricServiceImpl implements MetricService {
     @Override
     public List<RuntimeInfoDTO> queryMachineRuntimeInfo(Long userId, QueryMachineRuntimeInfoRequest request) {
         List<Long> serverIds = machineService.getUserServerIdListByCache(
-                PageDTO.of(userId, request.getPageIndex(), request.getPageSize())
+                request.getPageIndex(), request.getPageSize()
         );
 
         return serverIds.stream()

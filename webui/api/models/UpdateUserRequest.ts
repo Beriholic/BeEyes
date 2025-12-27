@@ -27,5 +27,6 @@ export type UpdateUserRequest = {
     phone?: string | null;
     userId?: string;
     roleCode?: number;
+    parentId?: string;
 };
 

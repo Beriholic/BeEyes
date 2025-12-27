@@ -12,9 +12,7 @@ public interface MachineService {
 
     void updateMachine(Long userId, UpdateMachineRequest request);
 
-    List<Long> getUserServerIdListByCache(PageDTO<Long> userIdPage);
-
-    void deleteUserServerCacheByServerId(Long serverId);
+    List<Long> getUserServerIdListByCache(int pageIndex, int pageSize);
 
     PageDTO<List<MachineManageView>> queryMachineManageList(long userId, QueryMachineManageListRequest request);
 
@@ -24,11 +22,13 @@ public interface MachineService {
 
     void updateLastConnectTime(long clientId, Long userId);
 
-    PageDTO<List<MachineTerminalListView>> queryMachineTerminalList(Long userId, QueryMachineTerminalListRequest request);
+    PageDTO<List<MachineTerminalListView>> queryMachineTerminalList(QueryMachineTerminalListRequest request);
 
     void updateMachineSSHConfig(Long userId, UpdateSSHConfigRequest request);
 
     boolean userHasServer(Long userId, Long serverId);
 
     MachineView getMachineDetail(long userId, Long serverId);
+
+    void deleteMachineStatusCache(Long machineId);
 }

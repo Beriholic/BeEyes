@@ -120,7 +120,7 @@ public class ClientServiceImpl implements ClientService {
         serverNetworkInterfaceRepository.deleteByIds(diffIds);
 
         // cache
-        machineService.deleteUserServerCacheByServerId(machineId);
+        machineService.deleteMachineStatusCache(machineId);
     }
 
     @Override

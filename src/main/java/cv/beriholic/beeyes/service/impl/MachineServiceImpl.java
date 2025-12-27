@@ -1,7 +1,6 @@
 package cv.beriholic.beeyes.service.impl;
 
 import cn.hutool.core.util.IdUtil;
-import com.google.common.collect.Lists;
 import cv.beriholic.beeyes.cache.CacheKey;
 import cv.beriholic.beeyes.cache.RedisUtils;
 import cv.beriholic.beeyes.consts.KafkaGroup;
@@ -65,7 +64,7 @@ public class MachineServiceImpl implements MachineService {
         serversRepository.deleteById(request.getServerId());
         sshConnectionsRepository.deleteById(request.getServerId());
         redisUtils.delete(CacheKey.machineStatus(request.getServerId()));
-        redisUtils.delete(CacheKey.userServerList(userId));
+        redisUtils.delete(CacheKey.serverList());
     }
 
     @Override
@@ -76,9 +75,9 @@ public class MachineServiceImpl implements MachineService {
     }
 
     @Override
-    public List<Long> getUserServerIdListByCache(PageDTO<Long> userIdPage) {
-        String cacheKey = CacheKey.userServerList(userIdPage.getData());
-        String pageFiled = CacheKey.pageKey(userIdPage.getPageIndex(), userIdPage.getPageSize());
+    public List<Long> getUserServerIdListByCache(int pageIndex, int pageSize) {
+        String cacheKey = CacheKey.serverList();
+        String pageFiled = CacheKey.pageKey(pageIndex, pageSize);
 
         List<Long> serverList = redisUtils.hGetList(
                 cacheKey,
@@ -86,7 +85,7 @@ public class MachineServiceImpl implements MachineService {
                 Long.class
         );
         if (CollectionUtils.isEmpty(serverList)) {
-            serverList = serversRepository.getServerIdListOrderByStatus(userIdPage);
+            serverList = serversRepository.getServerIdListOrderByStatus(pageIndex, pageSize);
             redisUtils.hSetList(cacheKey, pageFiled, serverList);
         }
 
@@ -94,15 +93,13 @@ public class MachineServiceImpl implements MachineService {
     }
 
     @Override
-    public void deleteUserServerCacheByServerId(Long serverId) {
-        userRepository.getUserIdList(serverId)
-                .forEach(id -> redisUtils.delete(CacheKey.machineStatus(id)));
+    public void deleteMachineStatusCache(Long serverId) {
+        redisUtils.delete(CacheKey.machineStatus(serverId));
     }
 
     @Override
     public PageDTO<List<MachineManageView>> queryMachineManageList(long userId, QueryMachineManageListRequest request) {
         QueryServerSpec queryServerSpec = new QueryServerSpec();
-        queryServerSpec.setUserId(userId);
         queryServerSpec.setHostname(request.getHostname());
 
         Page<MachineManageView> page = serversRepository.findBySpecFetchPage(
@@ -124,7 +121,6 @@ public class MachineServiceImpl implements MachineService {
     @Override
     public PageDTO<List<MachineView>> queryMachineListOrderByStatus(long userId, QueryMachineListRequest request) {
         QueryServerSpec queryServerSpec = new QueryServerSpec();
-        queryServerSpec.setUserId(userId);
 
         Page<MachineView> page = serversRepository.queryMachineListOrderByStatus(
                 queryServerSpec,
@@ -170,10 +166,9 @@ public class MachineServiceImpl implements MachineService {
     }
 
     @Override
-    public PageDTO<List<MachineTerminalListView>> queryMachineTerminalList(Long userId, QueryMachineTerminalListRequest request) {
+    public PageDTO<List<MachineTerminalListView>> queryMachineTerminalList(QueryMachineTerminalListRequest request) {
         QueryServerSpec spec = new QueryServerSpec();
         spec.setHostname(request.getHostname());
-        spec.setUserId(userId);
         Page<MachineTerminalListView> page = serversRepository.findBySpecFetchPage(
                 spec,
                 request.getPageIndex(),
@@ -198,7 +193,7 @@ public class MachineServiceImpl implements MachineService {
 
     @Override
     public boolean userHasServer(Long userId, Long serverId) {
-        return serversRepository.userHasServer(userId, serverId);
+        return serversRepository.userHasServer(serverId);
     }
 
     @Override
@@ -243,9 +238,6 @@ public class MachineServiceImpl implements MachineService {
         input.setApiKey(UUID.randomUUID().toString());
         input.setStatus(ServerStatus.UNREGISTER.getKey());
 
-        SaveCreateMachineInput.TargetOf_users user = new SaveCreateMachineInput.TargetOf_users();
-        user.setId(userId);
-        input.setUsers(Lists.newArrayList(user));
         return input;
     }
 

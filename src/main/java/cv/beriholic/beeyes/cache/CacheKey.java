@@ -6,7 +6,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum CacheKey {
     MACHINE_ID_TOKEN("machine_id_token", "缓存客户端机器id"),
-    USER_SERVER_LIST("user_server_list", "用户作用域"),
+    SERVER_LIST("server_list", "服务器列表"),
     MACHINE_STATUS("machine_status", "机器状态");
 
     private final String key;
@@ -17,8 +17,8 @@ public enum CacheKey {
         return MACHINE_ID_TOKEN.key + "::" + token;
     }
 
-    public static String userServerList(Long id) {
-        return USER_SERVER_LIST.key + "::" + id;
+    public static String serverList() {
+        return SERVER_LIST.key;
     }
 
     public static String machineStatus(Long id) {

@@ -29,8 +29,7 @@ public class TerminalController {
 
     @GetMapping("/list")
     public RestBean<PageDTO<List<MachineTerminalListView>>> queryTerminalList(QueryMachineTerminalListRequest request) {
-        Long userId = StpUtil.getLoginIdAsLong();
-        PageDTO<List<MachineTerminalListView>> pageDTO = machineService.queryMachineTerminalList(userId, request);
+        PageDTO<List<MachineTerminalListView>> pageDTO = machineService.queryMachineTerminalList(request);
         return RestBean.success(pageDTO);
     }
 }
