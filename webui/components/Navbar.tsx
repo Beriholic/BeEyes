@@ -46,6 +46,8 @@ export function Navbar() {
     return ["/login"].some((prefix) => pathname.startsWith(prefix));
   }, [pathname]);
 
+  const [permissions, setPermissions] = useState<string[]>([]);
+
   useEffect(() => {
     if (isHidden) return;
 
@@ -59,12 +61,16 @@ export function Navbar() {
     const userRequest = ProfileControllerService.getSelfInfo();
     // 获取用户角色
     const roleRequest = PermissionControllerService.getCurrentUserRole();
+    // 获取用户权限
+    const permissionRequest =
+      PermissionControllerService.getCurrentUserPermissions();
 
-    Promise.all([userRequest, roleRequest])
-      .then(([userRes, roleRes]) => {
+    Promise.all([userRequest, roleRequest, permissionRequest])
+      .then(([userRes, roleRes, permRes]) => {
         if (disposed) return;
         setUser(userRes?.data ?? null);
         setRole((roleRes?.data as unknown as string) ?? null);
+        setPermissions(permRes?.data ?? []);
       })
       .catch(() => {
         if (disposed) return;
@@ -79,6 +85,7 @@ export function Navbar() {
       cancelAnimationFrame(frame);
       userRequest.cancel();
       roleRequest.cancel();
+      permissionRequest.cancel();
     };
   }, [isHidden]);
 
@@ -129,6 +136,12 @@ export function Navbar() {
           </Link>
           <div className="flex items-center gap-4 text-sm text-slate-400">
             {NAV_ITEMS.map((item) => {
+              if (
+                item.key === "alarm" &&
+                !permissions.includes("ALERT_MANAGE")
+              ) {
+                return null;
+              }
               const isActive = activeKey === item.key;
               return (
                 <Link

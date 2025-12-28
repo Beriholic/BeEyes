@@ -10,8 +10,6 @@ import cv.beriholic.beeyes.models.entity.dto.SetPermissionRequest;
 import java.util.List;
 
 public interface PermissionService {
-    List<PermissionCode> getPermissionsEnum();
-
     List<PermissionCode> getUserPermission(Long userId);
 
     boolean checkUserPermission(Long userId, List<PermissionCode> permissionCodes);

@@ -2,9 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type RestBean_List_PermissionCode = {
+import type { AlertRuleDTO } from './AlertRuleDTO';
+export type RestBean_List_AlertRuleDTO = {
     code?: number;
     msg?: string;
-    data?: Array<'CRATE_SERVER' | 'UPDATE_SERVER' | 'DELETE_SERVER' | 'SSH_CONNECT' | 'ALERT_MANAGE'>;
+    data?: Array<AlertRuleDTO>;
 };
 

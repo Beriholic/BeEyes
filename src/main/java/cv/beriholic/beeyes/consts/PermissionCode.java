@@ -10,6 +10,7 @@ public enum PermissionCode {
     UPDATE_SERVER((short) 1, "更新机器"),
     DELETE_SERVER((short) 2, "删除机器"),
     SSH_CONNECT((short) 3, "SSH连接"),
+    ALERT_MANAGE((short) 4, "告警管理"),
     ;
     private final short code;
     private final String desc;

@@ -20,6 +20,7 @@ import cv.beriholic.beeyes.repository.MetricDataRepository;
 import cv.beriholic.beeyes.service.MachineService;
 import cv.beriholic.beeyes.service.MachineStatusService;
 import cv.beriholic.beeyes.service.MetricService;
+import cv.beriholic.beeyes.service.AlertService;
 import cv.beriholic.beeyes.utils.JsonUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +51,8 @@ public class MetricServiceImpl implements MetricService {
     public void recordMachineRuntimeInfo(MessageEntity message) {
         log.info("[recordMachineRuntimeInfo] message={}", JsonUtil.toJSONString(message));
         try {
-            MachineRuntimeInfoDTO machineRuntimeInfoDTO = JsonUtil.parseObject(message.getContent(), MachineRuntimeInfoDTO.class);
+            MachineRuntimeInfoDTO machineRuntimeInfoDTO = JsonUtil.parseObject(message.getContent(),
+                    MachineRuntimeInfoDTO.class);
             metricDataRepository.recordRuntimeInfo(machineRuntimeInfoDTO);
         } catch (Exception e) {
             log.error("[recordMachineRuntimeInfo] error", e);
@@ -72,7 +74,8 @@ public class MetricServiceImpl implements MetricService {
         if (Objects.isNull(machineId)) {
             return;
         }
-        log.info("[saveRuntimeInfo] biz start, machineId={}, runtimeInfo={}", machineId, JsonUtil.toJSONString(runtimeInfo));
+        log.info("[saveRuntimeInfo] biz start, machineId={}, runtimeInfo={}", machineId,
+                JsonUtil.toJSONString(runtimeInfo));
         runtimeInfoCache.put(machineId, runtimeInfo);
         MachineRuntimeInfoDTO runtimeInfoDTO = MachineRuntimeInfoDTO.from(machineId, runtimeInfo);
 
@@ -85,25 +88,24 @@ public class MetricServiceImpl implements MetricService {
     @Override
     public List<RuntimeInfoDTO> queryMachineRuntimeInfo(Long userId, QueryMachineRuntimeInfoRequest request) {
         List<Long> serverIds = machineService.getUserServerIdListByCache(
-                request.getPageIndex(), request.getPageSize()
-        );
+                request.getPageIndex(), request.getPageSize());
 
         return serverIds.stream()
                 .map(id -> {
-                            RuntimeInfo runtimeInfo = runtimeInfoCache.get(id, key -> null);
-                            if (Objects.isNull(runtimeInfo)) {
-                                return null;
-                            }
-                            ServerStatusDTO serverStatus = machineStatusService.getServerStatus(id);
-                            return new RuntimeInfoDTO(String.valueOf(id), serverStatus.getCurrentStatus(), runtimeInfo);
-                        }
-                )
+                    RuntimeInfo runtimeInfo = runtimeInfoCache.get(id, key -> null);
+                    if (Objects.isNull(runtimeInfo)) {
+                        return null;
+                    }
+                    ServerStatusDTO serverStatus = machineStatusService.getServerStatus(id);
+                    return new RuntimeInfoDTO(String.valueOf(id), serverStatus.getCurrentStatus(), runtimeInfo);
+                })
                 .filter(Objects::nonNull)
                 .toList();
     }
 
     @Override
-    public List<MachineRuntimeInfoDTO> queryMachineRuntimeHistory(Long userId, QueryMachineRuntimeHistoryRequest request) {
+    public List<MachineRuntimeInfoDTO> queryMachineRuntimeHistory(Long userId,
+            QueryMachineRuntimeHistoryRequest request) {
         Long serverId = Long.valueOf(request.getMachineId());
         boolean isValid = machineService.userHasServer(userId, serverId);
         if (!isValid) {
@@ -112,8 +114,6 @@ public class MetricServiceImpl implements MetricService {
         return metricDataRepository.queryHistoricalRuntimeInfo(
                 serverId,
                 request.getTime(),
-                HistoryTimeUnit.of(request.getTimeUnit())
-        );
+                HistoryTimeUnit.of(request.getTimeUnit()));
     }
 }
-

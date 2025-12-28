@@ -38,7 +38,7 @@ export class PermissionControllerService {
     public static getPermissionEnum(): CancelablePromise<RestBean_List_PermissionCode> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/v1/permission/list',
+            url: '/api/v1/permission/enum',
         });
     }
     /**

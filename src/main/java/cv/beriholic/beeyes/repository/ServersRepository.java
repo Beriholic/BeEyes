@@ -58,8 +58,8 @@ public class ServersRepository extends BaseRepository<ServersDO, ServersDOTable,
                 .getRows();
     }
 
-
-    public Page<MachineView> queryMachineListOrderByStatus(QueryServerSpec queryServerSpec, int pageIndex, int pageSize) {
+    public Page<MachineView> queryMachineListOrderByStatus(QueryServerSpec queryServerSpec, int pageIndex,
+            int pageSize) {
         return createQuery()
                 .where(queryServerSpec)
                 .orderBy(table.status().asc())
@@ -74,4 +74,3 @@ public class ServersRepository extends BaseRepository<ServersDO, ServersDOTable,
 
     }
 }
-

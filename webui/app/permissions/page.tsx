@@ -191,6 +191,8 @@ export default function PermissionsPage() {
             return Permission.DELETE_SERVER.code as number;
           if (str === "SSH_CONNECT")
             return Permission.SSH_CONNECT.code as number;
+          if (str === "ALERT_MANAGE")
+            return Permission.ALERT_MANAGE.code as number;
           return null;
         })
         .filter((c): c is number => typeof c === "number");

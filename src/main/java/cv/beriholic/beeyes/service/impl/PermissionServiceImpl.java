@@ -40,12 +40,6 @@ public class PermissionServiceImpl implements PermissionService {
     private final ProfileService profileService;
     private final UserRepository userRepository;
 
-
-    @Override
-    public List<PermissionCode> getPermissionsEnum() {
-        return List.of(PermissionCode.values());
-    }
-
     @Override
     public List<PermissionCode> getUserPermission(Long userId) {
         List<PermissionsDO> permissionsDOS = permissionsRepository.findByUserId(userId);
@@ -66,6 +60,10 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public boolean checkUserPermission(Long userId, PermissionCode permissionCodes) {
+        UserRoleCode userRole = getUserRole(userId);
+        if (userRole.equals(UserRoleCode.SUPER_ADMIN)) {
+            return true;
+        }
         return checkUserPermission(userId, Collections.singletonList(permissionCodes));
     }
 

@@ -55,6 +55,7 @@ public interface PermissionsDO extends BaseDO {
     @Nullable
     LocalDateTime expiresAt();
 
+    @Key
     @ManyToOne
     @JoinColumn(name = "user_id")
     @OnDissociate(DissociateAction.DELETE)

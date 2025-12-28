@@ -1,327 +1,3 @@
-create table if not exists alert_channels
-(
-    id         bigint                                 not null,
-    name       varchar(100)                           not null,
-    type       smallint                               not null,
-    config     jsonb                                  not null,
-    is_enabled boolean                  default true,
-    is_default boolean                  default false,
-    created_at timestamp with time zone default CURRENT_TIMESTAMP,
-    updated_at timestamp with time zone default CURRENT_TIMESTAMP,
-    is_deleted boolean                  default false not null,
-    created_by bigint
-);
-
-comment on table alert_channels is '告警通道表：存储告警通知渠道配置（如邮件、短信、钉钉等）';
-
-comment on column alert_channels.id is '告警通道ID';
-
-comment on column alert_channels.name is '通道名称';
-
-comment on column alert_channels.type is '通道类型（应用层维护枚举映射）';
-
-comment on column alert_channels.config is '通道配置信息';
-
-comment on column alert_channels.is_enabled is '通道是否启用';
-
-comment on column alert_channels.is_default is '是否为默认通道';
-
-comment on column alert_channels.created_at is '创建时间';
-
-comment on column alert_channels.updated_at is '更新时间';
-
-comment on column alert_channels.is_deleted is '是否删除';
-
-comment on column alert_channels.created_by is '创建者ID';
-
-create index if not exists idx_alert_channels_enabled_type
-    on alert_channels (is_enabled, type, is_deleted)
-    where (is_deleted = false);
-
-alter table alert_channels
-    add primary key (id);
-
-create table if not exists alert_incidents
-(
-    id              bigint                                 not null,
-    rule_id         bigint                                 not null,
-    server_id       bigint,
-    container_id    bigint,
-    title           varchar(500)                           not null,
-    message         text                                   not null,
-    severity        smallint                               not null,
-    status          smallint                 default 0,
-    trigger_data    jsonb,
-    acknowledged_by bigint,
-    acknowledged_at timestamp with time zone,
-    resolved_by     bigint,
-    resolved_at     timestamp with time zone,
-    resolution_note text,
-    created_at      timestamp with time zone default CURRENT_TIMESTAMP,
-    updated_at      timestamp with time zone default CURRENT_TIMESTAMP,
-    is_deleted      boolean                  default false not null,
-    created_by      bigint
-);
-
-comment on table alert_incidents is '告警事件表：存储告警触发后的具体事件记录和处理状态';
-
-comment on column alert_incidents.id is '告警事件ID';
-
-comment on column alert_incidents.rule_id is '触发规则的ID';
-
-comment on column alert_incidents.server_id is '关联服务器ID';
-
-comment on column alert_incidents.container_id is '关联容器ID';
-
-comment on column alert_incidents.title is '告警标题';
-
-comment on column alert_incidents.message is '告警消息内容';
-
-comment on column alert_incidents.severity is '告警严重级别（应用层维护枚举映射）';
-
-comment on column alert_incidents.status is '事件处理状态（应用层维护枚举映射）';
-
-comment on column alert_incidents.trigger_data is '触发时的详细数据';
-
-comment on column alert_incidents.acknowledged_by is '确认人ID';
-
-comment on column alert_incidents.acknowledged_at is '确认时间';
-
-comment on column alert_incidents.resolved_by is '解决人ID';
-
-comment on column alert_incidents.resolved_at is '解决时间';
-
-comment on column alert_incidents.resolution_note is '解决说明';
-
-comment on column alert_incidents.created_at is '创建时间';
-
-comment on column alert_incidents.updated_at is '更新时间';
-
-comment on column alert_incidents.is_deleted is '是否删除';
-
-create index if not exists idx_alert_incidents_resolution
-    on alert_incidents (acknowledged_at, resolved_at, status)
-    where (is_deleted = false);
-
-create index if not exists idx_alert_incidents_server_created
-    on alert_incidents (server_id, created_at, status)
-    where (is_deleted = false);
-
-create index if not exists idx_alert_incidents_status_created
-    on alert_incidents (status, severity, created_at)
-    where (is_deleted = false);
-
-create index if not exists idx_alert_incidents_time_series
-    on alert_incidents (created_at, severity, rule_id)
-    where (is_deleted = false);
-
-alter table alert_incidents
-    add primary key (id);
-
-create table if not exists alert_notifications
-(
-    id            bigint                                 not null,
-    incident_id   bigint                                 not null,
-    channel_id    bigint                                 not null,
-    status        smallint                 default 0,
-    sent_at       timestamp with time zone,
-    error_message text,
-    retry_count   integer                  default 0,
-    created_at    timestamp with time zone default CURRENT_TIMESTAMP,
-    updated_at    timestamp with time zone default CURRENT_TIMESTAMP,
-    is_deleted    boolean                  default false not null,
-    created_by    bigint
-);
-
-comment on table alert_notifications is '告警通知表：存储告警事件的通知发送记录和状态';
-
-comment on column alert_notifications.id is '通知记录ID';
-
-comment on column alert_notifications.incident_id is '关联告警事件ID';
-
-comment on column alert_notifications.channel_id is '通知通道ID';
-
-comment on column alert_notifications.status is '通知发送状态（应用层维护枚举映射）';
-
-comment on column alert_notifications.sent_at is '发送时间';
-
-comment on column alert_notifications.error_message is '错误信息（发送失败时）';
-
-comment on column alert_notifications.retry_count is '重试次数';
-
-comment on column alert_notifications.created_at is '创建时间';
-
-comment on column alert_notifications.updated_at is '更新时间';
-
-comment on column alert_notifications.is_deleted is '是否删除';
-
-create index if not exists idx_alert_notifications_retry
-    on alert_notifications (status, retry_count, created_at)
-    where ((is_deleted = false) AND (status <> 1));
-
-create index if not exists idx_alert_notifications_status_created
-    on alert_notifications (status, created_at, channel_id)
-    where (is_deleted = false);
-
-alter table alert_notifications
-    add primary key (id);
-
-create table if not exists alert_rule_channels
-(
-    id         bigint                                 not null,
-    rule_id    bigint                                 not null,
-    channel_id bigint                                 not null,
-    is_enabled boolean                  default true,
-    created_at timestamp with time zone default CURRENT_TIMESTAMP,
-    updated_at timestamp with time zone default CURRENT_TIMESTAMP,
-    is_deleted boolean                  default false not null,
-    created_by bigint
-);
-
-comment on table alert_rule_channels is '告警规则通道关联表：存储告警规则与通知通道的多对多关系';
-
-comment on column alert_rule_channels.id is '关联记录ID';
-
-comment on column alert_rule_channels.rule_id is '告警规则ID';
-
-comment on column alert_rule_channels.channel_id is '告警通道ID';
-
-comment on column alert_rule_channels.is_enabled is '关联是否启用';
-
-comment on column alert_rule_channels.created_at is '创建时间';
-
-comment on column alert_rule_channels.updated_at is '更新时间';
-
-comment on column alert_rule_channels.is_deleted is '是否删除';
-
-create index if not exists idx_alert_rule_channels_active
-    on alert_rule_channels (rule_id, channel_id, is_enabled, is_deleted)
-    where (is_deleted = false);
-
-alter table alert_rule_channels
-    add primary key (id);
-
-alter table alert_rule_channels
-    add constraint unique_rule_channel
-        unique (rule_id, channel_id);
-
-create table if not exists alert_rules
-(
-    id               bigint                                 not null,
-    name             varchar(200)                           not null,
-    description      text,
-    severity         smallint                               not null,
-    condition_type   smallint                               not null,
-    condition_config jsonb                                  not null,
-    target_servers   jsonb,
-    target_groups    jsonb,
-    is_enabled       boolean                  default true,
-    cooldown_minutes integer                  default 5,
-    created_at       timestamp with time zone default CURRENT_TIMESTAMP,
-    updated_at       timestamp with time zone default CURRENT_TIMESTAMP,
-    is_deleted       boolean                  default false not null,
-    created_by       bigint
-);
-
-comment on table alert_rules is '告警规则表：存储系统告警规则配置和触发条件';
-
-comment on column alert_rules.id is '告警规则ID';
-
-comment on column alert_rules.name is '规则名称';
-
-comment on column alert_rules.description is '规则描述';
-
-comment on column alert_rules.severity is '告警严重级别（应用层维护枚举映射）';
-
-comment on column alert_rules.condition_type is '条件类型（应用层维护枚举映射）';
-
-comment on column alert_rules.condition_config is '触发条件配置';
-
-comment on column alert_rules.target_servers is '目标服务器列表';
-
-comment on column alert_rules.target_groups is '目标服务器组列表';
-
-comment on column alert_rules.is_enabled is '规则是否启用';
-
-comment on column alert_rules.cooldown_minutes is '冷却时间（分钟）';
-
-comment on column alert_rules.created_at is '创建时间';
-
-comment on column alert_rules.updated_at is '更新时间';
-
-comment on column alert_rules.is_deleted is '是否删除';
-
-comment on column alert_rules.created_by is '创建者ID';
-
-create index if not exists idx_alert_rules_enabled_severity
-    on alert_rules (is_enabled, severity, is_deleted)
-    where (is_deleted = false);
-
-alter table alert_rules
-    add primary key (id);
-
-create table if not exists audit_logs
-(
-    id            bigint                                 not null,
-    user_id       bigint,
-    action        smallint                               not null,
-    resource_type varchar(50)                            not null,
-    resource_id   bigint,
-    old_values    jsonb,
-    new_values    jsonb,
-    ip_address    inet,
-    user_agent    text,
-    created_at    timestamp with time zone default CURRENT_TIMESTAMP,
-    updated_at    timestamp with time zone default CURRENT_TIMESTAMP,
-    is_deleted    boolean                  default false not null,
-    created_by    bigint
-);
-
-comment on table audit_logs is '审计日志表：存储系统操作的审计记录和安全日志';
-
-comment on column audit_logs.id is '审计记录ID';
-
-comment on column audit_logs.user_id is '操作用户ID';
-
-comment on column audit_logs.action is '操作类型（应用层维护枚举映射）';
-
-comment on column audit_logs.resource_type is '资源类型';
-
-comment on column audit_logs.resource_id is '资源ID';
-
-comment on column audit_logs.old_values is '操作前的数据';
-
-comment on column audit_logs.new_values is '操作后的数据';
-
-comment on column audit_logs.ip_address is '客户端IP地址';
-
-comment on column audit_logs.user_agent is '客户端用户代理';
-
-comment on column audit_logs.created_at is '操作时间';
-
-comment on column audit_logs.updated_at is '更新时间';
-
-comment on column audit_logs.is_deleted is '是否删除';
-
-create index if not exists idx_audit_logs_resource_created
-    on audit_logs (resource_type, resource_id, created_at)
-    where (is_deleted = false);
-
-create index if not exists idx_audit_logs_retention
-    on audit_logs (created_at)
-    where (is_deleted = false);
-
-create index if not exists idx_audit_logs_security
-    on audit_logs (ip_address, action, created_at)
-    where (is_deleted = false);
-
-create index if not exists idx_audit_logs_user_created
-    on audit_logs (user_id, created_at, action)
-    where (is_deleted = false);
-
-alter table audit_logs
-    add primary key (id);
-
 create table if not exists permissions
 (
     id         bigint                                 not null,
@@ -366,87 +42,6 @@ alter table permissions
 alter table permissions
     add constraint unique_user_permission
         unique (user_id, permission);
-
-create table if not exists scheduled_tasks
-(
-    id              bigint                                 not null,
-    name            varchar(200)                           not null,
-    description     text,
-    task_type       smallint                               not null,
-    cron_expression varchar(100)                           not null,
-    task_config     jsonb,
-    is_enabled      boolean                  default true,
-    max_retry_count integer                  default 3,
-    timeout_seconds integer                  default 300,
-    last_run_at     timestamp with time zone,
-    next_run_at     timestamp with time zone,
-    last_run_status smallint,
-    last_run_error  text,
-    run_count       integer                  default 0,
-    success_count   integer                  default 0,
-    failure_count   integer                  default 0,
-    created_at      timestamp with time zone default CURRENT_TIMESTAMP,
-    updated_at      timestamp with time zone default CURRENT_TIMESTAMP,
-    is_deleted      boolean                  default false not null,
-    created_by      bigint
-);
-
-comment on table scheduled_tasks is '定时任务表：存储系统定时任务的配置和执行状态';
-
-comment on column scheduled_tasks.id is '定时任务ID';
-
-comment on column scheduled_tasks.name is '任务名称';
-
-comment on column scheduled_tasks.description is '任务描述';
-
-comment on column scheduled_tasks.task_type is '任务类型（应用层维护枚举映射）';
-
-comment on column scheduled_tasks.cron_expression is 'Cron表达式';
-
-comment on column scheduled_tasks.task_config is '任务配置参数';
-
-comment on column scheduled_tasks.is_enabled is '任务是否启用';
-
-comment on column scheduled_tasks.max_retry_count is '最大重试次数';
-
-comment on column scheduled_tasks.timeout_seconds is '超时时间（秒）';
-
-comment on column scheduled_tasks.last_run_at is '最后执行时间';
-
-comment on column scheduled_tasks.next_run_at is '下次执行时间';
-
-comment on column scheduled_tasks.last_run_status is '最后执行状态（应用层维护枚举映射）';
-
-comment on column scheduled_tasks.last_run_error is '最后执行错误信息';
-
-comment on column scheduled_tasks.run_count is '执行次数';
-
-comment on column scheduled_tasks.success_count is '成功次数';
-
-comment on column scheduled_tasks.failure_count is '失败次数';
-
-comment on column scheduled_tasks.created_at is '创建时间';
-
-comment on column scheduled_tasks.updated_at is '更新时间';
-
-comment on column scheduled_tasks.is_deleted is '是否删除';
-
-comment on column scheduled_tasks.created_by is '创建者ID';
-
-create index if not exists idx_scheduled_tasks_enabled_status
-    on scheduled_tasks (is_enabled, last_run_status, next_run_at)
-    where (is_deleted = false);
-
-create index if not exists idx_scheduled_tasks_next_run
-    on scheduled_tasks (next_run_at)
-    where ((is_enabled = true) AND (is_deleted = false));
-
-alter table scheduled_tasks
-    add primary key (id);
-
-alter table scheduled_tasks
-    add constraint unique_task_name
-        unique (name);
 
 create table if not exists server_disk
 (
@@ -752,4 +347,76 @@ alter table users
 alter table users
     add unique (username);
 
+create table if not exists alert_rules
+(
+    id               bigint                                 not null,
+    name             varchar(100)                           not null,
+    server_id        bigint,
+    metric_type      smallint                               not null,
+    condition        smallint                               not null,
+    threshold        double precision                       not null,
+    duration_seconds integer,
+    enabled          boolean                  default true  not null,
+    silence_seconds  integer                  default 0,
+    created_at       timestamp with time zone default CURRENT_TIMESTAMP,
+    updated_at       timestamp with time zone default CURRENT_TIMESTAMP,
+    is_deleted       boolean                  default false not null,
+    created_by       bigint
+);
 
+comment on table alert_rules is '告警规则表：存储用户自定义的告警规则';
+comment on column alert_rules.id is '规则ID';
+comment on column alert_rules.name is '规则名称';
+comment on column alert_rules.server_id is '关联服务器ID（为空则对所有服务器生效）';
+comment on column alert_rules.metric_type is '指标类型（CPU/内存/磁盘/状态）';
+comment on column alert_rules.condition is '判断条件（大于/小于/等于）';
+comment on column alert_rules.threshold is '阈值';
+comment on column alert_rules.duration_seconds is '持续时间（秒）';
+comment on column alert_rules.enabled is '是否启用';
+comment on column alert_rules.silence_seconds is '沉默时间（秒）';
+comment on column alert_rules.created_at is '创建时间';
+comment on column alert_rules.updated_at is '更新时间';
+comment on column alert_rules.is_deleted is '是否删除';
+comment on column alert_rules.created_by is '创建者ID';
+
+create index if not exists idx_alert_rules_server
+    on alert_rules (server_id, is_deleted, enabled);
+
+alter table alert_rules
+    add primary key (id);
+
+create table if not exists alert_logs
+(
+    id           bigint                                 not null,
+    rule_id      bigint                                 not null,
+    server_id    bigint                                 not null,
+    metric_value double precision,
+    message      text,
+    status       smallint                               not null,
+    started_at   timestamp with time zone default CURRENT_TIMESTAMP,
+    resolved_at  timestamp with time zone,
+    created_at   timestamp with time zone default CURRENT_TIMESTAMP,
+    updated_at   timestamp with time zone default CURRENT_TIMESTAMP,
+    is_deleted   boolean                  default false not null,
+    created_by   bigint
+);
+
+
+comment on table alert_logs is '告警日志表：存储告警触发和恢复的历史记录';
+comment on column alert_logs.id is '日志ID';
+comment on column alert_logs.rule_id is '关联规则ID';
+comment on column alert_logs.server_id is '关联服务器ID';
+comment on column alert_logs.metric_value is '触发时的指标值';
+comment on column alert_logs.message is '告警内容';
+comment on column alert_logs.status is '告警状态（触发中/已恢复）';
+comment on column alert_logs.started_at is '开始时间';
+comment on column alert_logs.resolved_at is '恢复时间';
+comment on column alert_logs.created_at is '创建时间';
+comment on column alert_logs.updated_at is '更新时间';
+comment on column alert_logs.is_deleted is '是否删除';
+
+create index if not exists idx_alert_logs_server_status
+    on alert_logs (server_id, status, is_deleted);
+
+alter table alert_logs
+    add primary key (id);

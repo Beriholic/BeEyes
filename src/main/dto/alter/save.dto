@@ -1,0 +1,23 @@
+export cv.beriholic.beeyes.models.entity.AlertRuleDO
+
+input SaveAlertInput {
+    name
+    serverId
+    metricType
+    condition
+    threshold
+    durationSeconds
+    silenceSeconds
+    enabled
+}
+input UpdateAlertInput {
+    id
+    name
+    serverId
+    metricType
+    condition
+    threshold
+    durationSeconds
+    silenceSeconds
+    enabled
+}

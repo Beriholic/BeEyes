@@ -14,6 +14,7 @@ import cv.beriholic.beeyes.service.PermissionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -23,10 +24,10 @@ public class PermissionController {
     private final PermissionService permissionService;
     private final PermissionValidateHelper permissionValidateHelper;
 
-    @GetMapping("/list")
+    @GetMapping("/enum")
     public RestBean<List<PermissionCode>> getPermissionEnum() {
         permissionValidateHelper.checkUserRole(UserRoleCode.SUPER_ADMIN, UserRoleCode.ADMIN);
-        return RestBean.success(permissionService.getPermissionsEnum());
+        return RestBean.success(Arrays.stream(PermissionCode.values()).toList());
     }
 
     @PostMapping("/user-list")
