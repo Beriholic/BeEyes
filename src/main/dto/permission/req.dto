@@ -1,0 +1,17 @@
+export cv.beriholic.beeyes.models.entity.PermissionsDO
+
+input SetPermissionRequest {
+    userId: String
+    permissionCode: Array<Short>
+}
+
+input QueryPermissionUserListRequest {
+    username: String?
+    fullName: String?
+    email: String?
+    phone: String?
+    ruleCode: Short?
+
+    pageIndex: Int
+    pageSize: Int
+}

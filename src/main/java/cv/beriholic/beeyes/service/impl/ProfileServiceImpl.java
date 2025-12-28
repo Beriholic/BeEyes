@@ -1,5 +1,7 @@
 package cv.beriholic.beeyes.service.impl;
 
+import cv.beriholic.beeyes.exception.BizRuntimeException;
+import cv.beriholic.beeyes.exception.ErrorCode;
 import cv.beriholic.beeyes.models.entity.dto.UserBaseView;
 import cv.beriholic.beeyes.repository.UserRepository;
 import cv.beriholic.beeyes.service.ProfileService;
@@ -16,5 +18,13 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public UserBaseView getProfileById(Long userId) {
         return userRepository.findById(userId, UserBaseView.class);
+    }
+
+    @Override
+    public void checkParentUser(Long parentId, long userId) {
+        boolean ok = userRepository.checkParent(parentId, userId);
+        if (!ok) {
+            throw new BizRuntimeException(ErrorCode.UNAUTHORIZED);
+        }
     }
 }

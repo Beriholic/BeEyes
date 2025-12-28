@@ -8,7 +8,9 @@ import lombok.Getter;
 public enum PermissionCode {
     CRATE_SERVER((short) 0, "创建机器"),
     UPDATE_SERVER((short) 1, "更新机器"),
-    DELETE_SERVER((short) 2, "删除机器");
+    DELETE_SERVER((short) 2, "删除机器"),
+    SSH_CONNECT((short) 3, "SSH连接"),
+    ;
     private final short code;
     private final String desc;
 

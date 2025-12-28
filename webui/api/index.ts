@@ -29,6 +29,7 @@ export type { PageDTO_List_MachineView } from './models/PageDTO_List_MachineView
 export type { PageDTO_List_ManageUserView } from './models/PageDTO_List_ManageUserView';
 export type { QueryMachineRuntimeInfoRequest } from './models/QueryMachineRuntimeInfoRequest';
 export type { QueryManageUserListRequest } from './models/QueryManageUserListRequest';
+export type { QueryPermissionUserListRequest } from './models/QueryPermissionUserListRequest';
 export type { ResetUserPasswordRequest } from './models/ResetUserPasswordRequest';
 export type { ResetUserView } from './models/ResetUserView';
 export type { RestBean_CreateUserView } from './models/RestBean_CreateUserView';

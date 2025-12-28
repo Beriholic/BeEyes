@@ -36,5 +36,12 @@ public class UserRepository extends BaseRepository<UserDO, UserDOTable, Long> {
                 .where(table.id().eq(userId))
                 .execute();
     }
+
+    public boolean checkParent(Long parentId, Long userId) {
+        return createQuery()
+                .where(table.id().eq(userId))
+                .where(table.parentId().eq(parentId))
+                .exists();
+    }
 }
 
