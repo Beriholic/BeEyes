@@ -19,11 +19,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.babyfish.jimmer.sql.ast.mutation.SaveMode;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +41,6 @@ public class AlertServiceImpl implements AlertService {
     public void createRule(CreateAlertRequest request) {
         SaveAlertInput input = new SaveAlertInput();
         input.setName(request.getName());
-        input.setServerId(Long.valueOf(request.getServerId()));
         input.setMetricType(request.getMetricType());
         input.setCondition(request.getCondition());
         input.setThreshold(request.getThreshold());
@@ -76,22 +76,40 @@ public class AlertServiceImpl implements AlertService {
     }
 
     @Override
-    @Transactional
+    public List<AlertLogDO> getAlertLogs(QueryAlertLogRequest request) {
+        return alertLogRepository.findAlterLogByPage(request.getPageIndex(), request.getPageSize());
+    }
+
+    @Override
+    public Map<String, Long> getAlertStats() {
+        Map<String, Long> stats = new HashMap<>();
+        long triggeringCount = alertLogRepository.countByStatus(AlertStatus.TRIGGERING.getKey());
+        long resolvedCount = alertLogRepository.countByStatus(AlertStatus.RESOLVED.getKey());
+        stats.put("triggering", triggeringCount);
+        stats.put("resolved", resolvedCount);
+        return stats;
+    }
+
+    @Override
     public void checkAllAlerts() {
         List<AlertRuleDO> rules = alertRuleRepository.findEnabledRules();
         List<Long> allServerIds = serversRepository.getAllIds();
 
         for (AlertRuleDO rule : rules) {
             if (rule.serverId() != null) {
-                // Check specific server
                 checkRuleForServer(rule, rule.serverId());
             } else {
-                // Check all servers
                 for (Long serverId : allServerIds) {
                     checkRuleForServer(rule, serverId);
                 }
             }
         }
+    }
+
+    @Override
+    public void triggerManualCheck() {
+        log.info("[AlertService] Manual alert check triggered");
+        checkAllAlerts();
     }
 
     private void checkRuleForServer(AlertRuleDO rule, Long serverId) {
@@ -117,16 +135,12 @@ public class AlertServiceImpl implements AlertService {
         if (type == null)
             return -1;
 
-        switch (type) {
-            case CPU:
-                return info.getCpuUsage() != null ? info.getCpuUsage() : 0.0;
-            case MEMORY:
-                return info.getMemoryUsage() != null ? info.getMemoryUsage() : 0.0;
-            case DISK:
-                return info.getDiskUsage() != null ? info.getDiskUsage() : 0.0;
-            default:
-                return 0.0;
-        }
+        return switch (type) {
+            case CPU -> info.getCpuUsage() != null ? info.getCpuUsage() : 0.0;
+            case MEMORY -> info.getMemoryUsage() != null ? info.getMemoryUsage() : 0.0;
+            case DISK -> info.getDiskUsage() != null ? info.getDiskUsage() : 0.0;
+            default -> 0.0;
+        };
     }
 
     private boolean checkCondition(double value, int conditionInt, double threshold) {
@@ -134,16 +148,11 @@ public class AlertServiceImpl implements AlertService {
         if (cond == null)
             return false;
 
-        switch (cond) {
-            case GT:
-                return value > threshold;
-            case LT:
-                return value < threshold;
-            case EQ:
-                return Math.abs(value - threshold) < 0.0001;
-            default:
-                return false;
-        }
+        return switch (cond) {
+            case GT -> value > threshold;
+            case LT -> value < threshold;
+            case EQ -> Math.abs(value - threshold) < 0.0001;
+        };
     }
 
     private void handleTriggeredAlert(AlertRuleDO rule, Long serverId, double currentValue) {
@@ -151,34 +160,33 @@ public class AlertServiceImpl implements AlertService {
                 AlertStatus.TRIGGERING.getKey());
 
         if (!existingLogs.isEmpty()) {
-            AlertLogDO existing = existingLogs.get(0);
+            AlertLogDO existing = existingLogs.getFirst();
 
-            // Check silence period
             long silenceSeconds = rule.silenceSeconds();
             if (silenceSeconds > 0) {
                 LocalDateTime lastNotificationTime = existing.updatedAt() != null ? existing.updatedAt()
                         : existing.startedAt();
-                long secondsSinceLast = Duration.between(lastNotificationTime, LocalDateTime.now()).getSeconds();
+                long secondsSinceLast = 0;
+                if (lastNotificationTime != null) {
+                    secondsSinceLast = Duration.between(lastNotificationTime, LocalDateTime.now()).getSeconds();
+                }
 
                 if (secondsSinceLast < silenceSeconds) {
-                    // In silence period, skip notification
                     return;
                 }
             }
 
-            // Re-notify and update timestamp
             AlertLogDO updated = AlertLogDODraft.$.produce(existing, draft -> {
                 draft.setMetricValue(currentValue);
                 draft.setUpdatedAt(LocalDateTime.now());
             });
-            alertLogRepository.update(updated);
+            alertLogRepository.save(updated, SaveMode.UPSERT);
             log.warn("Alert Re-Triggered (Silence Period Over): Rule={}, Server={}, Value={}", rule.name(), serverId,
                     currentValue);
             notifyChannels(updated, rule);
             return;
         }
 
-        // Create new alert log
         AlertLogDO logEntry = AlertLogDODraft.$.produce(draft -> {
             draft.setRuleId(rule.id());
             draft.setServerId(serverId);
@@ -187,10 +195,9 @@ public class AlertServiceImpl implements AlertService {
             draft.setStatus(AlertStatus.TRIGGERING.getKey());
             draft.setStartedAt(LocalDateTime.now());
         });
-        alertLogRepository.save(logEntry);
+        alertLogRepository.save(logEntry, SaveMode.UPSERT);
         log.warn("Alert Triggered: Rule={}, Server={}, Value={}", rule.name(), serverId, currentValue);
 
-        // Notify channels
         notifyChannels(logEntry, rule);
     }
 
@@ -212,13 +219,12 @@ public class AlertServiceImpl implements AlertService {
             return;
         }
 
-        // Resolve existing alert
         for (AlertLogDO existing : existingLogs) {
             AlertLogDO updated = AlertLogDODraft.$.produce(existing, draft -> {
                 draft.setStatus(AlertStatus.RESOLVED.getKey());
                 draft.setResolvedAt(LocalDateTime.now());
             });
-            alertLogRepository.update(updated);
+            alertLogRepository.save(updated, SaveMode.UPSERT);
             log.info("Alert Resolved: Rule={}, Server={}", rule.name(), serverId);
         }
     }

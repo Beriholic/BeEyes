@@ -1,5 +1,7 @@
 package cv.beriholic.beeyes.helper;
 
+import cv.beriholic.beeyes.consts.AlertCondition;
+import cv.beriholic.beeyes.consts.AlertMetricType;
 import cv.beriholic.beeyes.consts.HistoryTimeUnit;
 import cv.beriholic.beeyes.consts.UserRoleCode;
 import cv.beriholic.beeyes.models.entity.dto.*;
@@ -7,6 +9,57 @@ import org.apache.commons.lang3.StringUtils;
 
 public class ValidateHelper {
     private static final int QUERY_MACHINE_MAX_PAGE_SIZE = 20;
+
+    public static void validateCreateAlertRequest(CreateAlertRequest request) {
+        if (StringUtils.isEmpty(request.getName())) {
+            throw new IllegalArgumentException("Alert rule name cannot be empty");
+        }
+        if (AlertMetricType.of(request.getMetricType()) == null) {
+            throw new IllegalArgumentException("Invalid metric type");
+        }
+        if (AlertCondition.of(request.getCondition()) == null) {
+            throw new IllegalArgumentException("Invalid condition");
+        }
+        if (request.getThreshold() < 0 || request.getThreshold() > 100) {
+            throw new IllegalArgumentException("Threshold must be between 0 and 100");
+        }
+        if (request.getDurationSeconds() != null && request.getDurationSeconds() < 0) {
+            throw new IllegalArgumentException("Duration seconds cannot be negative");
+        }
+        if (request.getSilenceSeconds() != null && request.getSilenceSeconds() < 0) {
+            throw new IllegalArgumentException("Silence seconds cannot be negative");
+        }
+    }
+
+    public static void validateUpdateAlertRequest(UpdateAlertRequest request) {
+        if (StringUtils.isEmpty(request.getId())) {
+            throw new IllegalArgumentException("Alert rule ID cannot be empty");
+        }
+        if (StringUtils.isEmpty(request.getName())) {
+            throw new IllegalArgumentException("Alert rule name cannot be empty");
+        }
+        if (AlertMetricType.of(request.getMetricType()) == null) {
+            throw new IllegalArgumentException("Invalid metric type");
+        }
+        if (AlertCondition.of(request.getCondition()) == null) {
+            throw new IllegalArgumentException("Invalid condition");
+        }
+        if (request.getThreshold() < 0 || request.getThreshold() > 100) {
+            throw new IllegalArgumentException("Threshold must be between 0 and 100");
+        }
+        if (request.getDurationSeconds() != null && request.getDurationSeconds() < 0) {
+            throw new IllegalArgumentException("Duration seconds cannot be negative");
+        }
+        if (request.getSilenceSeconds() != null && request.getSilenceSeconds() < 0) {
+            throw new IllegalArgumentException("Silence seconds cannot be negative");
+        }
+    }
+
+    public static void validateDeleteAlertRequest(DeleteAlertRequest request) {
+        if (StringUtils.isEmpty(request.getId())) {
+            throw new IllegalArgumentException("Alert rule ID cannot be empty");
+        }
+    }
 
     public static void validateQueryPageParam(int pageIndex, int pageSize) {
         if (pageIndex < 0 || pageSize < 0) {

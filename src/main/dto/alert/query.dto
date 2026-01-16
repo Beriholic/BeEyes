@@ -1,0 +1,8 @@
+export cv.beriholic.beeyes.models.entity.AlertLogDO
+
+input QueryAlertLogRequest {
+    serverId: String?
+    status: Int?
+    pageIndex: Int
+    pageSize: Int
+}

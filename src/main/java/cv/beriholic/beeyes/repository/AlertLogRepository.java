@@ -30,4 +30,21 @@ public class AlertLogRepository extends BaseRepository<AlertLogDO, AlertLogDOTab
                 .select(table)
                 .execute();
     }
+
+    public long countByStatus(int status) {
+        return createQuery()
+                .where(table.status().eq(status))
+                .select(table)
+                .execute()
+                .size();
+    }
+
+    public List<AlertLogDO> findAlterLogByPage(int pageIndex, int pageSize) {
+        return createQuery()
+                .where(table.serverId().isNotNull())
+                .where(table.status().isNotNull())
+                .select(table)
+                .fetchPage(pageIndex, pageSize)
+                .getRows();
+    }
 }

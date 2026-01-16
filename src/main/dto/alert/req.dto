@@ -2,24 +2,24 @@ export cv.beriholic.beeyes.models.entity.AlertRuleDO
 
 input CreateAlertRequest {
     name: String
-    serverId: String
+    serverId: String?
     metricType: Int
     condition: Int
     threshold: Double
-    durationSeconds: Int
-    silenceSeconds: Int
+    durationSeconds: Int?
+    silenceSeconds: Int?
     enabled: Boolean
 }
 
 input UpdateAlertRequest {
     id: String
     name: String
-    serverId: String
+    serverId: Long?
     metricType: Int
     condition: Int
     threshold: Double
-    durationSeconds: Int
-    silenceSeconds: Int
+    durationSeconds: Int?
+    silenceSeconds: Int?
     enabled: Boolean
 }
 
