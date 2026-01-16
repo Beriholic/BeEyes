@@ -22,6 +22,7 @@ import cv.beriholic.beeyes.repository.UserRoleRepository;
 import cv.beriholic.beeyes.service.PermissionService;
 import cv.beriholic.beeyes.service.ProfileService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.babyfish.jimmer.Page;
 import org.babyfish.jimmer.sql.ast.mutation.SaveMode;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PermissionServiceImpl implements PermissionService {
     private final PermissionsRepository permissionsRepository;
     private final UserRoleRepository userRoleRepository;
@@ -62,9 +64,12 @@ public class PermissionServiceImpl implements PermissionService {
     public boolean checkUserPermission(Long userId, PermissionCode permissionCodes) {
         UserRoleCode userRole = getUserRole(userId);
         if (userRole.equals(UserRoleCode.SUPER_ADMIN)) {
+            log.info("User {} is SUPER_ADMIN, bypassing permission check", userId);
             return true;
         }
-        return checkUserPermission(userId, Collections.singletonList(permissionCodes));
+        boolean result = checkUserPermission(userId, Collections.singletonList(permissionCodes));
+        log.info("Permission check: userId={}, permission={}, hasPermission={}", userId, permissionCodes, result);
+        return result;
     }
 
     @Override

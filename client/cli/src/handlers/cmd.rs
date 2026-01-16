@@ -12,6 +12,7 @@ pub async fn handle_commands() -> Result<()> {
     match &cli.command {
         Commands::Run => {
             config::verify_config()?;
+            models::init_system();
             report::report_to_server().await
         }
 

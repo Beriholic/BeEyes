@@ -79,8 +79,8 @@ public class MetricServiceImpl implements MetricService {
         runtimeInfoCache.put(machineId, runtimeInfo);
         MachineRuntimeInfoDTO runtimeInfoDTO = MachineRuntimeInfoDTO.from(machineId, runtimeInfo);
 
-        ServerStatusDTO oldStatus = machineStatusService.getServerStatus(machineId);
-        machineStatusService.setServerStatus(machineId, oldStatus, ServerStatus.ONLINE);
+        // 使用2参数版本强制更新状态，确保数据库总是被更新
+        machineStatusService.setServerStatus(machineId, ServerStatus.ONLINE);
 
         metricRecordProducerService.pushMachineMetricData(runtimeInfoDTO);
     }

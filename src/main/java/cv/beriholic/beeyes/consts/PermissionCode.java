@@ -6,11 +6,12 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum PermissionCode {
-    CRATE_SERVER((short) 0, "创建机器"),
+    CREATE_SERVER((short) 0, "创建机器"),
     UPDATE_SERVER((short) 1, "更新机器"),
     DELETE_SERVER((short) 2, "删除机器"),
     SSH_CONNECT((short) 3, "SSH连接"),
     ALERT_MANAGE((short) 4, "告警管理"),
+    SFTP_CONNECT((short) 5, "SFTP文件传输"),
     ;
     private final short code;
     private final String desc;

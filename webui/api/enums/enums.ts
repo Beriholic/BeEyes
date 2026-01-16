@@ -13,6 +13,7 @@ export const Permission = {
   DELETE_SERVER: { key: "删除机器", code: 2 },
   SSH_CONNECT: { key: "SSH连接", code: 3 },
   ALERT_MANAGE: { key: "告警管理", code: 4 },
+  SFTP_CONNECT: { key: "SFTP文件传输", code: 5 },
 } as const;
 
 export type PermissionKey = keyof typeof Permission;

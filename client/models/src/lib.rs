@@ -16,5 +16,5 @@ pub use errors::{BeEyesError, ReportError, BeEyesConfigValidationError};
 pub use api::RestResp;
 pub use system::{
     SystemInfo, CPUInfo, MemoryInfo, DiskInfo, NetworkInfo, NetworkInterfaceInfo,
-    MachineInfo, RuntimeInfo
+    MachineInfo, RuntimeInfo, init_system
 };

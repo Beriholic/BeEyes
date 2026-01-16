@@ -9,11 +9,13 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Jdenticon from "react-jdenticon";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Permission } from "@/api/enums/enums";
 
 const NAV_ITEMS = [
   { label: "监控", key: "monitor", href: "/" },
   { label: "机器", key: "machines", href: "/machines" },
   { label: "终端", key: "terminal", href: "/terminal" },
+  { label: "文件", key: "file", href: "/file" },
   { label: "告警", key: "alarm", href: "/alarm" },
 ];
 
@@ -25,7 +27,7 @@ const getActiveKey = (pathname: string | null): string => {
     { label: "用户管理", key: "users", href: "/users" },
     { label: "权限管理", key: "permissions", href: "/permissions" },
   ].find((item) =>
-    item.href === "/" ? pathname === "/" : pathname.startsWith(item.href)
+    item.href === "/" ? pathname === "/" : pathname.startsWith(item.href),
   );
   return matched?.key ?? "monitor";
 };
@@ -46,7 +48,7 @@ export function Navbar() {
     return ["/login"].some((prefix) => pathname.startsWith(prefix));
   }, [pathname]);
 
-  const [permissions, setPermissions] = useState<string[]>([]);
+  const [permissions, setPermissions] = useState<number[]>([]);
 
   useEffect(() => {
     if (isHidden) return;
@@ -138,7 +140,13 @@ export function Navbar() {
             {NAV_ITEMS.map((item) => {
               if (
                 item.key === "alarm" &&
-                !permissions.includes("ALERT_MANAGE")
+                !permissions.includes(Permission.ALERT_MANAGE.code)
+              ) {
+                return null;
+              }
+              if (
+                item.key === "file" &&
+                !permissions.includes(Permission.SFTP_CONNECT.code)
               ) {
                 return null;
               }
@@ -162,7 +170,7 @@ export function Navbar() {
         <div className="flex items-center gap-4">
           <div className="text-right text-xs text-slate-400">
             <p className="font-semibold text-sm text-white">
-              {loading ? "加载中..." : user?.username ?? "-"}
+              {loading ? "加载中..." : (user?.username ?? "-")}
             </p>
             <p>{user?.fullName ?? ""}</p>
           </div>

@@ -2,6 +2,8 @@ package cv.beriholic.beeyes.repository;
 
 import cv.beriholic.beeyes.models.entity.AlertLogDO;
 import cv.beriholic.beeyes.models.entity.AlertLogDOTable;
+import cv.beriholic.beeyes.models.entity.dto.QueryAlertLogRequest;
+import org.babyfish.jimmer.Page;
 import org.babyfish.jimmer.sql.JSqlClient;
 import org.springframework.stereotype.Repository;
 
@@ -34,17 +36,21 @@ public class AlertLogRepository extends BaseRepository<AlertLogDO, AlertLogDOTab
     public long countByStatus(int status) {
         return createQuery()
                 .where(table.status().eq(status))
-                .select(table)
-                .execute()
-                .size();
+                .select(table.count())
+                .execute().getFirst();
     }
 
-    public List<AlertLogDO> findAlterLogByPage(int pageIndex, int pageSize) {
-        return createQuery()
-                .where(table.serverId().isNotNull())
-                .where(table.status().isNotNull())
+    public Page<AlertLogDO> findAlterLogByPage(QueryAlertLogRequest request) {
+        var query = createQuery();
+        if (request.getServerId() != null && !request.getServerId().isBlank()) {
+            query.where(table.serverId().eq(Long.valueOf(request.getServerId())));
+        }
+        if (request.getStatus() != null) {
+            query.where(table.status().eq(request.getStatus()));
+        }
+        return query
+                .orderBy(table.id().desc())
                 .select(table)
-                .fetchPage(pageIndex, pageSize)
-                .getRows();
+                .fetchPage(request.getPageIndex(), request.getPageSize());
     }
 }

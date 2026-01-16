@@ -37,9 +37,12 @@ const summarizeDisks = (disks: MachineView["disks"]) => {
     };
   }
 
+  disks = disks.filter(
+    (it) => it.fileSystem !== "overlay" && it.fileSystem !== "virtiofs",
+  );
   const totalBytes = disks.reduce(
     (sum, disk) => sum + Number(disk.totalBytes ?? 0),
-    0
+    0,
   );
   const mainDisk = disks[0];
   const hasMore = disks.length > 1;
@@ -107,7 +110,7 @@ export default function HomePage() {
 
     const machineRequest = MachineControllerService.getMachineList(
       pageIndex - 1,
-      pageSize
+      pageSize,
     );
 
     machineRequest
@@ -317,14 +320,14 @@ export default function HomePage() {
                   machines.map((machine) => {
                     const diskInfo = summarizeDisks(machine.disks);
                     const networkInfo = summarizeNetwork(
-                      machine.networkInterfaces
+                      machine.networkInterfaces,
                     );
                     const hostnameLabel =
                       machine.hostname ?? `ID-${machine.id ?? "未知"}`;
 
                     // Find runtime data for this machine
                     const machineRuntimeData = runtimeData.find(
-                      (item) => item.id === String(machine.id)
+                      (item) => item.id === String(machine.id),
                     );
 
                     // Use runtime status if available, otherwise fallback to machine status
@@ -344,7 +347,7 @@ export default function HomePage() {
                                   {machine.hostname ?? "-"}
                                 </Link>
                               ) : (
-                                machine.hostname ?? "-"
+                                (machine.hostname ?? "-")
                               )}
                             </div>
                             <div className="mt-0.5 text-xs text-slate-400">
@@ -367,7 +370,9 @@ export default function HomePage() {
                           </td>
                           <td className="px-6 py-4">
                             <div className="text-sm text-slate-200">
-                              {machine.hardware?.cpuName ?? "-"}
+                              {(machine.hardware?.cpuName?.length ?? 0 > 0)
+                                ? machine.hardware?.cpuName
+                                : "vCPU"}
                             </div>
                             <div className="text-xs text-slate-400">
                               {machine.hardware?.cpuArch ?? "未知架构"} ·{" "}
@@ -389,7 +394,12 @@ export default function HomePage() {
                                 onClick={() =>
                                   setDiskModal({
                                     hostname: hostnameLabel,
-                                    disks: machine.disks ?? [],
+                                    disks:
+                                      machine.disks?.filter(
+                                        (it) =>
+                                          it.fileSystem !== "virtiofs" &&
+                                          it.fileSystem !== "overlay",
+                                      ) ?? [],
                                   })
                                 }
                                 className="group flex w-full flex-col items-start rounded-2xl border border-transparent px-3 py-2 text-left transition hover:border-indigo-400/60 hover:bg-indigo-500/5"

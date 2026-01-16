@@ -4,5 +4,5 @@ import cv.beriholic.beeyes.models.entity.AlertLogDO;
 import cv.beriholic.beeyes.models.entity.AlertRuleDO;
 
 public interface NotificationChannel {
-    void notify(AlertLogDO alertLog, AlertRuleDO rule);
+    NotificationResult notify(AlertLogDO alertLog, AlertRuleDO rule);
 }

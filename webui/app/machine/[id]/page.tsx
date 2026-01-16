@@ -14,25 +14,26 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-type TimeUnit = 0 | 1 | 2 | 3 | 4;
+type TimeUnit = 0 | 1 | 2 | 3 | 4 | 5;
 
 const PRESETS: { label: string; time: number; unit: TimeUnit }[] = [
-  { label: "5分钟", time: 5, unit: 0 },
-  { label: "15分钟", time: 15, unit: 0 },
-  { label: "30分钟", time: 30, unit: 0 },
-  { label: "1小时", time: 1, unit: 1 },
-  { label: "3小时", time: 3, unit: 1 },
-  { label: "6小时", time: 6, unit: 1 },
-  { label: "12小时", time: 12, unit: 1 },
-  { label: "1天", time: 1, unit: 2 },
-  { label: "3天", time: 3, unit: 2 },
-  { label: "1周", time: 1, unit: 3 },
-  { label: "2周", time: 2, unit: 3 },
-  { label: "3周", time: 3, unit: 3 },
-  { label: "1月", time: 1, unit: 4 },
-  { label: "3月", time: 3, unit: 4 },
-  { label: "6月", time: 6, unit: 4 },
-  { label: "1年", time: 12, unit: 4 },
+  { label: "5秒", time: 5, unit: 0 },
+  { label: "5分钟", time: 5, unit: 1 },
+  { label: "15分钟", time: 15, unit: 1 },
+  { label: "30分钟", time: 30, unit: 1 },
+  { label: "1小时", time: 1, unit: 2 },
+  { label: "3小时", time: 3, unit: 2 },
+  { label: "6小时", time: 6, unit: 2 },
+  { label: "12小时", time: 12, unit: 2 },
+  { label: "1天", time: 1, unit: 3 },
+  { label: "3天", time: 3, unit: 3 },
+  { label: "1周", time: 1, unit: 4 },
+  { label: "2周", time: 2, unit: 4 },
+  { label: "3周", time: 3, unit: 4 },
+  { label: "1月", time: 1, unit: 5 },
+  { label: "3月", time: 3, unit: 5 },
+  { label: "6月", time: 6, unit: 5 },
+  { label: "1年", time: 12, unit: 5 },
 ];
 
 //
@@ -51,11 +52,24 @@ export default function MachineDetailPage() {
 
   const [time, setTime] = useState<number>(1);
   const [timeUnit, setTimeUnit] = useState<TimeUnit>(1);
+  const [refreshInterval, setRefreshInterval] = useState<number>(0); // 0 = no auto-refresh
+
+  const REFRESH_OPTIONS = [
+    { label: "关闭", value: 0 },
+    { label: "开启", value: 5 },
+  ];
 
   const setPreset = (t: number, u: TimeUnit) => {
     setTime(t);
     setTimeUnit(u);
+    // Reset auto-refresh when switching away from 5s range
+    if (u !== 0 || t !== 5) {
+      setRefreshInterval(0);
+    }
   };
+
+  // Whether auto-refresh is available (only for 5s range)
+  const canAutoRefresh = timeUnit === 0 && time === 5;
 
   const reloadHistory = () => {
     if (!serverId) return;
@@ -64,7 +78,7 @@ export default function MachineDetailPage() {
     const req = MetricControllerService.queryMachineHistoryRuntimeInfo(
       serverId,
       time,
-      timeUnit
+      timeUnit,
     );
     req
       .then((res) => {
@@ -92,6 +106,7 @@ export default function MachineDetailPage() {
     req
       .then((res) => {
         if (disposed) return;
+
         setDetail(res?.data ?? null);
       })
       .catch((err) => {
@@ -122,7 +137,7 @@ export default function MachineDetailPage() {
     const req = MetricControllerService.queryMachineHistoryRuntimeInfo(
       serverId,
       time,
-      timeUnit
+      timeUnit,
     );
     req
       .then((res) => {
@@ -145,6 +160,33 @@ export default function MachineDetailPage() {
       req.cancel();
     };
   }, [serverId, time, timeUnit]);
+
+  // Auto-refresh effect
+  useEffect(() => {
+    if (!serverId || refreshInterval <= 0) return;
+
+    const timer = setInterval(() => {
+      setLoadingHistory(true);
+      setErrorHistory(null);
+      MetricControllerService.queryMachineHistoryRuntimeInfo(
+        serverId,
+        time,
+        timeUnit,
+      )
+        .then((res) => {
+          setHistory(res?.data ?? []);
+        })
+        .catch((err) => {
+          const msg = err instanceof Error ? err.message : "获取历史数据失败";
+          setErrorHistory(msg);
+        })
+        .finally(() => {
+          setLoadingHistory(false);
+        });
+    }, refreshInterval * 1000);
+
+    return () => clearInterval(timer);
+  }, [serverId, time, timeUnit, refreshInterval]);
 
   const hostname = detail?.hostname ?? `ID-${detail?.id ?? "未知"}`;
 
@@ -177,7 +219,12 @@ export default function MachineDetailPage() {
             <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
               <p>CPU 架构：{detail?.hardware?.cpuArch ?? "-"}</p>
               <p>CPU 核心：{detail?.hardware?.cpuCores ?? "-"}</p>
-              <p>CPU 型号：{detail?.hardware?.cpuName || "-"}</p>
+              <p>
+                CPU 型号：
+                {(detail?.hardware?.cpuName?.length ?? 0 > 0)
+                  ? detail?.hardware?.cpuName
+                  : "vCPU"}
+              </p>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
               <p>
@@ -204,12 +251,12 @@ export default function MachineDetailPage() {
                 </label>
                 {(() => {
                   const selectedIndex = PRESETS.findIndex(
-                    (p) => p.time === time && p.unit === timeUnit
+                    (p) => p.time === time && p.unit === timeUnit,
                   );
                   return (
                     <select
                       id="time-range"
-                      value={selectedIndex >= 0 ? String(selectedIndex) : "3"}
+                      value={selectedIndex >= 0 ? String(selectedIndex) : "0"}
                       onChange={(e) => {
                         const idx = Number(e.target.value);
                         const preset = PRESETS[idx] ?? PRESETS[3];
@@ -229,6 +276,34 @@ export default function MachineDetailPage() {
                     </select>
                   );
                 })()}
+                {canAutoRefresh && (
+                  <>
+                    <label
+                      htmlFor="refresh-interval"
+                      className="text-sm text-slate-400"
+                    >
+                      自动刷新
+                    </label>
+                    <select
+                      id="refresh-interval"
+                      value={refreshInterval}
+                      onChange={(e) =>
+                        setRefreshInterval(Number(e.target.value))
+                      }
+                      className="rounded-2xl border border-white/10 bg-slate-900 px-4 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none"
+                    >
+                      {REFRESH_OPTIONS.map((opt) => (
+                        <option
+                          key={opt.value}
+                          value={opt.value}
+                          className="text-black"
+                        >
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                  </>
+                )}
               </div>
               <Button
                 type="button"
@@ -291,20 +366,23 @@ export default function MachineDetailPage() {
               <p className="mb-3 text-lg font-semibold text-white">磁盘</p>
               {detail?.disks && detail.disks.length > 0 ? (
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {detail.disks.map((disk, idx) => (
-                    <div
-                      key={`${disk.diskName}-${idx}`}
-                      className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200"
-                    >
-                      <p className="font-semibold text-white">
-                        {disk.diskName}
-                      </p>
-                      <p className="text-slate-400">
-                        {disk.fileSystem} · {disk.diskKind}
-                      </p>
-                      <p className="mt-1">容量：{disk.totalBytes}</p>
-                    </div>
-                  ))}
+                  {detail.disks
+                    .filter((it) => it.fileSystem !== "virtiofs")
+                    .filter((it) => it.fileSystem !== "overlay")
+                    .map((disk, idx) => (
+                      <div
+                        key={`${disk.diskName}-${idx}`}
+                        className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200"
+                      >
+                        <p className="font-semibold text-white">
+                          {disk.diskName}
+                        </p>
+                        <p className="text-slate-400">
+                          {disk.fileSystem} · {disk.diskKind}
+                        </p>
+                        <p className="mt-1">容量：{disk.totalBytes}</p>
+                      </div>
+                    ))}
                 </div>
               ) : (
                 <p className="text-sm text-slate-500">暂无磁盘信息</p>

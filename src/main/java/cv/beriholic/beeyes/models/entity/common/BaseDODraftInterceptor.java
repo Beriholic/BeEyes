@@ -1,5 +1,6 @@
 package cv.beriholic.beeyes.models.entity.common;
 
+import cn.dev33.satoken.exception.NotWebContextException;
 import cn.dev33.satoken.stp.StpUtil;
 import org.babyfish.jimmer.ImmutableObjects;
 import org.babyfish.jimmer.sql.DraftInterceptor;
@@ -21,8 +22,13 @@ public class BaseDODraftInterceptor implements DraftInterceptor<BaseDO, BaseDODr
                 draft.setCreatedAt(LocalDateTime.now());
             }
             if (!ImmutableObjects.isLoaded(draft, BaseDOProps.CREATED_BY)) {
-                long loginIdAsLong = StpUtil.getLoginIdAsLong();
-                draft.setCreatedBy(loginIdAsLong);
+                try {
+                    long loginIdAsLong = StpUtil.getLoginIdAsLong();
+                    draft.setCreatedBy(loginIdAsLong);
+                } catch (NotWebContextException e) {
+                    // Scheduled tasks or async contexts don't have a web request
+                    // Leave createdBy as null
+                }
             }
         }
     }

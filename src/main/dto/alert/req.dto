@@ -14,7 +14,7 @@ input CreateAlertRequest {
 input UpdateAlertRequest {
     id: String
     name: String
-    serverId: Long?
+    serverId: String?
     metricType: Int
     condition: Int
     threshold: Double

@@ -5,6 +5,6 @@
 export type RestBean_List_PermissionCode = {
     code?: number;
     msg?: string;
-    data?: Array<'CRATE_SERVER' | 'UPDATE_SERVER' | 'DELETE_SERVER' | 'SSH_CONNECT' | 'ALERT_MANAGE'>;
+    data?: Array<'CREATE_SERVER' | 'UPDATE_SERVER' | 'DELETE_SERVER' | 'SSH_CONNECT' | 'ALERT_MANAGE' | 'FILE_READ' | 'FILE_WRITE' | 'FILE_DELETE' | 'FILE_CREATE_DIR'>;
 };
 

@@ -51,7 +51,7 @@ public class MachineController {
             return RestBean.failed(ErrorCode.PARAM_INVALID);
         }
         Long userId = StpUtil.getLoginIdAsLong();
-        permissionValidateHelper.checkPermission(userId, PermissionCode.CRATE_SERVER);
+        permissionValidateHelper.checkPermission(userId, PermissionCode.CREATE_SERVER);
         machineService.createMachine(userId, request);
         return RestBean.success();
     }

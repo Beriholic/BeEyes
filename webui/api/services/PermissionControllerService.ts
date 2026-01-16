@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { QueryPermissionUserListRequest } from '../models/QueryPermissionUserListRequest';
 import type { RestBean_List_PermissionCode } from '../models/RestBean_List_PermissionCode';
+import type { RestBean_List_short } from '../models/RestBean_List_short';
 import type { RestBean_PageDTO_List_ManageUserView } from '../models/RestBean_PageDTO_List_ManageUserView';
 import type { RestBean_UserRoleCode } from '../models/RestBean_UserRoleCode';
 import type { RestBean_Void } from '../models/RestBean_Void';
@@ -12,10 +13,10 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 export class PermissionControllerService {
     /**
-     * @returns RestBean_List_PermissionCode OK
+     * @returns RestBean_List_short OK
      * @throws ApiError
      */
-    public static getCurrentUserPermissions(): CancelablePromise<RestBean_List_PermissionCode> {
+    public static getCurrentUserPermissions(): CancelablePromise<RestBean_List_short> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/permission/current-permission',

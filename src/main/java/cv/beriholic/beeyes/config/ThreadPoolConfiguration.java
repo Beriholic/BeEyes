@@ -103,4 +103,34 @@ public class ThreadPoolConfiguration {
         executor.initialize();
         return executor;
     }
+
+    /**
+     * 告警通知线程池 - 专用于异步发送告警通知
+     * 避免通知延迟或失败阻塞告警检查流程
+     */
+    @Bean("alertNotificationExecutor")
+    public ThreadPoolTaskExecutor alertNotificationExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+
+        // 通知任务通常轻量，核心线程数等于CPU核数
+        int corePoolSize = Runtime.getRuntime().availableProcessors();
+        executor.setCorePoolSize(corePoolSize);
+        executor.setMaxPoolSize(corePoolSize * 2);
+
+        // 告警通知队列容量相对较大，但也不能无限
+        executor.setQueueCapacity(500);
+
+        // 通知任务空闲存活时间
+        executor.setKeepAliveSeconds(60);
+
+        executor.setThreadNamePrefix("alert-notify-");
+
+        // 队列满时使用调用者运行策略，避免通知丢失
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(30);
+        executor.initialize();
+        return executor;
+    }
 }

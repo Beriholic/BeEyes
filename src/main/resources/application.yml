@@ -2,6 +2,12 @@ spring:
   application:
     name: BeEyes
 
+  # File Upload Configuration
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
   # PostgreSQL Database Configuration
   datasource:
     url: ${DB_URL}
@@ -110,3 +116,11 @@ influx-db:
 
 encrypt:
   key: edw56sw57wgh8ui9 # length 16
+
+
+dingtalk:
+  robot:
+    enabled: true
+    webhook: ${DING_TALK_WEBHOOK:}
+    secret: ${DING_TALK_SECRET:}
+

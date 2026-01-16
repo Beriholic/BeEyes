@@ -7,7 +7,7 @@ import type { UpdateMachineRequest } from "@/api/models/UpdateMachineRequest";
 import { MachineControllerService } from "@/api/services/MachineControllerService";
 import { PermissionControllerService } from "@/api/services/PermissionControllerService";
 import { Permission } from "@/api/enums/enums";
-import { useCallback, useEffect, useMemo, useState, FormEvent } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import CountrySelect from "react-select-country-list";
 import ReactCountryFlag from "react-country-flag";
 
@@ -36,7 +36,7 @@ export default function MachinesPage() {
     loading: boolean;
   }>({ show: false, machine: null, loading: false });
   const [editMachine, setEditMachine] = useState<MachineManageView | null>(
-    null
+    null,
   ); // 添加编辑的机器状态
   const [formData, setFormData] = useState<CreateMachineRequest>({
     description: "",
@@ -59,7 +59,7 @@ export default function MachinesPage() {
     value: string;
     label: string;
   } | null>(null);
-  const [permissions, setPermissions] = useState<string[]>([]);
+  const [permissions, setPermissions] = useState<number[]>([]);
   const countryOptions = useMemo(() => CountrySelect().getData(), []);
 
   useEffect(() => {
@@ -76,11 +76,11 @@ export default function MachinesPage() {
   const getCountryName = useCallback(
     (countryCode: string) => {
       const country = countryOptions.find(
-        (c: { value: string; label: string }) => c.value === countryCode
+        (c: { value: string; label: string }) => c.value === countryCode,
       );
       return country ? country.label : countryCode;
     },
-    [countryOptions]
+    [countryOptions],
   );
 
   const loadMachines = useCallback(() => {
@@ -94,7 +94,7 @@ export default function MachinesPage() {
     const request = MachineControllerService.getMachineManageList(
       pageIndex - 1,
       pageSize,
-      hostname || undefined
+      hostname || undefined,
     );
 
     request
@@ -187,7 +187,7 @@ export default function MachinesPage() {
     // 设置选中的国家
     if (machine.region) {
       const country = countryOptions.find(
-        (c: { value: string; label: string }) => c.value === machine.region
+        (c: { value: string; label: string }) => c.value === machine.region,
       );
       setSelectedEditCountry(country || null);
     } else {
@@ -339,7 +339,7 @@ export default function MachinesPage() {
                   />
                 </svg>
               </div>
-              {permissions.includes(Permission.CREATE_SERVER.key) && (
+              {permissions.includes(Permission.CREATE_SERVER.code) && (
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(true)}
@@ -483,7 +483,7 @@ export default function MachinesPage() {
                                     if (machine.apiKey) {
                                       try {
                                         await navigator.clipboard.writeText(
-                                          machine.apiKey
+                                          machine.apiKey,
                                         );
                                         setCopySuccess(true);
                                         setTimeout(() => {
@@ -508,7 +508,7 @@ export default function MachinesPage() {
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2">
                             {permissions.includes(
-                              Permission.UPDATE_SERVER.key
+                              Permission.UPDATE_SERVER.code,
                             ) && (
                               <button
                                 type="button"
@@ -520,7 +520,7 @@ export default function MachinesPage() {
                               </button>
                             )}
                             {permissions.includes(
-                              Permission.DELETE_SERVER.key
+                              Permission.DELETE_SERVER.code,
                             ) && (
                               <button
                                 type="button"
@@ -712,7 +712,7 @@ export default function MachinesPage() {
                     onChange={(e) => {
                       const country = countryOptions.find(
                         (c: { value: string; label: string }) =>
-                          c.value === e.target.value
+                          c.value === e.target.value,
                       );
                       setSelectedCountry(country || null);
                     }}
@@ -730,7 +730,7 @@ export default function MachinesPage() {
                         >
                           {country.label}
                         </option>
-                      )
+                      ),
                     )}
                   </select>
                   {selectedCountry && (
@@ -869,7 +869,7 @@ export default function MachinesPage() {
                     onChange={(e) => {
                       const country = countryOptions.find(
                         (c: { value: string; label: string }) =>
-                          c.value === e.target.value
+                          c.value === e.target.value,
                       );
                       setSelectedEditCountry(country || null);
                     }}
@@ -887,7 +887,7 @@ export default function MachinesPage() {
                         >
                           {country.label}
                         </option>
-                      )
+                      ),
                     )}
                   </select>
                   {selectedEditCountry && (

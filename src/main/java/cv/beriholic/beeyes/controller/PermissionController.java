@@ -51,10 +51,12 @@ public class PermissionController {
     }
 
     @GetMapping("/current-permission")
-    public RestBean<List<PermissionCode>> getCurrentUserPermissions() {
+    public RestBean<List<Short>> getCurrentUserPermissions() {
         Long userId = StpUtil.getLoginIdAsLong();
         List<PermissionCode> userPermission = permissionService.getUserPermission(userId);
-        return RestBean.success(userPermission);
+        return RestBean.success(
+                userPermission.stream().map(PermissionCode::getCode).toList()
+        );
     }
 
     @GetMapping("/current-role")

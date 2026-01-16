@@ -11,12 +11,12 @@
 export type UpdateAlertRequest = {
     id?: string;
     name?: string;
-    serverId?: string;
+    serverId?: string | null;
     metricType?: number;
     condition?: number;
     threshold?: number;
-    durationSeconds?: number;
-    silenceSeconds?: number;
+    durationSeconds?: number | null;
+    silenceSeconds?: number | null;
     enabled?: boolean;
 };
 

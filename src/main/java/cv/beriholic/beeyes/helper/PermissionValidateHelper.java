@@ -7,12 +7,14 @@ import cv.beriholic.beeyes.exception.BizRuntimeException;
 import cv.beriholic.beeyes.exception.ErrorCode;
 import cv.beriholic.beeyes.service.PermissionService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class PermissionValidateHelper {
     private final PermissionService permissionService;
 
@@ -34,6 +36,7 @@ public class PermissionValidateHelper {
 
     public void checkPermission(Long userId, PermissionCode permission) {
         boolean ok = permissionService.checkUserPermission(userId, permission);
+        log.info("Permission check: userId={}, permission={}, result={}", userId, permission, ok);
         if (!ok) {
             throw new BizRuntimeException(ErrorCode.FORBIDDEN);
         }

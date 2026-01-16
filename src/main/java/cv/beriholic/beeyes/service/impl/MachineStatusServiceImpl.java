@@ -33,6 +33,8 @@ public class MachineStatusServiceImpl implements MachineStatusService {
         if (!Objects.equals(oldStatus.getCurrentStatus(), newStatus.getKey())) {
             ServerStatusDTO statusDTO = ServerStatusDTO.of(newStatus);
             redisUtils.set(CacheKey.machineStatus(id), JsonUtil.toJSONString(statusDTO), 1, TimeUnit.HOURS);
+            // 同步更新数据库，确保 AlertJob 能立即读到最新状态
+            serversRepository.updateStatus(id, newStatus);
             ServerStatusUpdatedDTO updatedStatus = new ServerStatusUpdatedDTO(id, newStatus.getKey());
             serverStatusProducerService.pushUpdateServerStatus(updatedStatus);
         }

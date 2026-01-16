@@ -97,7 +97,7 @@ public class ClientServiceImpl implements ClientService {
         // 清理旧数据
         cleanOldMachineReportedData(machineId, serversDO, saveServerInput);
         // 更新
-        serversRepository.save(saveServerInput, SaveMode.UPSERT);
+        serversRepository.save(saveServerInput, SaveMode.UPDATE_ONLY);
     }
 
     private void cleanOldMachineReportedData(Long machineId, ServersDO serversDO, SaveServerInput saveServerInput) {

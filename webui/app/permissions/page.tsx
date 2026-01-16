@@ -100,7 +100,7 @@ export default function PermissionsPage() {
       .then((response) => {
         // Map the string literals to our enum keys
         const mapped = (response.data || []).map((p) => {
-          if (p === "CRATE_SERVER") return "CREATE_SERVER";
+          if (p === "CREATE_SERVER") return "CREATE_SERVER";
           return p;
         }) as PermissionKey[];
         setAvailablePermissions(mapped);
@@ -144,7 +144,7 @@ export default function PermissionsPage() {
 
   const totalPages = useMemo(
     () => Math.max(Math.ceil(total / pageSize), 1),
-    [total, pageSize]
+    [total, pageSize],
   );
   const canPrev = pageIndex > 1;
   const canNext = pageIndex < totalPages;
@@ -175,7 +175,7 @@ export default function PermissionsPage() {
 
     try {
       const response = await PermissionControllerService.getUserPermissions(
-        user.id.toString()
+        user.id.toString(),
       );
       const userPerms = response.data || [];
 
@@ -183,7 +183,7 @@ export default function PermissionsPage() {
       const codes = userPerms
         .map((p) => {
           const str = String(p);
-          if (str === "CRATE_SERVER" || str === "CREATE_SERVER")
+          if (str === "CREATE_SERVER")
             return Permission.CREATE_SERVER.code as number;
           if (str === "UPDATE_SERVER")
             return Permission.UPDATE_SERVER.code as number;
@@ -193,6 +193,8 @@ export default function PermissionsPage() {
             return Permission.SSH_CONNECT.code as number;
           if (str === "ALERT_MANAGE")
             return Permission.ALERT_MANAGE.code as number;
+          if (str === "SFTP_CONNECT")
+            return Permission.SFTP_CONNECT.code as number;
           return null;
         })
         .filter((c): c is number => typeof c === "number");
@@ -207,7 +209,7 @@ export default function PermissionsPage() {
 
   const togglePermission = (code: number) => {
     setSelectedPermissions((prev) =>
-      prev.includes(code) ? prev.filter((p) => p !== code) : [...prev, code]
+      prev.includes(code) ? prev.filter((p) => p !== code) : [...prev, code],
     );
   };
 
@@ -219,7 +221,7 @@ export default function PermissionsPage() {
     try {
       await PermissionControllerService.setPermission(
         selectedUser.id.toString(),
-        selectedPermissions
+        selectedPermissions,
       );
       setShowPermissionModal(false);
       // Success feedback could be helpful
@@ -330,7 +332,7 @@ export default function PermissionsPage() {
                     value={inputRole ?? ""}
                     onChange={(e) =>
                       setInputRole(
-                        e.target.value ? Number(e.target.value) : null
+                        e.target.value ? Number(e.target.value) : null,
                       )
                     }
                     className="w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-2 text-sm text-white focus:border-indigo-500 focus:outline-none"

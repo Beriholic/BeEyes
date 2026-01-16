@@ -2,10 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { AlertRuleDTO } from './AlertRuleDTO';
-export type RestBean_List_AlertRuleDTO = {
+export type RestBean_List_short = {
     code?: number;
     msg?: string;
-    data?: Array<AlertRuleDTO>;
+    data?: Array<number>;
 };
 

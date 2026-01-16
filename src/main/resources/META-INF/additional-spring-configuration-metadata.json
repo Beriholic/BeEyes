@@ -24,6 +24,21 @@
       "name": "encrypt.key",
       "type": "java.lang.String",
       "description": "Description for encrypt.key."
+    },
+    {
+      "name": "dingtalk.robot.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable DingTalk notification channel."
+    },
+    {
+      "name": "dingtalk.robot.webhook",
+      "type": "java.lang.String",
+      "description": "DingTalk Robot webhook URL."
+    },
+    {
+      "name": "dingtalk.robot.secret",
+      "type": "java.lang.String",
+      "description": "DingTalk Robot signing secret."
     }
   ]
 }

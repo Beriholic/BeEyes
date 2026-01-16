@@ -5,6 +5,34 @@ use std::collections::HashSet;
 use std::thread;
 use std::time::Duration;
 use sysinfo::{Disks, Networks, System};
+use std::sync::Mutex;
+
+/// Global System instance for CPU monitoring
+/// Initialized once, CPU usage requires baseline + subsequent reads
+static SYSTEM: Mutex<Option<System>> = Mutex::new(None);
+
+/// Initialize the global System instance with CPU baseline
+/// Must be called before fetching CPU usage
+pub fn init_system() {
+    let mut system = System::new_all();
+    system.refresh_cpu_all();
+    // First refresh establishes baseline, sleep then refresh for real values
+    thread::sleep(Duration::from_millis(200));
+    system.refresh_cpu_all();
+    *SYSTEM.lock().unwrap() = Some(system);
+}
+
+/// Refresh and get CPU usage percentage
+/// Returns 0.0 if system not initialized
+fn get_cpu_usage() -> f32 {
+    let mut system = SYSTEM.lock().unwrap();
+    if let Some(ref mut sys) = *system {
+        sys.refresh_cpu_all();
+        sys.cpus().first().map_or(0.0, |cpu| cpu.cpu_usage())
+    } else {
+        0.0
+    }
+}
 
 /// System information including OS details
 #[derive(Serialize, Debug, Clone)]
@@ -38,15 +66,26 @@ pub struct CPUInfo {
 
 impl CPUInfo {
     pub fn fetch() -> Self {
-        let mut system = System::new_all();
-        system.refresh_cpu_all();
+        let mut system = SYSTEM.lock().unwrap();
+        let (name, core_count) = if let Some(ref mut sys) = *system {
+            (
+                sys.cpus().first().map_or("Unknown".to_owned(), |cpu| cpu.brand().to_owned()),
+                sys.cpus().len(),
+            )
+        } else {
+            // Fallback if not initialized
+            let temp_system = System::new_all();
+            (
+                temp_system.cpus().first().map_or("Unknown".to_owned(), |cpu| cpu.brand().to_owned()),
+                temp_system.cpus().len(),
+            )
+        };
+        drop(system); // Release lock before getting CPU usage
+
         Self {
-            name: system
-                .cpus()
-                .first()
-                .map_or("Unknown".to_owned(), |cpu| cpu.brand().to_owned()),
-            core_count: system.cpus().len(),
-            usage: system.cpus().first().map_or(0.0, |cpu| cpu.cpu_usage()),
+            name,
+            core_count,
+            usage: get_cpu_usage(),
         }
     }
 }

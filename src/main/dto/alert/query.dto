@@ -6,3 +6,10 @@ input QueryAlertLogRequest {
     pageIndex: Int
     pageSize: Int
 }
+
+input QueryAlertRuleRequest {
+    name: String?
+    serverId: String?
+    pageIndex: Int
+    pageSize: Int
+}
